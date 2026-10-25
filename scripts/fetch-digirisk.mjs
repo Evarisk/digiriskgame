@@ -86,12 +86,58 @@ export function buildDigiRiskHierarchy({ tree, risks, assessments, creationOptio
     });
   }
 
-  // Helper for DigiRisk scale (1..4)
+  // Helper for DigiRisk scale (1..4) : Gris, Orange, Rouge, Noir
   function getCotationScale(score) {
-    if (score >= 81) return { scale: 4, level: 'critical', label: 'Critique (Noir)', color: '#ef4444' };
-    if (score >= 51) return { scale: 3, level: 'high', label: 'Élevé (Rouge)', color: '#f97316' };
-    if (score >= 48) return { scale: 2, level: 'medium', label: 'Modéré (Orange)', color: '#eab308' };
-    return { scale: 1, level: 'low', label: 'Faible (Vert/Gris)', color: '#10b981' };
+    if (score >= 81) {
+      return {
+        scale: 4,
+        level: 'critical',
+        label: 'Critique (Noir)',
+        color: '#111827',
+        strokeColor: '#e2e8f0',
+        textColor: '#ffffff',
+        scoreTextColor: '#f8fafc',
+        bgBadge: '#09090b',
+        borderBadge: '#cbd5e1',
+      };
+    }
+    if (score >= 51) {
+      return {
+        scale: 3,
+        level: 'high',
+        label: 'Élevé (Rouge)',
+        color: '#ef4444',
+        strokeColor: '#ef4444',
+        textColor: '#ffffff',
+        scoreTextColor: '#ef4444',
+        bgBadge: 'rgba(239, 68, 68, 0.2)',
+        borderBadge: '#ef4444',
+      };
+    }
+    if (score >= 48) {
+      return {
+        scale: 2,
+        level: 'medium',
+        label: 'Modéré (Orange)',
+        color: '#f97316',
+        strokeColor: '#f97316',
+        textColor: '#ffffff',
+        scoreTextColor: '#f97316',
+        bgBadge: 'rgba(249, 115, 22, 0.2)',
+        borderBadge: '#f97316',
+      };
+    }
+    return {
+      scale: 1,
+      level: 'low',
+      label: 'Faible (Gris)',
+      color: '#94a3b8',
+      strokeColor: '#94a3b8',
+      textColor: '#0f172a',
+      scoreTextColor: '#cbd5e1',
+      bgBadge: 'rgba(148, 163, 184, 0.18)',
+      borderBadge: '#94a3b8',
+    };
   }
 
   // 4. Enrich Risks & group by fk_element

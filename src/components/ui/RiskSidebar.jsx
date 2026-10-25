@@ -84,7 +84,11 @@ export default function RiskSidebar({
           <div className="sidebar-title-left">
             <span
               className="sidebar-ref-badge"
-              style={{ backgroundColor: scaleObj?.color || '#3b82f6' }}
+              style={{
+                backgroundColor: scaleObj?.color || '#3b82f6',
+                color: scaleObj?.textColor || '#ffffff',
+                border: maxScore >= 81 ? '1px solid #cbd5e1' : 'none',
+              }}
             >
               {selectedElement.ref}
             </span>
@@ -108,14 +112,14 @@ export default function RiskSidebar({
         <div className="sidebar-kpi-grid">
           <div
             className="kpi-card"
-            style={{ borderColor: scaleObj?.color || '#334155' }}
+            style={{ borderColor: scaleObj?.borderBadge || scaleObj?.color || '#334155' }}
           >
             <span className="kpi-label">
               Cotation Max ({cotationMode === 'brute' ? 'Brute' : 'Résiduelle'})
             </span>
             <span
               className="kpi-value"
-              style={{ color: scaleObj?.color || '#f8fafc' }}
+              style={{ color: scaleObj?.scoreTextColor || scaleObj?.color || '#f8fafc' }}
             >
               {maxScore}/100
             </span>
@@ -274,7 +278,7 @@ function RiskDetailCard({ risk, cotationMode }) {
   return (
     <div
       className="risk-card"
-      style={{ borderLeftColor: activeScale.color }}
+      style={{ borderLeftColor: activeScale.borderBadge || activeScale.color }}
     >
       <div className="risk-card-header">
         <div className="risk-category-info">
@@ -306,9 +310,9 @@ function RiskDetailCard({ risk, cotationMode }) {
         <div
           className="risk-score-box"
           style={{
-            backgroundColor: activeScale.bgBadge,
-            borderColor: activeScale.color,
-            color: activeScale.color,
+            backgroundColor: activeScale.bgBadge || activeScale.color,
+            borderColor: activeScale.borderBadge || activeScale.color,
+            color: activeScale.scoreTextColor || activeScale.color,
           }}
         >
           <span className="score-num">{activeScore}</span>

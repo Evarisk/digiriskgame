@@ -25,6 +25,7 @@ export default function WorkUnitZone({
   const maxScore =
     cotationMode === 'brute' ? ut.stats.maxBrute : ut.stats.maxResiduelle;
   const riskColor = scaleObj.color;
+  const edgeColor = scaleObj.strokeColor || scaleObj.color;
   const isCritical = maxScore >= 81;
 
   useFrame(({ clock }) => {
@@ -73,7 +74,7 @@ export default function WorkUnitZone({
         <Edges
           scale={1.002}
           threshold={15}
-          color={isSelected ? '#ffffff' : riskColor}
+          color={isSelected ? '#ffffff' : edgeColor}
         />
       </mesh>
 
@@ -86,7 +87,7 @@ export default function WorkUnitZone({
         >
           <ringGeometry args={[Math.min(sizeW, sizeD) * 0.46, Math.min(sizeW, sizeD) * 0.52, 32]} />
           <meshBasicMaterial
-            color={isSelected ? '#38bdf8' : '#ef4444'}
+            color={isSelected ? '#38bdf8' : edgeColor}
             transparent
             opacity={0.85}
           />
@@ -110,7 +111,7 @@ export default function WorkUnitZone({
             emissiveIntensity={hovered || isSelected ? 0.45 : 0.22}
             roughness={0.35}
           />
-          <Edges scale={1.0} color={riskColor} />
+          <Edges scale={1.0} color={edgeColor} />
         </mesh>
       ) : (
         <group
@@ -124,19 +125,19 @@ export default function WorkUnitZone({
             <meshStandardMaterial
               color={riskColor}
               transparent
-              opacity={isSelected ? 0.18 : hovered ? 0.14 : 0.06}
+              opacity={isCritical ? 0.42 : isSelected ? 0.18 : hovered ? 0.14 : 0.08}
               depthWrite={false}
             />
             <Edges
               scale={1.0}
-              color={isSelected ? '#ffffff' : riskColor}
+              color={isSelected ? '#ffffff' : edgeColor}
             />
           </mesh>
 
           {/* Équipements 3D spécifiques au métier de l'UT */}
           <WorkstationProps
             archetype={ut.archetype}
-            riskColor={riskColor}
+            riskColor={edgeColor}
             isCritical={isCritical}
           />
         </group>
@@ -155,14 +156,24 @@ export default function WorkUnitZone({
             isCritical ? 'critical-pulse' : ''
           }`}
           style={{
-            borderColor: isSelected ? '#ffffff' : riskColor,
+            borderColor: isSelected ? '#ffffff' : edgeColor,
           }}
         >
           <div className="ut-badge-top">
-            <span className="ut-ref" style={{ background: riskColor }}>
+            <span
+              className="ut-ref"
+              style={{
+                background: riskColor,
+                color: scaleObj.textColor || '#ffffff',
+                border: isCritical ? '1px solid #cbd5e1' : 'none',
+              }}
+            >
               {ut.ref}
             </span>
-            <span className="ut-score" style={{ color: riskColor }}>
+            <span
+              className="ut-score"
+              style={{ color: scaleObj.scoreTextColor || edgeColor }}
+            >
               {maxScore}/100
             </span>
           </div>

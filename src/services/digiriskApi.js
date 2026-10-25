@@ -10,10 +10,13 @@ export function getCotationScale(score) {
       level: 'critical',
       label: 'Critique (81-100)',
       shortLabel: 'Critique',
-      color: '#ef4444',
-      emissive: '#dc2626',
-      bgBadge: 'rgba(239, 68, 68, 0.18)',
-      borderBadge: '#ef4444',
+      color: '#111827',
+      strokeColor: '#e2e8f0',
+      textColor: '#ffffff',
+      scoreTextColor: '#f8fafc',
+      emissive: '#09090b',
+      bgBadge: '#09090b',
+      borderBadge: '#cbd5e1',
     };
   }
   if (score >= 51) {
@@ -22,10 +25,13 @@ export function getCotationScale(score) {
       level: 'high',
       label: 'Élevé (51-80)',
       shortLabel: 'Élevé',
-      color: '#f97316',
-      emissive: '#ea580c',
-      bgBadge: 'rgba(249, 115, 22, 0.18)',
-      borderBadge: '#f97316',
+      color: '#ef4444',
+      strokeColor: '#ef4444',
+      textColor: '#ffffff',
+      scoreTextColor: '#ef4444',
+      emissive: '#dc2626',
+      bgBadge: 'rgba(239, 68, 68, 0.2)',
+      borderBadge: '#ef4444',
     };
   }
   if (score >= 48) {
@@ -34,10 +40,13 @@ export function getCotationScale(score) {
       level: 'medium',
       label: 'Modéré (48-50)',
       shortLabel: 'Modéré',
-      color: '#eab308',
-      emissive: '#ca8a04',
-      bgBadge: 'rgba(234, 179, 8, 0.18)',
-      borderBadge: '#eab308',
+      color: '#f97316',
+      strokeColor: '#f97316',
+      textColor: '#ffffff',
+      scoreTextColor: '#f97316',
+      emissive: '#ea580c',
+      bgBadge: 'rgba(249, 115, 22, 0.2)',
+      borderBadge: '#f97316',
     };
   }
   return {
@@ -45,10 +54,13 @@ export function getCotationScale(score) {
     level: 'low',
     label: 'Faible (0-47)',
     shortLabel: 'Faible',
-    color: '#10b981',
-    emissive: '#059669',
-    bgBadge: 'rgba(16, 185, 129, 0.16)',
-    borderBadge: '#10b981',
+    color: '#94a3b8',
+    strokeColor: '#94a3b8',
+    textColor: '#0f172a',
+    scoreTextColor: '#cbd5e1',
+    emissive: '#475569',
+    bgBadge: 'rgba(148, 163, 184, 0.18)',
+    borderBadge: '#94a3b8',
   };
 }
 
