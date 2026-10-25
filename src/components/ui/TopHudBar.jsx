@@ -3,7 +3,6 @@ import {
   Box,
   Layers,
   RefreshCw,
-  ShieldAlert,
   Users,
   Route,
   Compass,
@@ -11,6 +10,7 @@ import {
   CheckCircle2,
   Database,
   Eye,
+  FolderTree,
 } from 'lucide-react';
 
 export default function TopHudBar({
@@ -30,6 +30,8 @@ export default function TopHudBar({
   onRefreshApi,
   apiKey,
   setApiKey,
+  treeCollapsed,
+  setTreeCollapsed,
 }) {
   const [showApiPopover, setShowApiPopover] = useState(false);
 
@@ -39,6 +41,15 @@ export default function TopHudBar({
     <header className="top-hud">
       {/* Bloc Identité & Statut API DigiRisk */}
       <div className="hud-brand">
+        <button
+          type="button"
+          className={`hud-btn mobile-tree-btn ${!treeCollapsed ? 'active' : ''}`}
+          onClick={() => setTreeCollapsed(!treeCollapsed)}
+          title="Afficher / Masquer l'arborescence DUER"
+        >
+          <FolderTree size={16} />
+        </button>
+
         <div className="brand-logo">
           <img
             src="./digirisk-logo.png"
@@ -46,17 +57,21 @@ export default function TopHudBar({
             className="brand-logo-img"
           />
         </div>
-        <div>
+        <div className="brand-text">
           <div className="brand-title-row">
             <h1>DigiRiskGame</h1>
             <span className={`api-status-badge ${isLive ? 'live' : 'snapshot'}`}>
               {isLive ? (
                 <>
-                  <CheckCircle2 size={12} /> API Live (demodoli.digirisk.com)
+                  <CheckCircle2 size={12} />
+                  <span className="status-text-full">API Live (demodoli.digirisk.com)</span>
+                  <span className="status-text-short">Live</span>
                 </>
               ) : (
                 <>
-                  <Database size={12} /> Snapshot DigiRisk
+                  <Database size={12} />
+                  <span className="status-text-full">Snapshot DigiRisk</span>
+                  <span className="status-text-short">Snapshot</span>
                 </>
               )}
             </span>
@@ -68,16 +83,19 @@ export default function TopHudBar({
         </div>
       </div>
 
-      {/* Contrôles de rendu 3D & Logique Métier */}
+      {/* Contrôles de rendu 3D & Logique Métier (scrollables horizontalement sur mobile) */}
       <div className="hud-controls">
         {/* Bascule Étape 2 (Boîtes blanches) / Étape 3 (Assets 3D) */}
-        <div className="control-pill-group" title="Basculer entre Boîtes Blanches (Étape 2) et Assets 3D (Étape 3)">
+        <div
+          className="control-pill-group"
+          title="Basculer entre Boîtes Blanches (Étape 2) et Assets 3D (Étape 3)"
+        >
           <button
             type="button"
             className={`hud-btn ${visualMode === 'whitebox' ? 'active' : ''}`}
             onClick={() => setVisualMode('whitebox')}
           >
-            <Box size={15} />
+            <Box size={14} />
             <span>Boîtes Blanches</span>
           </button>
           <button
@@ -85,13 +103,16 @@ export default function TopHudBar({
             className={`hud-btn ${visualMode === 'detailed' ? 'active' : ''}`}
             onClick={() => setVisualMode('detailed')}
           >
-            <Layers size={15} />
+            <Layers size={14} />
             <span>Assets 3D</span>
           </button>
         </div>
 
         {/* Bascule Cotation Résiduelle / Brute */}
-        <div className="control-pill-group" title="Type de cotation affiché sur les ateliers">
+        <div
+          className="control-pill-group"
+          title="Type de cotation affiché sur les ateliers"
+        >
           <button
             type="button"
             className={`hud-btn ${cotationMode === 'residuelle' ? 'active' : ''}`}
@@ -115,7 +136,7 @@ export default function TopHudBar({
           onClick={() => setAgentsEnabled(!agentsEnabled)}
           title="Afficher / Masquer les opérateurs animés (Étape 4)"
         >
-          <Users size={15} />
+          <Users size={14} />
           <span>Agents</span>
         </button>
 
@@ -125,7 +146,7 @@ export default function TopHudBar({
           onClick={() => setShowPaths(!showPaths)}
           title="Afficher / Masquer les splines de déplacement entre UT"
         >
-          <Route size={15} />
+          <Route size={14} />
           <span>Flux</span>
         </button>
 
@@ -135,18 +156,18 @@ export default function TopHudBar({
           onClick={() => setShowRoof(!showRoof)}
           title="Afficher / Masquer les toitures des bâtiments"
         >
-          <Eye size={15} />
+          <Eye size={14} />
           <span>Toits</span>
         </button>
 
         {/* Recentrage Caméra */}
         <button
           type="button"
-          className="hud-btn"
+          className="hud-btn icon-toggle"
           onClick={onResetCamera}
           title="Recentrer la caméra sur l'ensemble du site"
         >
-          <Compass size={15} />
+          <Compass size={14} />
           <span>Vue Campus</span>
         </button>
 
@@ -154,11 +175,11 @@ export default function TopHudBar({
         <div className="api-config-wrapper">
           <button
             type="button"
-            className="hud-btn"
+            className="hud-btn icon-toggle"
             onClick={() => setShowApiPopover(!showApiPopover)}
             title="Configurer la clé DOLAPIKEY ou synchroniser l'API"
           >
-            <KeyRound size={15} />
+            <KeyRound size={14} />
           </button>
           <button
             type="button"
@@ -167,56 +188,56 @@ export default function TopHudBar({
             disabled={loading}
             title="Rafraîchir depuis demodoli.digirisk.com"
           >
-            <RefreshCw size={15} className={loading ? 'spin' : ''} />
+            <RefreshCw size={14} className={loading ? 'spin' : ''} />
             <span>Sync API</span>
           </button>
-
-          {showApiPopover && (
-            <div className="api-popover">
-              <h4>Connexion REST Dolibarr / DigiRisk</h4>
-              <label>
-                Endpoint
-                <input
-                  type="text"
-                  readOnly
-                  value="https://demodoli.digirisk.com/htdocs/api/index.php"
-                />
-              </label>
-              <label>
-                Clé API (DOLAPIKEY)
-                <input
-                  type="text"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  placeholder="Votre clé DOLAPIKEY"
-                />
-              </label>
-              <div className="popover-actions">
-                <button
-                  type="button"
-                  className="hud-btn"
-                  onClick={() => {
-                    onRefreshApi(true);
-                    setShowApiPopover(false);
-                  }}
-                >
-                  Mode Snapshot
-                </button>
-                <button
-                  type="button"
-                  className="hud-btn primary-sync"
-                  onClick={() => {
-                    onRefreshApi(false);
-                    setShowApiPopover(false);
-                  }}
-                >
-                  Tester & Charger Live
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
+
+      {showApiPopover && (
+        <div className="api-popover">
+          <h4>Connexion REST Dolibarr / DigiRisk</h4>
+          <label>
+            Endpoint
+            <input
+              type="text"
+              readOnly
+              value="https://demodoli.digirisk.com/htdocs/api/index.php"
+            />
+          </label>
+          <label>
+            Clé API (DOLAPIKEY)
+            <input
+              type="password"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              placeholder="Gérée par le serveur (.env) ou saisir ici"
+            />
+          </label>
+          <div className="popover-actions">
+            <button
+              type="button"
+              className="hud-btn"
+              onClick={() => {
+                onRefreshApi(true);
+                setShowApiPopover(false);
+              }}
+            >
+              Mode Snapshot
+            </button>
+            <button
+              type="button"
+              className="hud-btn primary-sync"
+              onClick={() => {
+                onRefreshApi(false);
+                setShowApiPopover(false);
+              }}
+            >
+              Tester & Charger Live
+            </button>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

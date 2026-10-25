@@ -1,6 +1,6 @@
 import snapshotData from '../data/digiriskSnapshot.json';
 
-const DEFAULT_API_KEY = import.meta.env.VITE_DOLAPIKEY || '';
+const DEFAULT_API_KEY = '';
 const PUBLIC_HOST = import.meta.env.VITE_DIGIRISK_PUBLIC_URL || 'https://demodoli.digirisk.com/htdocs';
 
 export function getCotationScale(score) {
