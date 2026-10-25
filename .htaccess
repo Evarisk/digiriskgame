@@ -1,0 +1,10 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Redirige l'entrée du dossier vers le bundle compilé dist/index.html
+  RewriteRule ^$ dist/index.html [L]
+
+  # Redirige tous les appels (assets JS/CSS, images, api-proxy.php) vers dist/
+  RewriteCond $1 !^dist/
+  RewriteRule ^(.*)$ dist/$1 [L,QSA]
+</IfModule>

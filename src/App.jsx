@@ -8,9 +8,7 @@ import RiskSidebar from './components/ui/RiskSidebar';
 export default function App() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [apiKey, setApiKey] = useState(
-    import.meta.env.VITE_DOLAPIKEY || ''
-  );
+  const [apiKey, setApiKey] = useState('');
 
   // Modes d'affichage 3D et métier
   const [visualMode, setVisualMode] = useState('detailed'); // 'detailed' (Étape 3) | 'whitebox' (Étape 2)

@@ -41,7 +41,7 @@ export default function TopHudBar({
       <div className="hud-brand">
         <div className="brand-logo">
           <img
-            src="/digirisk-logo.png"
+            src="./digirisk-logo.png"
             alt="Logo DigiRisk"
             className="brand-logo-img"
           />
