@@ -1,4 +1,4 @@
-# DigiGame 3D — Jumeau Numérique Interactif connecté à DigiRisk / Dolibarr
+# DigiRiskGame — Jumeau Numérique Interactif connecté à DigiRisk / Dolibarr
 
 Jumeau numérique 3D WebGL temps réel (**React + Vite + React Three Fiber + Drei**) connecté à l'API REST de `demodoli.digirisk.com`.
 

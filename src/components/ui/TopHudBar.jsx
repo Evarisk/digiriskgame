@@ -44,7 +44,7 @@ export default function TopHudBar({
         </div>
         <div>
           <div className="brand-title-row">
-            <h1>DigiGame 3D</h1>
+            <h1>DigiRiskGame</h1>
             <span className={`api-status-badge ${isLive ? 'live' : 'snapshot'}`}>
               {isLive ? (
                 <>
