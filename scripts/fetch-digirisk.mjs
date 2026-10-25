@@ -86,12 +86,58 @@ export function buildDigiRiskHierarchy({ tree, risks, assessments, creationOptio
     });
   }
 
-  // Helper for DigiRisk scale (1..4)
+  // Helper for DigiRisk scale (1..4) : Gris, Orange, Rouge, Noir
   function getCotationScale(score) {
-    if (score >= 81) return { scale: 4, level: 'critical', label: 'Critique (Noir)', color: '#ef4444' };
-    if (score >= 51) return { scale: 3, level: 'high', label: 'Élevé (Rouge)', color: '#f97316' };
-    if (score >= 48) return { scale: 2, level: 'medium', label: 'Modéré (Orange)', color: '#eab308' };
-    return { scale: 1, level: 'low', label: 'Faible (Vert/Gris)', color: '#10b981' };
+    if (score >= 81) {
+      return {
+        scale: 4,
+        level: 'critical',
+        label: 'Critique (Noir)',
+        color: '#111827',
+        strokeColor: '#e2e8f0',
+        textColor: '#ffffff',
+        scoreTextColor: '#f8fafc',
+        bgBadge: '#09090b',
+        borderBadge: '#cbd5e1',
+      };
+    }
+    if (score >= 51) {
+      return {
+        scale: 3,
+        level: 'high',
+        label: 'Élevé (Rouge)',
+        color: '#ef4444',
+        strokeColor: '#ef4444',
+        textColor: '#ffffff',
+        scoreTextColor: '#ef4444',
+        bgBadge: 'rgba(239, 68, 68, 0.2)',
+        borderBadge: '#ef4444',
+      };
+    }
+    if (score >= 48) {
+      return {
+        scale: 2,
+        level: 'medium',
+        label: 'Modéré (Orange)',
+        color: '#f97316',
+        strokeColor: '#f97316',
+        textColor: '#ffffff',
+        scoreTextColor: '#f97316',
+        bgBadge: 'rgba(249, 115, 22, 0.2)',
+        borderBadge: '#f97316',
+      };
+    }
+    return {
+      scale: 1,
+      level: 'low',
+      label: 'Faible (Gris)',
+      color: '#94a3b8',
+      strokeColor: '#94a3b8',
+      textColor: '#0f172a',
+      scoreTextColor: '#cbd5e1',
+      bgBadge: 'rgba(148, 163, 184, 0.18)',
+      borderBadge: '#94a3b8',
+    };
   }
 
   // 4. Enrich Risks & group by fk_element
@@ -115,6 +161,11 @@ export function buildDigiRiskHierarchy({ tree, risks, assessments, creationOptio
       comment: '',
     };
     const latestEval = evals[evals.length - 1] || initialEval;
+    const evalWithPhoto = [...evals].reverse().find((e) => e.photo) || latestEval;
+    const safePhotoSlug = evalWithPhoto.photo
+      ? `${evalWithPhoto.ref}_${evalWithPhoto.photo.replace(/[^a-zA-Z0-9._-]/g, '_')}`
+      : null;
+
     const categoryInfo = categoriesByPos[Number(r.category)] || {
       position: Number(r.category),
       name: 'Risque professionnel',
@@ -128,13 +179,8 @@ export function buildDigiRiskHierarchy({ tree, risks, assessments, creationOptio
         ? linkedTasks.reduce((acc, item) => acc + item.progress, 0) / linkedTasks.length
         : 0;
 
-    const rawCotation = Math.max(initialEval.cotation, latestEval.cotation);
-    const residualCotation =
-      evals.length > 1
-        ? latestEval.cotation
-        : avgTaskProgress > 0
-        ? Math.max(10, Math.round(rawCotation * (1 - (avgTaskProgress / 100) * 0.45)))
-        : latestEval.cotation;
+    const rawCotation = latestEval.cotation;
+    const residualCotation = latestEval.cotation;
 
     const enriched = {
       id: riskId,
@@ -148,10 +194,16 @@ export function buildDigiRiskHierarchy({ tree, risks, assessments, creationOptio
       cotationResiduelle: residualCotation,
       scaleBrute: getCotationScale(rawCotation),
       scaleResiduelle: getCotationScale(residualCotation),
+      photoUrl: safePhotoSlug ? `./risk-photos/${safePhotoSlug}` : null,
+      photoFallbackPath: evalWithPhoto.photo
+        ? `riskassessment/${evalWithPhoto.ref}/${evalWithPhoto.photo}`
+        : null,
+      photoRaRef: evalWithPhoto.photo ? evalWithPhoto.ref : null,
+      photoRawName: evalWithPhoto.photo || null,
       latestEvaluation: latestEval,
       initialEvaluation: initialEval,
       evaluationsCount: evals.length,
-       evaluations: evals,
+      evaluations: evals,
       tasks: linkedTasks,
     };
 
@@ -295,6 +347,55 @@ async function main() {
   const outFile = path.join(outDir, 'digiriskSnapshot.json');
   fs.writeFileSync(outFile, JSON.stringify(structured, null, 2), 'utf8');
   console.log(`\n💾 Snapshot JSON sauvegardé dans : ${outFile}`);
+
+  // Téléchargement des miniatures des photos de risques dans public/risk-photos/
+  const photosDir = path.join(__dirname, '..', 'public', 'risk-photos');
+  fs.mkdirSync(photosDir, { recursive: true });
+
+  const allRisks = structured.rootEntity?.allRisks || [];
+  const risksWithPhoto = allRisks.filter((r) => r.photoRaRef && r.photoRawName);
+  console.log(`📸 Téléchargement de ${risksWithPhoto.length} photos de risques...`);
+
+  for (const r of risksWithPhoto) {
+    const safePhotoSlug = `${r.photoRaRef}_${r.photoRawName.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+    const destPath = path.join(photosDir, safePhotoSlug);
+    if (fs.existsSync(destPath)) continue;
+
+    const extIdx = r.photoRawName.lastIndexOf('.');
+    const baseName = extIdx !== -1 ? r.photoRawName.slice(0, extIdx) : r.photoRawName;
+    const ext = extIdx !== -1 ? r.photoRawName.slice(extIdx) : '';
+    const candidateRefs = [
+      r.photoRaRef,
+      ...(r.evaluations || []).filter((e) => e.photo).map((e) => e.ref),
+    ].filter((v, idx, arr) => v && arr.indexOf(v) === idx);
+
+    let saved = false;
+    for (const refCandidate of candidateRefs) {
+      const thumbPath = `riskassessment/${refCandidate}/thumbs/${baseName}_small${ext}`;
+      const origPath = `riskassessment/${refCandidate}/${r.photoRawName}`;
+      try {
+        let doc = await fetchEndpoint(
+          `/documents/download?modulepart=digiriskdolibarr&original_file=${encodeURIComponent(thumbPath)}`
+        ).catch(() => null);
+        if (!doc || !doc.content) {
+          doc = await fetchEndpoint(
+            `/documents/download?modulepart=digiriskdolibarr&original_file=${encodeURIComponent(origPath)}`
+          ).catch(() => null);
+        }
+        if (doc && doc.content) {
+          fs.writeFileSync(destPath, Buffer.from(doc.content, 'base64'));
+          console.log(`  ✔ [${r.ref}/${refCandidate}] -> ${safePhotoSlug}`);
+          saved = true;
+          break;
+        }
+      } catch {
+        // try next candidate
+      }
+    }
+    if (!saved) {
+      console.warn(`  ⚠ Photo absente sur le serveur pour ${r.ref} (${r.photoRaRef})`);
+    }
+  }
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url))) {

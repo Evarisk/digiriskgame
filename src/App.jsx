@@ -24,6 +24,7 @@ export default function App() {
 
   // Sélection & Caméra
   const [selectedElement, setSelectedElement] = useState(null);
+  const [activeRisk, setActiveRisk] = useState(null);
   const [cameraTarget, setCameraTarget] = useState({ type: 'overview' });
 
   const fetchTwinData = useCallback(
@@ -54,6 +55,7 @@ export default function App() {
 
   const handleSelectElement = (element) => {
     setSelectedElement(element);
+    setActiveRisk(null);
     if (!element) return;
 
     // Sur mobile/tablette, refermer l'arborescence quand on sélectionne un atelier
@@ -115,6 +117,7 @@ export default function App() {
           visualMode={visualMode}
           cotationMode={cotationMode}
           selectedElement={selectedElement}
+          activeRisk={activeRisk}
           onSelectElement={handleSelectElement}
           showPaths={showPaths}
           agentsEnabled={agentsEnabled}
@@ -137,7 +140,12 @@ export default function App() {
         <RiskSidebar
           selectedElement={selectedElement}
           cotationMode={cotationMode}
-          onClose={() => setSelectedElement(null)}
+          activeRisk={activeRisk}
+          onHoverRisk={setActiveRisk}
+          onClose={() => {
+            setSelectedElement(null);
+            setActiveRisk(null);
+          }}
           onSelectElement={handleSelectElement}
         />
       </div>

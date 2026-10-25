@@ -21,6 +21,8 @@ import {
 export default function RiskSidebar({
   selectedElement,
   cotationMode,
+  activeRisk,
+  onHoverRisk,
   onClose,
   onSelectElement,
 }) {
@@ -84,7 +86,11 @@ export default function RiskSidebar({
           <div className="sidebar-title-left">
             <span
               className="sidebar-ref-badge"
-              style={{ backgroundColor: scaleObj?.color || '#3b82f6' }}
+              style={{
+                backgroundColor: scaleObj?.color || '#3b82f6',
+                color: scaleObj?.textColor || '#ffffff',
+                border: maxScore >= 81 ? '1px solid #cbd5e1' : 'none',
+              }}
             >
               {selectedElement.ref}
             </span>
@@ -108,14 +114,12 @@ export default function RiskSidebar({
         <div className="sidebar-kpi-grid">
           <div
             className="kpi-card"
-            style={{ borderColor: scaleObj?.color || '#334155' }}
+            style={{ borderColor: scaleObj?.borderBadge || scaleObj?.color || '#334155' }}
           >
-            <span className="kpi-label">
-              Cotation Max ({cotationMode === 'brute' ? 'Brute' : 'Résiduelle'})
-            </span>
+            <span className="kpi-label">Cotation Max</span>
             <span
               className="kpi-value"
-              style={{ color: scaleObj?.color || '#f8fafc' }}
+              style={{ color: scaleObj?.scoreTextColor || scaleObj?.color || '#f8fafc' }}
             >
               {maxScore}/100
             </span>
@@ -202,6 +206,8 @@ export default function RiskSidebar({
                   key={risk.id}
                   risk={risk}
                   cotationMode={cotationMode}
+                  isHighlighted={activeRisk?.id === risk.id}
+                  onHoverRisk={onHoverRisk}
                 />
               ))}
             </div>
@@ -263,7 +269,7 @@ export default function RiskSidebar({
   );
 }
 
-function RiskDetailCard({ risk, cotationMode }) {
+function RiskDetailCard({ risk, cotationMode, isHighlighted, onHoverRisk }) {
   const evalData = risk.latestEvaluation || {};
   const activeScale =
     cotationMode === 'brute' ? risk.scaleBrute : risk.scaleResiduelle;
@@ -273,8 +279,10 @@ function RiskDetailCard({ risk, cotationMode }) {
 
   return (
     <div
-      className="risk-card"
-      style={{ borderLeftColor: activeScale.color }}
+      className={`risk-card ${isHighlighted ? 'highlighted' : ''}`}
+      style={{ borderLeftColor: activeScale.borderBadge || activeScale.color }}
+      onMouseEnter={() => onHoverRisk && onHoverRisk(risk)}
+      onClick={() => onHoverRisk && onHoverRisk(risk)}
     >
       <div className="risk-card-header">
         <div className="risk-category-info">
@@ -306,9 +314,9 @@ function RiskDetailCard({ risk, cotationMode }) {
         <div
           className="risk-score-box"
           style={{
-            backgroundColor: activeScale.bgBadge,
-            borderColor: activeScale.color,
-            color: activeScale.color,
+            backgroundColor: activeScale.bgBadge || activeScale.color,
+            borderColor: activeScale.borderBadge || activeScale.color,
+            color: activeScale.scoreTextColor || activeScale.color,
           }}
         >
           <span className="score-num">{activeScore}</span>
@@ -316,20 +324,33 @@ function RiskDetailCard({ risk, cotationMode }) {
         </div>
       </div>
 
-      {/* Description du risque */}
-      {risk.description && (
-        <p className="risk-desc-text">{risk.description}</p>
-      )}
-
-      {/* Comparaison Brute -> Résiduelle si atténuation */}
-      {hasReduction && (
-        <div className="cotation-delta-banner">
-          <TrendingDown size={14} />
-          <span>
-            Cotation Brute <strong>{risk.cotationBrute}</strong> → Résiduelle{' '}
-            <strong>{risk.cotationResiduelle}</strong> grâce aux actions de
-            prévention
-          </span>
+      {/* Photo du risque (issue de l'évaluation RA) + Description */}
+      {(risk.photoUrl || risk.description) && (
+        <div className="risk-media-row">
+          {risk.photoUrl && (
+            <div className="risk-photo-wrapper">
+              <img
+                src={risk.photoUrl}
+                alt={`Photo ${risk.ref}`}
+                className="risk-photo-thumb"
+                loading="lazy"
+                onError={(e) => {
+                  const fallback = risk.photoFallbackPath
+                    ? `./api-proxy.php?photo=${encodeURIComponent(risk.photoFallbackPath)}`
+                    : null;
+                  if (fallback && !e.currentTarget.dataset.retried) {
+                    e.currentTarget.dataset.retried = '1';
+                    e.currentTarget.src = fallback;
+                  } else {
+                    e.currentTarget.parentElement.style.display = 'none';
+                  }
+                }}
+              />
+            </div>
+          )}
+          {risk.description && (
+            <p className="risk-desc-text">{risk.description}</p>
+          )}
         </div>
       )}
 

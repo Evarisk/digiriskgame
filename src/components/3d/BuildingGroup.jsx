@@ -11,6 +11,7 @@ export default function BuildingGroup({
   visualMode,
   cotationMode,
   selectedElement,
+  activeRisk,
   onSelectElement,
   showRoof,
 }) {
@@ -171,9 +172,9 @@ export default function BuildingGroup({
           <span
             className="building-max-pill"
             style={{
-              background: scaleObj.bgBadge,
-              color: scaleObj.color,
-              borderColor: scaleObj.color,
+              background: scaleObj.bgBadge || scaleObj.color,
+              color: scaleObj.scoreTextColor || scaleObj.color,
+              borderColor: scaleObj.borderBadge || scaleObj.color,
             }}
           >
             Max {maxScore}
@@ -189,6 +190,7 @@ export default function BuildingGroup({
           visualMode={visualMode}
           cotationMode={cotationMode}
           isSelected={selectedElement?.id === ut.id}
+          activeRisk={activeRisk}
           onSelect={onSelectElement}
         />
       ))}

@@ -113,9 +113,9 @@ export default function HierarchyNavigator({
                 <span
                   className="tree-score-pill"
                   style={{
-                    backgroundColor: bScale.bgBadge,
-                    color: bScale.color,
-                    borderColor: bScale.color,
+                    backgroundColor: bScale.bgBadge || bScale.color,
+                    color: bScale.scoreTextColor || '#ffffff',
+                    borderColor: bScale.borderBadge || bScale.color,
                   }}
                 >
                   {bMax}
@@ -142,12 +142,22 @@ export default function HierarchyNavigator({
                         }`}
                         onClick={() => onSelectElement(ut)}
                       >
-                        <Wrench size={13} style={{ color: utScale.color }} />
+                        <Wrench
+                          size={13}
+                          style={{ color: utScale.strokeColor || utScale.color }}
+                        />
                         <span className="tree-ut-ref">{ut.ref}</span>
                         <span className="tree-ut-label">{ut.label}</span>
                         <span
                           className="tree-ut-dot"
-                          style={{ backgroundColor: utScale.color }}
+                          style={{
+                            backgroundColor: utScale.color,
+                            color: utScale.textColor || '#ffffff',
+                            border:
+                              utMax >= 81
+                                ? '1px solid #cbd5e1'
+                                : '1px solid transparent',
+                          }}
                           title={`Cotation max : ${utMax}/100 (${utScale.label})`}
                         >
                           {utMax}
@@ -162,24 +172,30 @@ export default function HierarchyNavigator({
         })}
       </div>
 
-      {/* Légende officielle des échelles de cotation DigiRisk */}
+      {/* Légende officielle des échelles de cotation DigiRisk : Gris, Orange, Rouge, Noir */}
       <div className="legend-footer">
         <div className="legend-title">Échelle de Criticité DigiRisk</div>
         <div className="legend-grid">
           <div className="legend-item">
-            <span className="legend-swatch" style={{ background: '#10b981' }} />
+            <span className="legend-swatch" style={{ background: '#94a3b8' }} />
             <span>0–47 Faible</span>
           </div>
           <div className="legend-item">
-            <span className="legend-swatch" style={{ background: '#eab308' }} />
+            <span className="legend-swatch" style={{ background: '#f97316' }} />
             <span>48–50 Modéré</span>
           </div>
           <div className="legend-item">
-            <span className="legend-swatch" style={{ background: '#f97316' }} />
+            <span className="legend-swatch" style={{ background: '#ef4444' }} />
             <span>51–80 Élevé</span>
           </div>
           <div className="legend-item">
-            <span className="legend-swatch" style={{ background: '#ef4444' }} />
+            <span
+              className="legend-swatch"
+              style={{
+                background: '#09090b',
+                border: '1px solid #cbd5e1',
+              }}
+            />
             <span>81–100 Critique</span>
           </div>
         </div>

@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Box,
-  Layers,
   RefreshCw,
   Users,
   Route,
@@ -9,23 +7,16 @@ import {
   KeyRound,
   CheckCircle2,
   Database,
-  Eye,
   FolderTree,
 } from 'lucide-react';
 
 export default function TopHudBar({
   data,
   loading,
-  visualMode,
-  setVisualMode,
-  cotationMode,
-  setCotationMode,
   agentsEnabled,
   setAgentsEnabled,
   showPaths,
   setShowPaths,
-  showRoof,
-  setShowRoof,
   onResetCamera,
   onRefreshApi,
   apiKey,
@@ -83,58 +74,13 @@ export default function TopHudBar({
         </div>
       </div>
 
-      {/* Contrôles de rendu 3D & Logique Métier (scrollables horizontalement sur mobile) */}
+      {/* Contrôles de scène épurés */}
       <div className="hud-controls">
-        {/* Bascule Étape 2 (Boîtes blanches) / Étape 3 (Assets 3D) */}
-        <div
-          className="control-pill-group"
-          title="Basculer entre Boîtes Blanches (Étape 2) et Assets 3D (Étape 3)"
-        >
-          <button
-            type="button"
-            className={`hud-btn ${visualMode === 'whitebox' ? 'active' : ''}`}
-            onClick={() => setVisualMode('whitebox')}
-          >
-            <Box size={14} />
-            <span>Boîtes Blanches</span>
-          </button>
-          <button
-            type="button"
-            className={`hud-btn ${visualMode === 'detailed' ? 'active' : ''}`}
-            onClick={() => setVisualMode('detailed')}
-          >
-            <Layers size={14} />
-            <span>Assets 3D</span>
-          </button>
-        </div>
-
-        {/* Bascule Cotation Résiduelle / Brute */}
-        <div
-          className="control-pill-group"
-          title="Type de cotation affiché sur les ateliers"
-        >
-          <button
-            type="button"
-            className={`hud-btn ${cotationMode === 'residuelle' ? 'active' : ''}`}
-            onClick={() => setCotationMode('residuelle')}
-          >
-            <span>Cot. Résiduelle</span>
-          </button>
-          <button
-            type="button"
-            className={`hud-btn ${cotationMode === 'brute' ? 'active' : ''}`}
-            onClick={() => setCotationMode('brute')}
-          >
-            <span>Cot. Brute</span>
-          </button>
-        </div>
-
-        {/* Options Cinématique des Flux (Étape 4) & Toiture */}
         <button
           type="button"
           className={`hud-btn icon-toggle ${agentsEnabled ? 'active' : ''}`}
           onClick={() => setAgentsEnabled(!agentsEnabled)}
-          title="Afficher / Masquer les opérateurs animés (Étape 4)"
+          title="Afficher / Masquer les opérateurs animés"
         >
           <Users size={14} />
           <span>Agents</span>
@@ -144,23 +90,12 @@ export default function TopHudBar({
           type="button"
           className={`hud-btn icon-toggle ${showPaths ? 'active' : ''}`}
           onClick={() => setShowPaths(!showPaths)}
-          title="Afficher / Masquer les splines de déplacement entre UT"
+          title="Afficher / Masquer les trajectoires entre UT"
         >
           <Route size={14} />
           <span>Flux</span>
         </button>
 
-        <button
-          type="button"
-          className={`hud-btn icon-toggle ${showRoof ? 'active' : ''}`}
-          onClick={() => setShowRoof(!showRoof)}
-          title="Afficher / Masquer les toitures des bâtiments"
-        >
-          <Eye size={14} />
-          <span>Toits</span>
-        </button>
-
-        {/* Recentrage Caméra */}
         <button
           type="button"
           className="hud-btn icon-toggle"

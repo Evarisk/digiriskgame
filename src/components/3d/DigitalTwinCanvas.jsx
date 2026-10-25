@@ -10,6 +10,7 @@ export default function DigitalTwinCanvas({
   visualMode,
   cotationMode,
   selectedElement,
+  activeRisk,
   onSelectElement,
   showPaths,
   agentsEnabled,
@@ -70,6 +71,7 @@ export default function DigitalTwinCanvas({
             visualMode={visualMode}
             cotationMode={cotationMode}
             selectedElement={selectedElement}
+            activeRisk={activeRisk}
             onSelectElement={onSelectElement}
             showRoof={showRoof}
           />
