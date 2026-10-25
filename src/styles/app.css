@@ -1,6 +1,6 @@
 :root {
   --bg-dark: #090d16;
-  --panel-bg: rgba(15, 23, 42, 0.86);
+  --panel-bg: rgba(15, 23, 42, 0.88);
   --panel-border: rgba(148, 163, 184, 0.18);
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
@@ -19,15 +19,31 @@
 
 html,
 body,
-#root,
-.app-shell {
+#root {
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background: var(--bg-dark);
   color: var(--text-main);
   user-select: none;
+}
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.stage-container {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
 }
 
 .canvas-wrapper {
@@ -39,39 +55,48 @@ body,
 
 /* ==================== TOP HUD BAR ==================== */
 .top-hud {
-  position: absolute;
-  top: 12px;
-  left: 16px;
-  right: 16px;
-  z-index: 30;
+  position: relative;
+  z-index: 40;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 10px 16px;
+  gap: 12px;
+  margin: 8px 12px 0;
+  padding: 8px 14px;
   background: var(--panel-bg);
   backdrop-filter: blur(14px);
   border: 1px solid var(--panel-border);
-  border-radius: 14px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  border-radius: 13px;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.42);
+  flex-shrink: 0;
 }
 
 .hud-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.mobile-tree-btn {
+  display: inline-flex;
+  padding: 7px !important;
+  border: 1px solid rgba(148, 163, 184, 0.25) !important;
+  background: rgba(15, 23, 42, 0.8);
 }
 
 .brand-logo {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.94);
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.95);
   padding: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  flex-shrink: 0;
 }
 
 .brand-logo-img {
@@ -80,26 +105,37 @@ body,
   object-fit: contain;
 }
 
+.brand-text {
+  min-width: 0;
+}
+
 .brand-title-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  flex-wrap: nowrap;
 }
 
 .brand-title-row h1 {
-  font-size: 16px;
+  font-size: 15.5px;
   font-weight: 800;
   letter-spacing: -0.02em;
+  white-space: nowrap;
 }
 
 .api-status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   font-size: 11px;
   font-weight: 600;
   padding: 2px 8px;
   border-radius: 999px;
+  white-space: nowrap;
+}
+
+.status-text-short {
+  display: none;
 }
 
 .api-status-badge.live {
@@ -115,38 +151,52 @@ body,
 }
 
 .brand-subtitle {
-  font-size: 12px;
+  font-size: 11.5px;
   color: var(--text-muted);
-  margin-top: 2px;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .hud-controls {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 6px;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 2px 0;
+}
+
+.hud-controls::-webkit-scrollbar {
+  display: none;
 }
 
 .control-pill-group {
   display: flex;
   background: rgba(15, 23, 42, 0.9);
   border: 1px solid rgba(148, 163, 184, 0.2);
-  border-radius: 9px;
+  border-radius: 8px;
   padding: 2px;
+  flex-shrink: 0;
 }
 
 .hud-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 11px;
-  font-size: 12px;
+  gap: 5px;
+  padding: 6px 10px;
+  font-size: 11.5px;
   font-weight: 600;
   color: #cbd5e1;
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 7px;
+  border-radius: 6px;
   cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: all 0.15s ease;
 }
 
@@ -189,23 +239,23 @@ body,
 }
 
 .api-config-wrapper {
-  position: relative;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
+  flex-shrink: 0;
 }
 
 .api-popover {
   position: absolute;
-  top: 44px;
-  right: 0;
-  width: 340px;
+  top: calc(100% + 8px);
+  right: 12px;
+  width: min(340px, calc(100vw - 24px));
   background: #0f172a;
   border: 1px solid rgba(148, 163, 184, 0.3);
   border-radius: 12px;
   padding: 14px;
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65);
-  z-index: 60;
+  z-index: 80;
 }
 
 .api-popover h4 {
@@ -241,12 +291,40 @@ body,
 }
 
 /* ==================== LEFT HIERARCHY TREE ==================== */
+.hierarchy-collapsed-trigger {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  z-index: 25;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 13px;
+  background: var(--panel-bg);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 11px;
+  color: #f8fafc;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  transition: all 0.15s ease;
+}
+
+.hierarchy-collapsed-trigger:hover {
+  border-color: #38bdf8;
+  background: rgba(15, 23, 42, 0.96);
+  transform: translateY(-1px);
+}
+
 .hierarchy-panel {
   position: absolute;
-  top: 82px;
-  left: 16px;
+  top: 10px;
+  left: 12px;
+  bottom: 12px;
   width: 285px;
-  max-height: calc(100vh - 98px);
+  max-height: calc(100% - 22px);
   z-index: 25;
   display: flex;
   flex-direction: column;
@@ -254,8 +332,20 @@ body,
   backdrop-filter: blur(14px);
   border: 1px solid var(--panel-border);
   border-radius: 14px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
   overflow: hidden;
+  animation: slideInLeft 0.18s ease-out;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .hierarchy-header {
@@ -265,6 +355,11 @@ body,
   padding: 11px 14px;
   border-bottom: 1px solid rgba(148, 163, 184, 0.14);
   cursor: pointer;
+  flex-shrink: 0;
+}
+
+.hierarchy-header:hover {
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .hierarchy-title {
@@ -277,10 +372,21 @@ body,
 }
 
 .collapse-btn {
-  background: none;
-  border: none;
-  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: #cbd5e1;
   cursor: pointer;
+}
+
+.collapse-btn:hover {
+  background: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
 }
 
 .hierarchy-list {
@@ -402,6 +508,7 @@ body,
   padding: 10px 12px;
   border-top: 1px solid rgba(148, 163, 184, 0.14);
   background: rgba(9, 13, 22, 0.55);
+  flex-shrink: 0;
 }
 
 .legend-title {
@@ -606,14 +713,15 @@ body,
 /* ==================== RIGHT RISK SIDEBAR (ÉTAPE 5) ==================== */
 .risk-sidebar {
   position: absolute;
-  top: 82px;
-  right: 16px;
-  bottom: 16px;
-  width: 420px;
+  top: 10px;
+  right: 12px;
+  bottom: 12px;
+  width: 410px;
+  max-width: calc(100vw - 24px);
   z-index: 30;
   display: flex;
   flex-direction: column;
-  background: rgba(15, 23, 42, 0.92);
+  background: rgba(15, 23, 42, 0.94);
   backdrop-filter: blur(16px);
   border: 1px solid var(--panel-border);
   border-radius: 16px;
@@ -634,8 +742,9 @@ body,
 }
 
 .sidebar-header {
-  padding: 16px 18px 0;
+  padding: 14px 16px 0;
   border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+  flex-shrink: 0;
 }
 
 .sidebar-breadcrumb {
@@ -678,7 +787,7 @@ body,
 }
 
 .sidebar-title-left h2 {
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 800;
   line-height: 1.2;
 }
@@ -694,6 +803,7 @@ body,
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .sidebar-close-btn:hover {
@@ -702,30 +812,34 @@ body,
 }
 
 .sidebar-description {
-  font-size: 12px;
+  font-size: 11.5px;
   line-height: 1.45;
   color: #94a3b8;
-  margin-top: 8px;
+  margin-top: 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .sidebar-kpi-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-top: 12px;
+  gap: 7px;
+  margin-top: 10px;
 }
 
 .kpi-card {
   background: rgba(30, 41, 59, 0.65);
   border: 1px solid rgba(148, 163, 184, 0.2);
   border-radius: 10px;
-  padding: 8px 10px;
+  padding: 7px 9px;
   display: flex;
   flex-direction: column;
 }
 
 .kpi-label {
-  font-size: 10px;
+  font-size: 9.5px;
   color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -733,25 +847,25 @@ body,
 
 .kpi-value {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 18px;
+  font-size: 16.5px;
   font-weight: 800;
   margin: 2px 0;
 }
 
 .kpi-sub {
-  font-size: 10.5px;
+  font-size: 10px;
   color: #cbd5e1;
 }
 
 .sub-units-strip {
-  margin-top: 10px;
+  margin-top: 9px;
 }
 
 .strip-label {
-  font-size: 11px;
+  font-size: 10.5px;
   color: #94a3b8;
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
 }
 
 .strip-chips {
@@ -765,7 +879,7 @@ body,
   border: 1px solid #334155;
   color: #e2e8f0;
   font-size: 11px;
-  padding: 4px 8px;
+  padding: 3px 7px;
   border-radius: 6px;
   cursor: pointer;
 }
@@ -777,7 +891,7 @@ body,
 .sidebar-tabs {
   display: flex;
   gap: 6px;
-  margin-top: 14px;
+  margin-top: 10px;
 }
 
 .tab-btn {
@@ -786,12 +900,12 @@ body,
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 9px 10px;
+  padding: 8px 10px;
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
   color: #94a3b8;
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -804,12 +918,12 @@ body,
 .sidebar-body {
   flex: 1;
   overflow-y: auto;
-  padding: 14px 16px;
+  padding: 12px 14px;
 }
 
 .empty-state {
   text-align: center;
-  padding: 40px 20px;
+  padding: 32px 16px;
   color: #94a3b8;
 }
 
@@ -833,7 +947,7 @@ body,
 .tasks-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .risk-card {
@@ -841,7 +955,7 @@ body,
   border: 1px solid rgba(148, 163, 184, 0.18);
   border-left: 4px solid #10b981;
   border-radius: 10px;
-  padding: 12px;
+  padding: 11px;
 }
 
 .risk-card-header {
@@ -858,8 +972,8 @@ body,
 }
 
 .inrs-picto {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 8px;
   object-fit: contain;
   background: #ffffff;
@@ -868,8 +982,8 @@ body,
 }
 
 .inrs-picto-fallback {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 8px;
   background: rgba(249, 115, 22, 0.2);
   color: #f97316;
@@ -912,7 +1026,7 @@ body,
 }
 
 .risk-cat-title {
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 700;
   color: #f1f5f9;
   line-height: 1.3;
@@ -939,7 +1053,7 @@ body,
 }
 
 .risk-desc-text {
-  font-size: 12px;
+  font-size: 11.5px;
   color: #e2e8f0;
   margin-top: 8px;
   padding: 6px 8px;
@@ -962,8 +1076,8 @@ body,
 .criteria-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 6px;
-  margin-top: 10px;
+  gap: 5px;
+  margin-top: 9px;
 }
 
 .criterion-item {
@@ -975,7 +1089,7 @@ body,
 .criterion-top {
   display: flex;
   justify-content: space-between;
-  font-size: 9.5px;
+  font-size: 9px;
   color: #94a3b8;
   margin-bottom: 4px;
 }
@@ -1001,14 +1115,14 @@ body,
   align-items: flex-start;
   gap: 6px;
   margin-top: 8px;
-  font-size: 11.5px;
+  font-size: 11px;
   color: #cbd5e1;
   font-style: italic;
 }
 
 .risk-inline-tasks {
-  margin-top: 10px;
-  padding-top: 8px;
+  margin-top: 9px;
+  padding-top: 7px;
   border-top: 1px dashed rgba(148, 163, 184, 0.2);
 }
 
@@ -1019,7 +1133,7 @@ body,
   font-size: 11px;
   font-weight: 700;
   color: #38bdf8;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
 }
 
 .inline-task-item {
@@ -1027,7 +1141,7 @@ body,
   align-items: center;
   gap: 6px;
   font-size: 11px;
-  padding: 4px 0;
+  padding: 3px 0;
   color: #cbd5e1;
 }
 
@@ -1055,7 +1169,7 @@ body,
   background: rgba(30, 41, 59, 0.65);
   border: 1px solid rgba(148, 163, 184, 0.18);
   border-radius: 10px;
-  padding: 12px;
+  padding: 11px;
 }
 
 .task-card-top {
@@ -1081,10 +1195,10 @@ body,
 }
 
 .task-label {
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
   color: #f1f5f9;
-  margin-bottom: 10px;
+  margin-bottom: 9px;
 }
 
 .task-metrics {
@@ -1123,10 +1237,91 @@ body,
   align-items: center;
   gap: 4px;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 700;
   color: #38bdf8;
   background: rgba(56, 189, 248, 0.12);
   padding: 4px 8px;
   border-radius: 6px;
+}
+
+/* ==================== RESPONSIVE TABLET & MOBILE ==================== */
+@media (max-width: 1100px) {
+  .top-hud {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 8px 10px;
+    margin: 6px 8px 0;
+  }
+
+  .hud-brand {
+    justify-content: flex-start;
+  }
+
+  .hud-controls {
+    width: 100%;
+    padding-bottom: 2px;
+  }
+
+  .status-text-full {
+    display: none;
+  }
+
+  .status-text-short {
+    display: inline;
+  }
+}
+
+@media (max-width: 768px) {
+  .brand-subtitle {
+    display: none;
+  }
+
+  .brand-logo {
+    width: 30px;
+    height: 30px;
+    padding: 4px;
+  }
+
+  .brand-title-row h1 {
+    font-size: 14px;
+  }
+
+  .hud-btn {
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+
+  .hierarchy-collapsed-trigger {
+    top: 8px;
+    left: 8px;
+    padding: 7px 11px;
+    font-size: 11.5px;
+  }
+
+  .hierarchy-panel {
+    top: 8px;
+    left: 8px;
+    bottom: 8px;
+    width: min(280px, calc(100vw - 16px));
+    z-index: 45;
+  }
+
+  /* Sur mobile, le panneau de risques s'affiche en tiroir bas (bottom-sheet) */
+  .risk-sidebar {
+    top: auto;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    width: auto;
+    height: 56dvh;
+    max-height: 56dvh;
+    border-radius: 14px;
+    z-index: 40;
+  }
+
+  .criteria-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }

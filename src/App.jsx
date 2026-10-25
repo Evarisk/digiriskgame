@@ -17,6 +17,11 @@ export default function App() {
   const [showPaths, setShowPaths] = useState(true);
   const [showRoof, setShowRoof] = useState(false);
 
+  // État d'ouverture de l'arborescence à gauche (fermée par défaut sur mobile)
+  const [treeCollapsed, setTreeCollapsed] = useState(
+    () => typeof window !== 'undefined' && window.innerWidth < 960
+  );
+
   // Sélection & Caméra
   const [selectedElement, setSelectedElement] = useState(null);
   const [cameraTarget, setCameraTarget] = useState({ type: 'overview' });
@@ -28,9 +33,12 @@ export default function App() {
       setData(result);
       setLoading(false);
 
-      // Sélectionner par défaut l'atelier le plus critique (UT14 Soudeurs - 100/100) au premier chargement
+      // Sur grand écran uniquement, sélectionner UT14 par défaut au premier chargement
       setSelectedElement((prev) => {
         if (prev) return prev;
+        if (typeof window !== 'undefined' && window.innerWidth < 960) {
+          return null;
+        }
         const criticalUt = result.allWorkUnitsWorld?.find(
           (u) => u.ref === 'UT14'
         );
@@ -47,6 +55,11 @@ export default function App() {
   const handleSelectElement = (element) => {
     setSelectedElement(element);
     if (!element) return;
+
+    // Sur mobile/tablette, refermer l'arborescence quand on sélectionne un atelier
+    if (typeof window !== 'undefined' && window.innerWidth < 960) {
+      setTreeCollapsed(true);
+    }
 
     if (element.elementType === 'workunit' && element.layout3D?.worldPosition) {
       setCameraTarget({
@@ -73,7 +86,7 @@ export default function App() {
 
   return (
     <div className="app-shell">
-      {/* Barre supérieure HUD */}
+      {/* Barre supérieure HUD (ne chevauche jamais les panneaux latéraux) */}
       <TopHudBar
         data={data}
         loading={loading}
@@ -91,37 +104,43 @@ export default function App() {
         onRefreshApi={fetchTwinData}
         apiKey={apiKey}
         setApiKey={setApiKey}
+        treeCollapsed={treeCollapsed}
+        setTreeCollapsed={setTreeCollapsed}
       />
 
-      {/* Scène WebGL 3D (React Three Fiber) */}
-      <DigitalTwinCanvas
-        data={data}
-        visualMode={visualMode}
-        cotationMode={cotationMode}
-        selectedElement={selectedElement}
-        onSelectElement={handleSelectElement}
-        showPaths={showPaths}
-        agentsEnabled={agentsEnabled}
-        agentSpeed={1}
-        showRoof={showRoof}
-        cameraTarget={cameraTarget}
-      />
+      {/* Zone principale 3D + Panneaux latéraux positionnés sous le bandeau */}
+      <div className="stage-container">
+        <DigitalTwinCanvas
+          data={data}
+          visualMode={visualMode}
+          cotationMode={cotationMode}
+          selectedElement={selectedElement}
+          onSelectElement={handleSelectElement}
+          showPaths={showPaths}
+          agentsEnabled={agentsEnabled}
+          agentSpeed={1}
+          showRoof={showRoof}
+          cameraTarget={cameraTarget}
+        />
 
-      {/* Explorateur Arborescent (Groupements > Unités de Travail) */}
-      <HierarchyNavigator
-        data={data}
-        cotationMode={cotationMode}
-        selectedElement={selectedElement}
-        onSelectElement={handleSelectElement}
-      />
+        {/* Explorateur Arborescent (Groupements > Unités de Travail) */}
+        <HierarchyNavigator
+          data={data}
+          cotationMode={cotationMode}
+          selectedElement={selectedElement}
+          onSelectElement={handleSelectElement}
+          collapsed={treeCollapsed}
+          setCollapsed={setTreeCollapsed}
+        />
 
-      {/* Panneau latéral droit : Détail des Risques INRS & Plan d'Actions */}
-      <RiskSidebar
-        selectedElement={selectedElement}
-        cotationMode={cotationMode}
-        onClose={() => setSelectedElement(null)}
-        onSelectElement={handleSelectElement}
-      />
+        {/* Panneau latéral droit : Détail des Risques INRS & Plan d'Actions */}
+        <RiskSidebar
+          selectedElement={selectedElement}
+          cotationMode={cotationMode}
+          onClose={() => setSelectedElement(null)}
+          onSelectElement={handleSelectElement}
+        />
+      </div>
     </div>
   );
 }
