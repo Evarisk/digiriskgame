@@ -1,20 +1,23 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html, Edges } from '@react-three/drei';
 import WorkstationProps from './WorkstationProps';
 
 /**
  * Représentation 3D interactive d'une Unité de Travail (UT) rattachée à un Groupement.
- * Teintée dynamiquement selon la cotation DigiRisk (Vert/Gris, Orange, Rouge, Noir/Critique).
+ * Teintée dynamiquement selon la cotation DigiRisk (Gris, Orange, Rouge, Noir/Critique)
+ * et projette en hologramme 3D la photo du risque sur l'unité de travail.
  */
 export default function WorkUnitZone({
   ut,
   visualMode, // 'detailed' | 'whitebox'
   cotationMode, // 'residuelle' | 'brute'
   isSelected,
+  activeRisk,
   onSelect,
 }) {
   const [hovered, setHovered] = useState(false);
+  const [photoCycleIdx, setPhotoCycleIdx] = useState(0);
   const pulseRingRef = useRef();
 
   const [posX, posY, posZ] = ut.layout3D.localPosition;
@@ -27,6 +30,26 @@ export default function WorkUnitZone({
   const riskColor = scaleObj.color;
   const edgeColor = scaleObj.strokeColor || scaleObj.color;
   const isCritical = maxScore >= 81;
+
+  // Risques avec photo rattachés à cette UT
+  const risksWithPhoto = (ut.directRisks || []).filter((r) => r.photoUrl);
+
+  // Défilement automatique des photos de risques quand l'UT est sélectionnée
+  useEffect(() => {
+    if (!isSelected || risksWithPhoto.length <= 1) return;
+    const timer = setInterval(() => {
+      setPhotoCycleIdx((prev) => (prev + 1) % risksWithPhoto.length);
+    }, 3800);
+    return () => clearInterval(timer);
+  }, [isSelected, risksWithPhoto.length]);
+
+  // Risque dont la photo est projetée au-dessus de l'UT
+  const activeUtRisk =
+    activeRisk && activeRisk.fkElement === ut.id && activeRisk.photoUrl
+      ? activeRisk
+      : (isSelected || hovered) && risksWithPhoto.length > 0
+      ? risksWithPhoto[photoCycleIdx % risksWithPhoto.length]
+      : null;
 
   useFrame(({ clock }) => {
     if (pulseRingRef.current) {
@@ -85,7 +108,13 @@ export default function WorkUnitZone({
           position={[0, 0.14, 0]}
           rotation={[-Math.PI / 2, 0, 0]}
         >
-          <ringGeometry args={[Math.min(sizeW, sizeD) * 0.46, Math.min(sizeW, sizeD) * 0.52, 32]} />
+          <ringGeometry
+            args={[
+              Math.min(sizeW, sizeD) * 0.46,
+              Math.min(sizeW, sizeD) * 0.52,
+              32,
+            ]}
+          />
           <meshBasicMaterial
             color={isSelected ? '#38bdf8' : edgeColor}
             transparent
@@ -94,7 +123,7 @@ export default function WorkUnitZone({
         </mesh>
       )}
 
-      {/* Mode Étape 2 : Boîtes blanches (Cubes simples) vs Mode Étape 3 : Assets 3D métiers */}
+      {/* Volume 3D & Équipements de l'atelier */}
       {visualMode === 'whitebox' ? (
         <mesh
           position={[0, sizeH / 2 + 0.12, 0]}
@@ -125,13 +154,12 @@ export default function WorkUnitZone({
             <meshStandardMaterial
               color={riskColor}
               transparent
-              opacity={isCritical ? 0.42 : isSelected ? 0.18 : hovered ? 0.14 : 0.08}
+              opacity={
+                isCritical ? 0.42 : isSelected ? 0.18 : hovered ? 0.14 : 0.08
+              }
               depthWrite={false}
             />
-            <Edges
-              scale={1.0}
-              color={isSelected ? '#ffffff' : edgeColor}
-            />
+            <Edges scale={1.0} color={isSelected ? '#ffffff' : edgeColor} />
           </mesh>
 
           {/* Équipements 3D spécifiques au métier de l'UT */}
@@ -143,44 +171,91 @@ export default function WorkUnitZone({
         </group>
       )}
 
-      {/* Hologramme HTML flottant au-dessus de l'Unité de Travail */}
+      {/* Hologramme HTML flottant au-dessus de l'Unité de Travail + Projection Photo Risque */}
       <Html
-        position={[0, sizeH + 0.55, 0]}
+        position={[0, sizeH + (activeUtRisk ? 1.35 : 0.55), 0]}
         center
-        distanceFactor={26}
-        zIndexRange={[10, 0]}
+        distanceFactor={25}
+        zIndexRange={[15, 0]}
       >
-        <div
-          onClick={handleClick}
-          className={`ut-floating-badge ${isSelected ? 'selected' : ''} ${
-            isCritical ? 'critical-pulse' : ''
-          }`}
-          style={{
-            borderColor: isSelected ? '#ffffff' : edgeColor,
-          }}
-        >
-          <div className="ut-badge-top">
-            <span
-              className="ut-ref"
+        <div className="ut-hologram-stack" onClick={handleClick}>
+          {/* Projection Holographique de la photo du risque sur l'UT */}
+          {activeUtRisk && (
+            <div
+              key={activeUtRisk.id}
+              className="ut-photo-hologram"
               style={{
-                background: riskColor,
-                color: scaleObj.textColor || '#ffffff',
-                border: isCritical ? '1px solid #cbd5e1' : 'none',
+                borderColor:
+                  activeUtRisk.scaleResiduelle?.borderBadge || edgeColor,
               }}
             >
-              {ut.ref}
-            </span>
-            <span
-              className="ut-score"
-              style={{ color: scaleObj.scoreTextColor || edgeColor }}
-            >
-              {maxScore}/100
-            </span>
-          </div>
-          <div className="ut-label">{ut.label}</div>
-          <div className="ut-meta">
-            {ut.stats.totalRisks} risque{ut.stats.totalRisks > 1 ? 's' : ''}
-            {ut.stats.totalTasks > 0 ? ` • ${ut.stats.totalTasks} action(s)` : ''}
+              <div className="ut-photo-hologram-media">
+                <img
+                  src={activeUtRisk.photoUrl}
+                  alt={activeUtRisk.description}
+                  className="ut-photo-hologram-img"
+                  onError={(e) => {
+                    const fallback = activeUtRisk.photoFallbackPath
+                      ? `./api-proxy.php?photo=${encodeURIComponent(
+                          activeUtRisk.photoFallbackPath
+                        )}`
+                      : null;
+                    if (fallback && !e.currentTarget.dataset.retried) {
+                      e.currentTarget.dataset.retried = '1';
+                      e.currentTarget.src = fallback;
+                    }
+                  }}
+                />
+                <div className="hologram-scanline" />
+                <span
+                  className="ut-photo-risk-tag"
+                  style={{
+                    background: activeUtRisk.scaleResiduelle?.color || riskColor,
+                    color: activeUtRisk.scaleResiduelle?.textColor || '#fff',
+                  }}
+                >
+                  {activeUtRisk.ref} • {activeUtRisk.cotationResiduelle}/100
+                </span>
+              </div>
+              <div className="ut-photo-caption">{activeUtRisk.description}</div>
+              <div className="hologram-beam" />
+            </div>
+          )}
+
+          {/* Badge principal de l'Unité de Travail */}
+          <div
+            className={`ut-floating-badge ${isSelected ? 'selected' : ''} ${
+              isCritical ? 'critical-pulse' : ''
+            }`}
+            style={{
+              borderColor: isSelected ? '#ffffff' : edgeColor,
+            }}
+          >
+            <div className="ut-badge-top">
+              <span
+                className="ut-ref"
+                style={{
+                  background: riskColor,
+                  color: scaleObj.textColor || '#ffffff',
+                  border: isCritical ? '1px solid #cbd5e1' : 'none',
+                }}
+              >
+                {ut.ref}
+              </span>
+              <span
+                className="ut-score"
+                style={{ color: scaleObj.scoreTextColor || edgeColor }}
+              >
+                {maxScore}/100
+              </span>
+            </div>
+            <div className="ut-label">{ut.label}</div>
+            <div className="ut-meta">
+              {ut.stats.totalRisks} risque{ut.stats.totalRisks > 1 ? 's' : ''}
+              {ut.stats.totalTasks > 0
+                ? ` • ${ut.stats.totalTasks} action(s)`
+                : ''}
+            </div>
           </div>
         </div>
       </Html>

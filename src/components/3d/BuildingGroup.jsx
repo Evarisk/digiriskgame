@@ -11,6 +11,7 @@ export default function BuildingGroup({
   visualMode,
   cotationMode,
   selectedElement,
+  activeRisk,
   onSelectElement,
   showRoof,
 }) {
@@ -189,6 +190,7 @@ export default function BuildingGroup({
           visualMode={visualMode}
           cotationMode={cotationMode}
           isSelected={selectedElement?.id === ut.id}
+          activeRisk={activeRisk}
           onSelect={onSelectElement}
         />
       ))}

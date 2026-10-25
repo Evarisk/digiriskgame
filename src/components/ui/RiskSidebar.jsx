@@ -21,6 +21,8 @@ import {
 export default function RiskSidebar({
   selectedElement,
   cotationMode,
+  activeRisk,
+  onHoverRisk,
   onClose,
   onSelectElement,
 }) {
@@ -206,6 +208,8 @@ export default function RiskSidebar({
                   key={risk.id}
                   risk={risk}
                   cotationMode={cotationMode}
+                  isHighlighted={activeRisk?.id === risk.id}
+                  onHoverRisk={onHoverRisk}
                 />
               ))}
             </div>
@@ -267,7 +271,7 @@ export default function RiskSidebar({
   );
 }
 
-function RiskDetailCard({ risk, cotationMode }) {
+function RiskDetailCard({ risk, cotationMode, isHighlighted, onHoverRisk }) {
   const evalData = risk.latestEvaluation || {};
   const activeScale =
     cotationMode === 'brute' ? risk.scaleBrute : risk.scaleResiduelle;
@@ -277,8 +281,10 @@ function RiskDetailCard({ risk, cotationMode }) {
 
   return (
     <div
-      className="risk-card"
+      className={`risk-card ${isHighlighted ? 'highlighted' : ''}`}
       style={{ borderLeftColor: activeScale.borderBadge || activeScale.color }}
+      onMouseEnter={() => onHoverRisk && onHoverRisk(risk)}
+      onClick={() => onHoverRisk && onHoverRisk(risk)}
     >
       <div className="risk-card-header">
         <div className="risk-category-info">
