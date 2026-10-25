@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-25T22:28:48.081Z",
+  "fetchedAt": "2026-10-25T22:34:10.364Z",
   "sourceUrl": "https://demodoli.digirisk.com/htdocs/api/index.php",
   "entityName": "MetalOandCo-Industrie",
   "rootEntity": {
@@ -45,6 +45,10 @@
           "bgBadge": "rgba(239, 68, 68, 0.2)",
           "borderBadge": "#ef4444"
         },
+        "photoUrl": "./risk-photos/RA93_homme_moto_en_ville.png",
+        "photoFallbackPath": "riskassessment/RA93/homme_moto_en_ville.png",
+        "photoRaRef": "RA93",
+        "photoRawName": "homme_moto_en_ville.png",
         "latestEvaluation": {
           "id": 3505,
           "ref": "RA93",
@@ -127,6 +131,10 @@
           "bgBadge": "rgba(239, 68, 68, 0.2)",
           "borderBadge": "#ef4444"
         },
+        "photoUrl": "./risk-photos/RA94_homme_trottinette_casque_velo-en-ville.png",
+        "photoFallbackPath": "riskassessment/RA94/homme_trottinette_casque_velo-en-ville.png",
+        "photoRaRef": "RA94",
+        "photoRawName": "homme_trottinette_casque_velo-en-ville.png",
         "latestEvaluation": {
           "id": 3506,
           "ref": "RA94",
@@ -237,6 +245,10 @@
           "bgBadge": "rgba(249, 115, 22, 0.2)",
           "borderBadge": "#f97316"
         },
+        "photoUrl": "./risk-photos/RA91_ChatGPT_Image_20_juil._2025__19_55_13.png",
+        "photoFallbackPath": "riskassessment/RA91/ChatGPT Image 20 juil. 2025, 19_55_13.png",
+        "photoRaRef": "RA91",
+        "photoRawName": "ChatGPT Image 20 juil. 2025, 19_55_13.png",
         "latestEvaluation": {
           "id": 3503,
           "ref": "RA91",
@@ -344,6 +356,10 @@
           "bgBadge": "rgba(249, 115, 22, 0.2)",
           "borderBadge": "#f97316"
         },
+        "photoUrl": "./risk-photos/RA107_causeries_risque_15_lumiere_1024px.png",
+        "photoFallbackPath": "riskassessment/RA107/causeries_risque_15_lumiere_1024px.png",
+        "photoRaRef": "RA107",
+        "photoRawName": "causeries_risque_15_lumiere_1024px.png",
         "latestEvaluation": {
           "id": 3549,
           "ref": "RA107",
@@ -451,6 +467,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": "./risk-photos/RA92_ChatGPT_Image_20_juil._2025__20_13_30.png",
+        "photoFallbackPath": "riskassessment/RA92/ChatGPT Image 20 juil. 2025, 20_13_30.png",
+        "photoRaRef": "RA92",
+        "photoRawName": "ChatGPT Image 20 juil. 2025, 20_13_30.png",
         "latestEvaluation": {
           "id": 3504,
           "ref": "RA92",
@@ -543,6 +563,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": "./risk-photos/RA89_homme_passage_pieton_en_ville.png",
+        "photoFallbackPath": "riskassessment/RA89/homme_passage_pieton_en_ville.png",
+        "photoRaRef": "RA89",
+        "photoRawName": "homme_passage_pieton_en_ville.png",
         "latestEvaluation": {
           "id": 3501,
           "ref": "RA89",
@@ -650,6 +674,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3550,
           "ref": "RA108",
@@ -811,6 +839,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3526,
           "ref": "RA106",
@@ -948,6 +980,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": "./risk-photos/RA95_ChatGPT_Image_25_juil._2025__14_16_12.png",
+        "photoFallbackPath": "riskassessment/RA95/ChatGPT Image 25 juil. 2025, 14_16_12.png",
+        "photoRaRef": "RA95",
+        "photoRawName": "ChatGPT Image 25 juil. 2025, 14_16_12.png",
         "latestEvaluation": {
           "id": 3507,
           "ref": "RA95",
@@ -1098,6 +1134,10 @@
               "bgBadge": "rgba(249, 115, 22, 0.2)",
               "borderBadge": "#f97316"
             },
+            "photoUrl": "./risk-photos/RA7_20210803_192804.jpg",
+            "photoFallbackPath": "riskassessment/RA7/20210803_192804.jpg",
+            "photoRaRef": "RA7",
+            "photoRawName": "20210803_192804.jpg",
             "latestEvaluation": {
               "id": 7,
               "ref": "RA7",
@@ -1190,6 +1230,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 1,
               "ref": "RA1",
@@ -1304,6 +1348,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": "./risk-photos/RA61_causeries_risque_15_ordinateur_1024px.png",
+                "photoFallbackPath": "riskassessment/RA61/causeries_risque_15_ordinateur_1024px.png",
+                "photoRaRef": "RA61",
+                "photoRawName": "causeries_risque_15_ordinateur_1024px.png",
                 "latestEvaluation": {
                   "id": 3265,
                   "ref": "RA61",
@@ -1405,6 +1453,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": "./risk-photos/RA110_001.webp",
+                "photoFallbackPath": "riskassessment/RA110/001.webp",
+                "photoRaRef": "RA110",
+                "photoRawName": "001.webp",
                 "latestEvaluation": {
                   "id": 3552,
                   "ref": "RA110",
@@ -1512,6 +1564,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": "./risk-photos/RA109_marches.png",
+                "photoFallbackPath": "riskassessment/RA109/marches.png",
+                "photoRaRef": "RA109",
+                "photoRawName": "marches.png",
                 "latestEvaluation": {
                   "id": 3551,
                   "ref": "RA109",
@@ -1622,6 +1678,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": "./risk-photos/RA61_causeries_risque_15_ordinateur_1024px.png",
+                "photoFallbackPath": "riskassessment/RA61/causeries_risque_15_ordinateur_1024px.png",
+                "photoRaRef": "RA61",
+                "photoRawName": "causeries_risque_15_ordinateur_1024px.png",
                 "latestEvaluation": {
                   "id": 3265,
                   "ref": "RA61",
@@ -1723,6 +1783,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": "./risk-photos/RA110_001.webp",
+                "photoFallbackPath": "riskassessment/RA110/001.webp",
+                "photoRaRef": "RA110",
+                "photoRawName": "001.webp",
                 "latestEvaluation": {
                   "id": 3552,
                   "ref": "RA110",
@@ -1830,6 +1894,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": "./risk-photos/RA109_marches.png",
+                "photoFallbackPath": "riskassessment/RA109/marches.png",
+                "photoRaRef": "RA109",
+                "photoRawName": "marches.png",
                 "latestEvaluation": {
                   "id": 3551,
                   "ref": "RA109",
@@ -1985,6 +2053,10 @@
                   "bgBadge": "rgba(239, 68, 68, 0.2)",
                   "borderBadge": "#ef4444"
                 },
+                "photoUrl": "./risk-photos/RA117_2026-06-17_11-58.png",
+                "photoFallbackPath": "riskassessment/RA117/2026-06-17_11-58.png",
+                "photoRaRef": "RA117",
+                "photoRawName": "2026-06-17_11-58.png",
                 "latestEvaluation": {
                   "id": 3559,
                   "ref": "RA117",
@@ -2067,6 +2139,10 @@
                   "bgBadge": "rgba(249, 115, 22, 0.2)",
                   "borderBadge": "#f97316"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3555,
                   "ref": "RA113",
@@ -2149,6 +2225,10 @@
                   "bgBadge": "rgba(249, 115, 22, 0.2)",
                   "borderBadge": "#f97316"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3556,
                   "ref": "RA114",
@@ -2231,6 +2311,10 @@
                   "bgBadge": "rgba(249, 115, 22, 0.2)",
                   "borderBadge": "#f97316"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3558,
                   "ref": "RA116",
@@ -2313,6 +2397,10 @@
                   "bgBadge": "rgba(249, 115, 22, 0.2)",
                   "borderBadge": "#f97316"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3560,
                   "ref": "RA118",
@@ -2395,6 +2483,10 @@
                   "bgBadge": "rgba(249, 115, 22, 0.2)",
                   "borderBadge": "#f97316"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3561,
                   "ref": "RA119",
@@ -2477,6 +2569,10 @@
                   "bgBadge": "rgba(249, 115, 22, 0.2)",
                   "borderBadge": "#f97316"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3562,
                   "ref": "RA120",
@@ -2559,6 +2655,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 8,
                   "ref": "RA8",
@@ -2651,6 +2751,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3284,
                   "ref": "RA70",
@@ -2743,6 +2847,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3557,
                   "ref": "RA115",
@@ -2828,6 +2936,10 @@
                   "bgBadge": "rgba(239, 68, 68, 0.2)",
                   "borderBadge": "#ef4444"
                 },
+                "photoUrl": "./risk-photos/RA117_2026-06-17_11-58.png",
+                "photoFallbackPath": "riskassessment/RA117/2026-06-17_11-58.png",
+                "photoRaRef": "RA117",
+                "photoRawName": "2026-06-17_11-58.png",
                 "latestEvaluation": {
                   "id": 3559,
                   "ref": "RA117",
@@ -2910,6 +3022,10 @@
                   "bgBadge": "rgba(249, 115, 22, 0.2)",
                   "borderBadge": "#f97316"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3555,
                   "ref": "RA113",
@@ -2992,6 +3108,10 @@
                   "bgBadge": "rgba(249, 115, 22, 0.2)",
                   "borderBadge": "#f97316"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3556,
                   "ref": "RA114",
@@ -3074,6 +3194,10 @@
                   "bgBadge": "rgba(249, 115, 22, 0.2)",
                   "borderBadge": "#f97316"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3558,
                   "ref": "RA116",
@@ -3156,6 +3280,10 @@
                   "bgBadge": "rgba(249, 115, 22, 0.2)",
                   "borderBadge": "#f97316"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3560,
                   "ref": "RA118",
@@ -3238,6 +3366,10 @@
                   "bgBadge": "rgba(249, 115, 22, 0.2)",
                   "borderBadge": "#f97316"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3561,
                   "ref": "RA119",
@@ -3320,6 +3452,10 @@
                   "bgBadge": "rgba(249, 115, 22, 0.2)",
                   "borderBadge": "#f97316"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3562,
                   "ref": "RA120",
@@ -3402,6 +3538,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 8,
                   "ref": "RA8",
@@ -3494,6 +3634,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3284,
                   "ref": "RA70",
@@ -3586,6 +3730,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3557,
                   "ref": "RA115",
@@ -3716,6 +3864,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": "./risk-photos/RA10_20210220_161046.jpg",
+                "photoFallbackPath": "riskassessment/RA10/20210220_161046.jpg",
+                "photoRaRef": "RA10",
+                "photoRawName": "20210220_161046.jpg",
                 "latestEvaluation": {
                   "id": 10,
                   "ref": "RA10",
@@ -3817,6 +3969,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": "./risk-photos/RA104_udesk-bureau-ordinateur-768x655.jpg",
+                "photoFallbackPath": "riskassessment/RA104/udesk-bureau-ordinateur-768x655.jpg",
+                "photoRaRef": "RA104",
+                "photoRawName": "udesk-bureau-ordinateur-768x655.jpg",
                 "latestEvaluation": {
                   "id": 3524,
                   "ref": "RA104",
@@ -3951,6 +4107,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": "./risk-photos/RA10_20210220_161046.jpg",
+                "photoFallbackPath": "riskassessment/RA10/20210220_161046.jpg",
+                "photoRaRef": "RA10",
+                "photoRawName": "20210220_161046.jpg",
                 "latestEvaluation": {
                   "id": 10,
                   "ref": "RA10",
@@ -4052,6 +4212,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": "./risk-photos/RA104_udesk-bureau-ordinateur-768x655.jpg",
+                "photoFallbackPath": "riskassessment/RA104/udesk-bureau-ordinateur-768x655.jpg",
+                "photoRaRef": "RA104",
+                "photoRawName": "udesk-bureau-ordinateur-768x655.jpg",
                 "latestEvaluation": {
                   "id": 3524,
                   "ref": "RA104",
@@ -4231,6 +4395,10 @@
                   "bgBadge": "rgba(249, 115, 22, 0.2)",
                   "borderBadge": "#f97316"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 9,
                   "ref": "RA9",
@@ -4326,6 +4494,10 @@
                   "bgBadge": "rgba(249, 115, 22, 0.2)",
                   "borderBadge": "#f97316"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 9,
                   "ref": "RA9",
@@ -4515,6 +4687,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": "./risk-photos/RA4_20211110_135913.jpg",
+                "photoFallbackPath": "riskassessment/RA4/20211110_135913.jpg",
+                "photoRaRef": "RA4",
+                "photoRawName": "20211110_135913.jpg",
                 "latestEvaluation": {
                   "id": 4,
                   "ref": "RA4",
@@ -4616,6 +4792,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3285,
                   "ref": "RA71",
@@ -4711,6 +4891,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": "./risk-photos/RA4_20211110_135913.jpg",
+                "photoFallbackPath": "riskassessment/RA4/20211110_135913.jpg",
+                "photoRaRef": "RA4",
+                "photoRawName": "20211110_135913.jpg",
                 "latestEvaluation": {
                   "id": 4,
                   "ref": "RA4",
@@ -4812,6 +4996,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3285,
                   "ref": "RA71",
@@ -4943,6 +5131,10 @@
               "bgBadge": "rgba(249, 115, 22, 0.2)",
               "borderBadge": "#f97316"
             },
+            "photoUrl": "./risk-photos/RA7_20210803_192804.jpg",
+            "photoFallbackPath": "riskassessment/RA7/20210803_192804.jpg",
+            "photoRaRef": "RA7",
+            "photoRawName": "20210803_192804.jpg",
             "latestEvaluation": {
               "id": 7,
               "ref": "RA7",
@@ -5035,6 +5227,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 1,
               "ref": "RA1",
@@ -5136,6 +5332,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": "./risk-photos/RA61_causeries_risque_15_ordinateur_1024px.png",
+            "photoFallbackPath": "riskassessment/RA61/causeries_risque_15_ordinateur_1024px.png",
+            "photoRaRef": "RA61",
+            "photoRawName": "causeries_risque_15_ordinateur_1024px.png",
             "latestEvaluation": {
               "id": 3265,
               "ref": "RA61",
@@ -5237,6 +5437,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": "./risk-photos/RA110_001.webp",
+            "photoFallbackPath": "riskassessment/RA110/001.webp",
+            "photoRaRef": "RA110",
+            "photoRawName": "001.webp",
             "latestEvaluation": {
               "id": 3552,
               "ref": "RA110",
@@ -5344,6 +5548,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": "./risk-photos/RA109_marches.png",
+            "photoFallbackPath": "riskassessment/RA109/marches.png",
+            "photoRaRef": "RA109",
+            "photoRawName": "marches.png",
             "latestEvaluation": {
               "id": 3551,
               "ref": "RA109",
@@ -5451,6 +5659,10 @@
               "bgBadge": "rgba(239, 68, 68, 0.2)",
               "borderBadge": "#ef4444"
             },
+            "photoUrl": "./risk-photos/RA117_2026-06-17_11-58.png",
+            "photoFallbackPath": "riskassessment/RA117/2026-06-17_11-58.png",
+            "photoRaRef": "RA117",
+            "photoRawName": "2026-06-17_11-58.png",
             "latestEvaluation": {
               "id": 3559,
               "ref": "RA117",
@@ -5533,6 +5745,10 @@
               "bgBadge": "rgba(249, 115, 22, 0.2)",
               "borderBadge": "#f97316"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3555,
               "ref": "RA113",
@@ -5615,6 +5831,10 @@
               "bgBadge": "rgba(249, 115, 22, 0.2)",
               "borderBadge": "#f97316"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3556,
               "ref": "RA114",
@@ -5697,6 +5917,10 @@
               "bgBadge": "rgba(249, 115, 22, 0.2)",
               "borderBadge": "#f97316"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3558,
               "ref": "RA116",
@@ -5779,6 +6003,10 @@
               "bgBadge": "rgba(249, 115, 22, 0.2)",
               "borderBadge": "#f97316"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3560,
               "ref": "RA118",
@@ -5861,6 +6089,10 @@
               "bgBadge": "rgba(249, 115, 22, 0.2)",
               "borderBadge": "#f97316"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3561,
               "ref": "RA119",
@@ -5943,6 +6175,10 @@
               "bgBadge": "rgba(249, 115, 22, 0.2)",
               "borderBadge": "#f97316"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3562,
               "ref": "RA120",
@@ -6025,6 +6261,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 8,
               "ref": "RA8",
@@ -6117,6 +6357,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3284,
               "ref": "RA70",
@@ -6209,6 +6453,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3557,
               "ref": "RA115",
@@ -6291,6 +6539,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": "./risk-photos/RA10_20210220_161046.jpg",
+            "photoFallbackPath": "riskassessment/RA10/20210220_161046.jpg",
+            "photoRaRef": "RA10",
+            "photoRawName": "20210220_161046.jpg",
             "latestEvaluation": {
               "id": 10,
               "ref": "RA10",
@@ -6392,6 +6644,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": "./risk-photos/RA104_udesk-bureau-ordinateur-768x655.jpg",
+            "photoFallbackPath": "riskassessment/RA104/udesk-bureau-ordinateur-768x655.jpg",
+            "photoRaRef": "RA104",
+            "photoRawName": "udesk-bureau-ordinateur-768x655.jpg",
             "latestEvaluation": {
               "id": 3524,
               "ref": "RA104",
@@ -6523,6 +6779,10 @@
               "bgBadge": "rgba(249, 115, 22, 0.2)",
               "borderBadge": "#f97316"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 9,
               "ref": "RA9",
@@ -6615,6 +6875,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": "./risk-photos/RA4_20211110_135913.jpg",
+            "photoFallbackPath": "riskassessment/RA4/20211110_135913.jpg",
+            "photoRaRef": "RA4",
+            "photoRawName": "20211110_135913.jpg",
             "latestEvaluation": {
               "id": 4,
               "ref": "RA4",
@@ -6716,6 +6980,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3285,
               "ref": "RA71",
@@ -6856,6 +7124,10 @@
               "bgBadge": "#09090b",
               "borderBadge": "#cbd5e1"
             },
+            "photoUrl": "./risk-photos/RA105_20210916_183635.jpg",
+            "photoFallbackPath": "riskassessment/RA105/20210916_183635.jpg",
+            "photoRaRef": "RA105",
+            "photoRawName": "20210916_183635.jpg",
             "latestEvaluation": {
               "id": 3525,
               "ref": "RA105",
@@ -6985,6 +7257,10 @@
                   "bgBadge": "#09090b",
                   "borderBadge": "#cbd5e1"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3266,
                   "ref": "RA62",
@@ -7110,6 +7386,10 @@
                   "bgBadge": "rgba(239, 68, 68, 0.2)",
                   "borderBadge": "#ef4444"
                 },
+                "photoUrl": "./risk-photos/RA59_20220127_094415.jpg",
+                "photoFallbackPath": "riskassessment/RA59/20220127_094415.jpg",
+                "photoRaRef": "RA59",
+                "photoRawName": "20220127_094415.jpg",
                 "latestEvaluation": {
                   "id": 3263,
                   "ref": "RA59",
@@ -7220,6 +7500,10 @@
                   "bgBadge": "rgba(239, 68, 68, 0.2)",
                   "borderBadge": "#ef4444"
                 },
+                "photoUrl": "./risk-photos/RA73_causeries_risque5_charge_epaule_600px.png",
+                "photoFallbackPath": "riskassessment/RA73/causeries_risque5_charge_epaule_600px.png",
+                "photoRaRef": "RA73",
+                "photoRawName": "causeries_risque5_charge_epaule_600px.png",
                 "latestEvaluation": {
                   "id": 3287,
                   "ref": "RA73",
@@ -7317,6 +7601,10 @@
                   "bgBadge": "rgba(239, 68, 68, 0.2)",
                   "borderBadge": "#ef4444"
                 },
+                "photoUrl": "./risk-photos/RA72_20240613_141231.jpg",
+                "photoFallbackPath": "riskassessment/RA72/20240613_141231.jpg",
+                "photoRaRef": "RA72",
+                "photoRawName": "20240613_141231.jpg",
                 "latestEvaluation": {
                   "id": 3286,
                   "ref": "RA72",
@@ -7409,6 +7697,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": "./risk-photos/RA64_causeries_risque5_charge_epaule_600px.png",
+                "photoFallbackPath": "riskassessment/RA64/causeries_risque5_charge_epaule_600px.png",
+                "photoRaRef": "RA64",
+                "photoRawName": "causeries_risque5_charge_epaule_600px.png",
                 "latestEvaluation": {
                   "id": 3278,
                   "ref": "RA64",
@@ -7491,6 +7783,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3438,
                   "ref": "RA79",
@@ -7592,6 +7888,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": "./risk-photos/RA65_20240613_141231.jpg",
+                "photoFallbackPath": "riskassessment/RA65/20240613_141231.jpg",
+                "photoRaRef": "RA65",
+                "photoRawName": "20240613_141231.jpg",
                 "latestEvaluation": {
                   "id": 3279,
                   "ref": "RA65",
@@ -7696,6 +7996,10 @@
                   "bgBadge": "#09090b",
                   "borderBadge": "#cbd5e1"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3266,
                   "ref": "RA62",
@@ -7821,6 +8125,10 @@
                   "bgBadge": "rgba(239, 68, 68, 0.2)",
                   "borderBadge": "#ef4444"
                 },
+                "photoUrl": "./risk-photos/RA59_20220127_094415.jpg",
+                "photoFallbackPath": "riskassessment/RA59/20220127_094415.jpg",
+                "photoRaRef": "RA59",
+                "photoRawName": "20220127_094415.jpg",
                 "latestEvaluation": {
                   "id": 3263,
                   "ref": "RA59",
@@ -7931,6 +8239,10 @@
                   "bgBadge": "rgba(239, 68, 68, 0.2)",
                   "borderBadge": "#ef4444"
                 },
+                "photoUrl": "./risk-photos/RA73_causeries_risque5_charge_epaule_600px.png",
+                "photoFallbackPath": "riskassessment/RA73/causeries_risque5_charge_epaule_600px.png",
+                "photoRaRef": "RA73",
+                "photoRawName": "causeries_risque5_charge_epaule_600px.png",
                 "latestEvaluation": {
                   "id": 3287,
                   "ref": "RA73",
@@ -8028,6 +8340,10 @@
                   "bgBadge": "rgba(239, 68, 68, 0.2)",
                   "borderBadge": "#ef4444"
                 },
+                "photoUrl": "./risk-photos/RA72_20240613_141231.jpg",
+                "photoFallbackPath": "riskassessment/RA72/20240613_141231.jpg",
+                "photoRaRef": "RA72",
+                "photoRawName": "20240613_141231.jpg",
                 "latestEvaluation": {
                   "id": 3286,
                   "ref": "RA72",
@@ -8120,6 +8436,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": "./risk-photos/RA64_causeries_risque5_charge_epaule_600px.png",
+                "photoFallbackPath": "riskassessment/RA64/causeries_risque5_charge_epaule_600px.png",
+                "photoRaRef": "RA64",
+                "photoRawName": "causeries_risque5_charge_epaule_600px.png",
                 "latestEvaluation": {
                   "id": 3278,
                   "ref": "RA64",
@@ -8202,6 +8522,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3438,
                   "ref": "RA79",
@@ -8303,6 +8627,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": "./risk-photos/RA65_20240613_141231.jpg",
+                "photoFallbackPath": "riskassessment/RA65/20240613_141231.jpg",
+                "photoRaRef": "RA65",
+                "photoRawName": "20240613_141231.jpg",
                 "latestEvaluation": {
                   "id": 3279,
                   "ref": "RA65",
@@ -8452,6 +8780,10 @@
                   "bgBadge": "rgba(239, 68, 68, 0.2)",
                   "borderBadge": "#ef4444"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3493,
                   "ref": "RA81",
@@ -8544,6 +8876,10 @@
                   "bgBadge": "rgba(239, 68, 68, 0.2)",
                   "borderBadge": "#ef4444"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3553,
                   "ref": "RA111",
@@ -8669,6 +9005,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3554,
                   "ref": "RA112",
@@ -8764,6 +9104,10 @@
                   "bgBadge": "rgba(239, 68, 68, 0.2)",
                   "borderBadge": "#ef4444"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3493,
                   "ref": "RA81",
@@ -8856,6 +9200,10 @@
                   "bgBadge": "rgba(239, 68, 68, 0.2)",
                   "borderBadge": "#ef4444"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3553,
                   "ref": "RA111",
@@ -8981,6 +9329,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3554,
                   "ref": "RA112",
@@ -9112,6 +9464,10 @@
               "bgBadge": "#09090b",
               "borderBadge": "#cbd5e1"
             },
+            "photoUrl": "./risk-photos/RA105_20210916_183635.jpg",
+            "photoFallbackPath": "riskassessment/RA105/20210916_183635.jpg",
+            "photoRaRef": "RA105",
+            "photoRawName": "20210916_183635.jpg",
             "latestEvaluation": {
               "id": 3525,
               "ref": "RA105",
@@ -9228,6 +9584,10 @@
               "bgBadge": "#09090b",
               "borderBadge": "#cbd5e1"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3266,
               "ref": "RA62",
@@ -9353,6 +9713,10 @@
               "bgBadge": "rgba(239, 68, 68, 0.2)",
               "borderBadge": "#ef4444"
             },
+            "photoUrl": "./risk-photos/RA59_20220127_094415.jpg",
+            "photoFallbackPath": "riskassessment/RA59/20220127_094415.jpg",
+            "photoRaRef": "RA59",
+            "photoRawName": "20220127_094415.jpg",
             "latestEvaluation": {
               "id": 3263,
               "ref": "RA59",
@@ -9463,6 +9827,10 @@
               "bgBadge": "rgba(239, 68, 68, 0.2)",
               "borderBadge": "#ef4444"
             },
+            "photoUrl": "./risk-photos/RA73_causeries_risque5_charge_epaule_600px.png",
+            "photoFallbackPath": "riskassessment/RA73/causeries_risque5_charge_epaule_600px.png",
+            "photoRaRef": "RA73",
+            "photoRawName": "causeries_risque5_charge_epaule_600px.png",
             "latestEvaluation": {
               "id": 3287,
               "ref": "RA73",
@@ -9560,6 +9928,10 @@
               "bgBadge": "rgba(239, 68, 68, 0.2)",
               "borderBadge": "#ef4444"
             },
+            "photoUrl": "./risk-photos/RA72_20240613_141231.jpg",
+            "photoFallbackPath": "riskassessment/RA72/20240613_141231.jpg",
+            "photoRaRef": "RA72",
+            "photoRawName": "20240613_141231.jpg",
             "latestEvaluation": {
               "id": 3286,
               "ref": "RA72",
@@ -9652,6 +10024,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": "./risk-photos/RA64_causeries_risque5_charge_epaule_600px.png",
+            "photoFallbackPath": "riskassessment/RA64/causeries_risque5_charge_epaule_600px.png",
+            "photoRaRef": "RA64",
+            "photoRawName": "causeries_risque5_charge_epaule_600px.png",
             "latestEvaluation": {
               "id": 3278,
               "ref": "RA64",
@@ -9734,6 +10110,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3438,
               "ref": "RA79",
@@ -9835,6 +10215,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": "./risk-photos/RA65_20240613_141231.jpg",
+            "photoFallbackPath": "riskassessment/RA65/20240613_141231.jpg",
+            "photoRaRef": "RA65",
+            "photoRawName": "20240613_141231.jpg",
             "latestEvaluation": {
               "id": 3279,
               "ref": "RA65",
@@ -9936,6 +10320,10 @@
               "bgBadge": "rgba(239, 68, 68, 0.2)",
               "borderBadge": "#ef4444"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3493,
               "ref": "RA81",
@@ -10028,6 +10416,10 @@
               "bgBadge": "rgba(239, 68, 68, 0.2)",
               "borderBadge": "#ef4444"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3553,
               "ref": "RA111",
@@ -10153,6 +10545,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3554,
               "ref": "RA112",
@@ -10305,6 +10701,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3280,
                   "ref": "RA66",
@@ -10400,6 +10800,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3280,
                   "ref": "RA66",
@@ -10589,6 +10993,10 @@
                   "bgBadge": "rgba(239, 68, 68, 0.2)",
                   "borderBadge": "#ef4444"
                 },
+                "photoUrl": "./risk-photos/RA67_ATEX.jpg",
+                "photoFallbackPath": "riskassessment/RA67/ATEX.jpg",
+                "photoRaRef": "RA67",
+                "photoRawName": "ATEX.jpg",
                 "latestEvaluation": {
                   "id": 3281,
                   "ref": "RA67",
@@ -10681,6 +11089,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3282,
                   "ref": "RA68",
@@ -10766,6 +11178,10 @@
                   "bgBadge": "rgba(239, 68, 68, 0.2)",
                   "borderBadge": "#ef4444"
                 },
+                "photoUrl": "./risk-photos/RA67_ATEX.jpg",
+                "photoFallbackPath": "riskassessment/RA67/ATEX.jpg",
+                "photoRaRef": "RA67",
+                "photoRawName": "ATEX.jpg",
                 "latestEvaluation": {
                   "id": 3281,
                   "ref": "RA67",
@@ -10858,6 +11274,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3282,
                   "ref": "RA68",
@@ -10988,6 +11408,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3499,
                   "ref": "RA87",
@@ -11083,6 +11507,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3499,
                   "ref": "RA87",
@@ -11214,6 +11642,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3280,
               "ref": "RA66",
@@ -11306,6 +11738,10 @@
               "bgBadge": "rgba(239, 68, 68, 0.2)",
               "borderBadge": "#ef4444"
             },
+            "photoUrl": "./risk-photos/RA67_ATEX.jpg",
+            "photoFallbackPath": "riskassessment/RA67/ATEX.jpg",
+            "photoRaRef": "RA67",
+            "photoRawName": "ATEX.jpg",
             "latestEvaluation": {
               "id": 3281,
               "ref": "RA67",
@@ -11398,6 +11834,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3282,
               "ref": "RA68",
@@ -11480,6 +11920,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3499,
               "ref": "RA87",
@@ -11620,6 +12064,10 @@
               "bgBadge": "rgba(239, 68, 68, 0.2)",
               "borderBadge": "#ef4444"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3496,
               "ref": "RA84",
@@ -11702,6 +12150,10 @@
               "bgBadge": "rgba(239, 68, 68, 0.2)",
               "borderBadge": "#ef4444"
             },
+            "photoUrl": "./risk-photos/RA96_TK2503-1157-2025-03-04_00-19-RPS-outils_INRS.png",
+            "photoFallbackPath": "riskassessment/RA96/TK2503-1157-2025-03-04_00-19-RPS-outils_INRS.png",
+            "photoRaRef": "RA96",
+            "photoRawName": "TK2503-1157-2025-03-04_00-19-RPS-outils_INRS.png",
             "latestEvaluation": {
               "id": 3516,
               "ref": "RA96",
@@ -11803,6 +12255,10 @@
               "bgBadge": "rgba(249, 115, 22, 0.2)",
               "borderBadge": "#f97316"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3497,
               "ref": "RA85",
@@ -11885,6 +12341,10 @@
               "bgBadge": "rgba(249, 115, 22, 0.2)",
               "borderBadge": "#f97316"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3518,
               "ref": "RA98",
@@ -11967,6 +12427,10 @@
               "bgBadge": "rgba(249, 115, 22, 0.2)",
               "borderBadge": "#f97316"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3519,
               "ref": "RA99",
@@ -12049,6 +12513,10 @@
               "bgBadge": "rgba(249, 115, 22, 0.2)",
               "borderBadge": "#f97316"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3520,
               "ref": "RA100",
@@ -12131,6 +12599,10 @@
               "bgBadge": "rgba(249, 115, 22, 0.2)",
               "borderBadge": "#f97316"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3523,
               "ref": "RA103",
@@ -12213,6 +12685,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": "./risk-photos/RA86_2025-03-04_00-19-RPS-outils_INRS.png",
+            "photoFallbackPath": "riskassessment/RA86/2025-03-04_00-19-RPS-outils_INRS.png",
+            "photoRaRef": "RA86",
+            "photoRawName": "2025-03-04_00-19-RPS-outils_INRS.png",
             "latestEvaluation": {
               "id": 3498,
               "ref": "RA86",
@@ -12295,6 +12771,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3517,
               "ref": "RA97",
@@ -12377,6 +12857,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3521,
               "ref": "RA101",
@@ -12459,6 +12943,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3522,
               "ref": "RA102",
@@ -12554,6 +13042,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": "./risk-photos/RA2_risque_routiers-en-mission_crash-voiture_600px.png",
+                "photoFallbackPath": "riskassessment/RA2/risque_routiers-en-mission_crash-voiture_600px.png",
+                "photoRaRef": "RA2",
+                "photoRawName": "risque_routiers-en-mission_crash-voiture_600px.png",
                 "latestEvaluation": {
                   "id": 2,
                   "ref": "RA2",
@@ -12649,6 +13141,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": "./risk-photos/RA2_risque_routiers-en-mission_crash-voiture_600px.png",
+                "photoFallbackPath": "riskassessment/RA2/risque_routiers-en-mission_crash-voiture_600px.png",
+                "photoRaRef": "RA2",
+                "photoRawName": "risque_routiers-en-mission_crash-voiture_600px.png",
                 "latestEvaluation": {
                   "id": 2,
                   "ref": "RA2",
@@ -12789,6 +13285,10 @@
                   "bgBadge": "rgba(239, 68, 68, 0.2)",
                   "borderBadge": "#ef4444"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3288,
                   "ref": "RA74",
@@ -12881,6 +13381,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3495,
                   "ref": "RA83",
@@ -12973,6 +13477,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": "./risk-photos/RA60_20211113_115816.jpg",
+                "photoFallbackPath": "riskassessment/RA60/20211113_115816.jpg",
+                "photoRaRef": "RA60",
+                "photoRawName": "20211113_115816.jpg",
                 "latestEvaluation": {
                   "id": 3264,
                   "ref": "RA60",
@@ -13110,6 +13618,10 @@
                   "bgBadge": "rgba(239, 68, 68, 0.2)",
                   "borderBadge": "#ef4444"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3288,
                   "ref": "RA74",
@@ -13202,6 +13714,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
                 "latestEvaluation": {
                   "id": 3495,
                   "ref": "RA83",
@@ -13294,6 +13810,10 @@
                   "bgBadge": "rgba(148, 163, 184, 0.18)",
                   "borderBadge": "#94a3b8"
                 },
+                "photoUrl": "./risk-photos/RA60_20211113_115816.jpg",
+                "photoFallbackPath": "riskassessment/RA60/20211113_115816.jpg",
+                "photoRaRef": "RA60",
+                "photoRawName": "20211113_115816.jpg",
                 "latestEvaluation": {
                   "id": 3264,
                   "ref": "RA60",
@@ -13516,6 +14036,10 @@
               "bgBadge": "rgba(239, 68, 68, 0.2)",
               "borderBadge": "#ef4444"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3496,
               "ref": "RA84",
@@ -13598,6 +14122,10 @@
               "bgBadge": "rgba(239, 68, 68, 0.2)",
               "borderBadge": "#ef4444"
             },
+            "photoUrl": "./risk-photos/RA96_TK2503-1157-2025-03-04_00-19-RPS-outils_INRS.png",
+            "photoFallbackPath": "riskassessment/RA96/TK2503-1157-2025-03-04_00-19-RPS-outils_INRS.png",
+            "photoRaRef": "RA96",
+            "photoRawName": "TK2503-1157-2025-03-04_00-19-RPS-outils_INRS.png",
             "latestEvaluation": {
               "id": 3516,
               "ref": "RA96",
@@ -13699,6 +14227,10 @@
               "bgBadge": "rgba(249, 115, 22, 0.2)",
               "borderBadge": "#f97316"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3497,
               "ref": "RA85",
@@ -13781,6 +14313,10 @@
               "bgBadge": "rgba(249, 115, 22, 0.2)",
               "borderBadge": "#f97316"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3518,
               "ref": "RA98",
@@ -13863,6 +14399,10 @@
               "bgBadge": "rgba(249, 115, 22, 0.2)",
               "borderBadge": "#f97316"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3519,
               "ref": "RA99",
@@ -13945,6 +14485,10 @@
               "bgBadge": "rgba(249, 115, 22, 0.2)",
               "borderBadge": "#f97316"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3520,
               "ref": "RA100",
@@ -14027,6 +14571,10 @@
               "bgBadge": "rgba(249, 115, 22, 0.2)",
               "borderBadge": "#f97316"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3523,
               "ref": "RA103",
@@ -14109,6 +14657,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": "./risk-photos/RA86_2025-03-04_00-19-RPS-outils_INRS.png",
+            "photoFallbackPath": "riskassessment/RA86/2025-03-04_00-19-RPS-outils_INRS.png",
+            "photoRaRef": "RA86",
+            "photoRawName": "2025-03-04_00-19-RPS-outils_INRS.png",
             "latestEvaluation": {
               "id": 3498,
               "ref": "RA86",
@@ -14191,6 +14743,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3517,
               "ref": "RA97",
@@ -14273,6 +14829,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3521,
               "ref": "RA101",
@@ -14355,6 +14915,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3522,
               "ref": "RA102",
@@ -14437,6 +15001,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": "./risk-photos/RA2_risque_routiers-en-mission_crash-voiture_600px.png",
+            "photoFallbackPath": "riskassessment/RA2/risque_routiers-en-mission_crash-voiture_600px.png",
+            "photoRaRef": "RA2",
+            "photoRawName": "risque_routiers-en-mission_crash-voiture_600px.png",
             "latestEvaluation": {
               "id": 2,
               "ref": "RA2",
@@ -14529,6 +15097,10 @@
               "bgBadge": "rgba(239, 68, 68, 0.2)",
               "borderBadge": "#ef4444"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3288,
               "ref": "RA74",
@@ -14621,6 +15193,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
             "latestEvaluation": {
               "id": 3495,
               "ref": "RA83",
@@ -14713,6 +15289,10 @@
               "bgBadge": "rgba(148, 163, 184, 0.18)",
               "borderBadge": "#94a3b8"
             },
+            "photoUrl": "./risk-photos/RA60_20211113_115816.jpg",
+            "photoFallbackPath": "riskassessment/RA60/20211113_115816.jpg",
+            "photoRaRef": "RA60",
+            "photoRawName": "20211113_115816.jpg",
             "latestEvaluation": {
               "id": 3264,
               "ref": "RA60",
@@ -14886,6 +15466,10 @@
           "bgBadge": "rgba(239, 68, 68, 0.2)",
           "borderBadge": "#ef4444"
         },
+        "photoUrl": "./risk-photos/RA93_homme_moto_en_ville.png",
+        "photoFallbackPath": "riskassessment/RA93/homme_moto_en_ville.png",
+        "photoRaRef": "RA93",
+        "photoRawName": "homme_moto_en_ville.png",
         "latestEvaluation": {
           "id": 3505,
           "ref": "RA93",
@@ -14968,6 +15552,10 @@
           "bgBadge": "rgba(239, 68, 68, 0.2)",
           "borderBadge": "#ef4444"
         },
+        "photoUrl": "./risk-photos/RA94_homme_trottinette_casque_velo-en-ville.png",
+        "photoFallbackPath": "riskassessment/RA94/homme_trottinette_casque_velo-en-ville.png",
+        "photoRaRef": "RA94",
+        "photoRawName": "homme_trottinette_casque_velo-en-ville.png",
         "latestEvaluation": {
           "id": 3506,
           "ref": "RA94",
@@ -15078,6 +15666,10 @@
           "bgBadge": "rgba(249, 115, 22, 0.2)",
           "borderBadge": "#f97316"
         },
+        "photoUrl": "./risk-photos/RA91_ChatGPT_Image_20_juil._2025__19_55_13.png",
+        "photoFallbackPath": "riskassessment/RA91/ChatGPT Image 20 juil. 2025, 19_55_13.png",
+        "photoRaRef": "RA91",
+        "photoRawName": "ChatGPT Image 20 juil. 2025, 19_55_13.png",
         "latestEvaluation": {
           "id": 3503,
           "ref": "RA91",
@@ -15185,6 +15777,10 @@
           "bgBadge": "rgba(249, 115, 22, 0.2)",
           "borderBadge": "#f97316"
         },
+        "photoUrl": "./risk-photos/RA107_causeries_risque_15_lumiere_1024px.png",
+        "photoFallbackPath": "riskassessment/RA107/causeries_risque_15_lumiere_1024px.png",
+        "photoRaRef": "RA107",
+        "photoRawName": "causeries_risque_15_lumiere_1024px.png",
         "latestEvaluation": {
           "id": 3549,
           "ref": "RA107",
@@ -15292,6 +15888,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": "./risk-photos/RA92_ChatGPT_Image_20_juil._2025__20_13_30.png",
+        "photoFallbackPath": "riskassessment/RA92/ChatGPT Image 20 juil. 2025, 20_13_30.png",
+        "photoRaRef": "RA92",
+        "photoRawName": "ChatGPT Image 20 juil. 2025, 20_13_30.png",
         "latestEvaluation": {
           "id": 3504,
           "ref": "RA92",
@@ -15384,6 +15984,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": "./risk-photos/RA89_homme_passage_pieton_en_ville.png",
+        "photoFallbackPath": "riskassessment/RA89/homme_passage_pieton_en_ville.png",
+        "photoRaRef": "RA89",
+        "photoRawName": "homme_passage_pieton_en_ville.png",
         "latestEvaluation": {
           "id": 3501,
           "ref": "RA89",
@@ -15491,6 +16095,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3550,
           "ref": "RA108",
@@ -15652,6 +16260,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3526,
           "ref": "RA106",
@@ -15789,6 +16401,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": "./risk-photos/RA95_ChatGPT_Image_25_juil._2025__14_16_12.png",
+        "photoFallbackPath": "riskassessment/RA95/ChatGPT Image 25 juil. 2025, 14_16_12.png",
+        "photoRaRef": "RA95",
+        "photoRawName": "ChatGPT Image 25 juil. 2025, 14_16_12.png",
         "latestEvaluation": {
           "id": 3507,
           "ref": "RA95",
@@ -15926,6 +16542,10 @@
           "bgBadge": "rgba(249, 115, 22, 0.2)",
           "borderBadge": "#f97316"
         },
+        "photoUrl": "./risk-photos/RA7_20210803_192804.jpg",
+        "photoFallbackPath": "riskassessment/RA7/20210803_192804.jpg",
+        "photoRaRef": "RA7",
+        "photoRawName": "20210803_192804.jpg",
         "latestEvaluation": {
           "id": 7,
           "ref": "RA7",
@@ -16018,6 +16638,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 1,
           "ref": "RA1",
@@ -16119,6 +16743,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": "./risk-photos/RA61_causeries_risque_15_ordinateur_1024px.png",
+        "photoFallbackPath": "riskassessment/RA61/causeries_risque_15_ordinateur_1024px.png",
+        "photoRaRef": "RA61",
+        "photoRawName": "causeries_risque_15_ordinateur_1024px.png",
         "latestEvaluation": {
           "id": 3265,
           "ref": "RA61",
@@ -16220,6 +16848,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": "./risk-photos/RA110_001.webp",
+        "photoFallbackPath": "riskassessment/RA110/001.webp",
+        "photoRaRef": "RA110",
+        "photoRawName": "001.webp",
         "latestEvaluation": {
           "id": 3552,
           "ref": "RA110",
@@ -16327,6 +16959,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": "./risk-photos/RA109_marches.png",
+        "photoFallbackPath": "riskassessment/RA109/marches.png",
+        "photoRaRef": "RA109",
+        "photoRawName": "marches.png",
         "latestEvaluation": {
           "id": 3551,
           "ref": "RA109",
@@ -16434,6 +17070,10 @@
           "bgBadge": "rgba(239, 68, 68, 0.2)",
           "borderBadge": "#ef4444"
         },
+        "photoUrl": "./risk-photos/RA117_2026-06-17_11-58.png",
+        "photoFallbackPath": "riskassessment/RA117/2026-06-17_11-58.png",
+        "photoRaRef": "RA117",
+        "photoRawName": "2026-06-17_11-58.png",
         "latestEvaluation": {
           "id": 3559,
           "ref": "RA117",
@@ -16516,6 +17156,10 @@
           "bgBadge": "rgba(249, 115, 22, 0.2)",
           "borderBadge": "#f97316"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3555,
           "ref": "RA113",
@@ -16598,6 +17242,10 @@
           "bgBadge": "rgba(249, 115, 22, 0.2)",
           "borderBadge": "#f97316"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3556,
           "ref": "RA114",
@@ -16680,6 +17328,10 @@
           "bgBadge": "rgba(249, 115, 22, 0.2)",
           "borderBadge": "#f97316"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3558,
           "ref": "RA116",
@@ -16762,6 +17414,10 @@
           "bgBadge": "rgba(249, 115, 22, 0.2)",
           "borderBadge": "#f97316"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3560,
           "ref": "RA118",
@@ -16844,6 +17500,10 @@
           "bgBadge": "rgba(249, 115, 22, 0.2)",
           "borderBadge": "#f97316"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3561,
           "ref": "RA119",
@@ -16926,6 +17586,10 @@
           "bgBadge": "rgba(249, 115, 22, 0.2)",
           "borderBadge": "#f97316"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3562,
           "ref": "RA120",
@@ -17008,6 +17672,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 8,
           "ref": "RA8",
@@ -17100,6 +17768,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3284,
           "ref": "RA70",
@@ -17192,6 +17864,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3557,
           "ref": "RA115",
@@ -17274,6 +17950,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": "./risk-photos/RA10_20210220_161046.jpg",
+        "photoFallbackPath": "riskassessment/RA10/20210220_161046.jpg",
+        "photoRaRef": "RA10",
+        "photoRawName": "20210220_161046.jpg",
         "latestEvaluation": {
           "id": 10,
           "ref": "RA10",
@@ -17375,6 +18055,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": "./risk-photos/RA104_udesk-bureau-ordinateur-768x655.jpg",
+        "photoFallbackPath": "riskassessment/RA104/udesk-bureau-ordinateur-768x655.jpg",
+        "photoRaRef": "RA104",
+        "photoRawName": "udesk-bureau-ordinateur-768x655.jpg",
         "latestEvaluation": {
           "id": 3524,
           "ref": "RA104",
@@ -17506,6 +18190,10 @@
           "bgBadge": "rgba(249, 115, 22, 0.2)",
           "borderBadge": "#f97316"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 9,
           "ref": "RA9",
@@ -17598,6 +18286,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": "./risk-photos/RA4_20211110_135913.jpg",
+        "photoFallbackPath": "riskassessment/RA4/20211110_135913.jpg",
+        "photoRaRef": "RA4",
+        "photoRawName": "20211110_135913.jpg",
         "latestEvaluation": {
           "id": 4,
           "ref": "RA4",
@@ -17699,6 +18391,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3285,
           "ref": "RA71",
@@ -17791,6 +18487,10 @@
           "bgBadge": "#09090b",
           "borderBadge": "#cbd5e1"
         },
+        "photoUrl": "./risk-photos/RA105_20210916_183635.jpg",
+        "photoFallbackPath": "riskassessment/RA105/20210916_183635.jpg",
+        "photoRaRef": "RA105",
+        "photoRawName": "20210916_183635.jpg",
         "latestEvaluation": {
           "id": 3525,
           "ref": "RA105",
@@ -17907,6 +18607,10 @@
           "bgBadge": "#09090b",
           "borderBadge": "#cbd5e1"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3266,
           "ref": "RA62",
@@ -18032,6 +18736,10 @@
           "bgBadge": "rgba(239, 68, 68, 0.2)",
           "borderBadge": "#ef4444"
         },
+        "photoUrl": "./risk-photos/RA59_20220127_094415.jpg",
+        "photoFallbackPath": "riskassessment/RA59/20220127_094415.jpg",
+        "photoRaRef": "RA59",
+        "photoRawName": "20220127_094415.jpg",
         "latestEvaluation": {
           "id": 3263,
           "ref": "RA59",
@@ -18142,6 +18850,10 @@
           "bgBadge": "rgba(239, 68, 68, 0.2)",
           "borderBadge": "#ef4444"
         },
+        "photoUrl": "./risk-photos/RA73_causeries_risque5_charge_epaule_600px.png",
+        "photoFallbackPath": "riskassessment/RA73/causeries_risque5_charge_epaule_600px.png",
+        "photoRaRef": "RA73",
+        "photoRawName": "causeries_risque5_charge_epaule_600px.png",
         "latestEvaluation": {
           "id": 3287,
           "ref": "RA73",
@@ -18239,6 +18951,10 @@
           "bgBadge": "rgba(239, 68, 68, 0.2)",
           "borderBadge": "#ef4444"
         },
+        "photoUrl": "./risk-photos/RA72_20240613_141231.jpg",
+        "photoFallbackPath": "riskassessment/RA72/20240613_141231.jpg",
+        "photoRaRef": "RA72",
+        "photoRawName": "20240613_141231.jpg",
         "latestEvaluation": {
           "id": 3286,
           "ref": "RA72",
@@ -18331,6 +19047,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": "./risk-photos/RA64_causeries_risque5_charge_epaule_600px.png",
+        "photoFallbackPath": "riskassessment/RA64/causeries_risque5_charge_epaule_600px.png",
+        "photoRaRef": "RA64",
+        "photoRawName": "causeries_risque5_charge_epaule_600px.png",
         "latestEvaluation": {
           "id": 3278,
           "ref": "RA64",
@@ -18413,6 +19133,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3438,
           "ref": "RA79",
@@ -18514,6 +19238,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": "./risk-photos/RA65_20240613_141231.jpg",
+        "photoFallbackPath": "riskassessment/RA65/20240613_141231.jpg",
+        "photoRaRef": "RA65",
+        "photoRawName": "20240613_141231.jpg",
         "latestEvaluation": {
           "id": 3279,
           "ref": "RA65",
@@ -18615,6 +19343,10 @@
           "bgBadge": "rgba(239, 68, 68, 0.2)",
           "borderBadge": "#ef4444"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3493,
           "ref": "RA81",
@@ -18707,6 +19439,10 @@
           "bgBadge": "rgba(239, 68, 68, 0.2)",
           "borderBadge": "#ef4444"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3553,
           "ref": "RA111",
@@ -18832,6 +19568,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3554,
           "ref": "RA112",
@@ -18924,6 +19664,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3280,
           "ref": "RA66",
@@ -19016,6 +19760,10 @@
           "bgBadge": "rgba(239, 68, 68, 0.2)",
           "borderBadge": "#ef4444"
         },
+        "photoUrl": "./risk-photos/RA67_ATEX.jpg",
+        "photoFallbackPath": "riskassessment/RA67/ATEX.jpg",
+        "photoRaRef": "RA67",
+        "photoRawName": "ATEX.jpg",
         "latestEvaluation": {
           "id": 3281,
           "ref": "RA67",
@@ -19108,6 +19856,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3282,
           "ref": "RA68",
@@ -19190,6 +19942,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3499,
           "ref": "RA87",
@@ -19282,6 +20038,10 @@
           "bgBadge": "rgba(239, 68, 68, 0.2)",
           "borderBadge": "#ef4444"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3496,
           "ref": "RA84",
@@ -19364,6 +20124,10 @@
           "bgBadge": "rgba(239, 68, 68, 0.2)",
           "borderBadge": "#ef4444"
         },
+        "photoUrl": "./risk-photos/RA96_TK2503-1157-2025-03-04_00-19-RPS-outils_INRS.png",
+        "photoFallbackPath": "riskassessment/RA96/TK2503-1157-2025-03-04_00-19-RPS-outils_INRS.png",
+        "photoRaRef": "RA96",
+        "photoRawName": "TK2503-1157-2025-03-04_00-19-RPS-outils_INRS.png",
         "latestEvaluation": {
           "id": 3516,
           "ref": "RA96",
@@ -19465,6 +20229,10 @@
           "bgBadge": "rgba(249, 115, 22, 0.2)",
           "borderBadge": "#f97316"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3497,
           "ref": "RA85",
@@ -19547,6 +20315,10 @@
           "bgBadge": "rgba(249, 115, 22, 0.2)",
           "borderBadge": "#f97316"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3518,
           "ref": "RA98",
@@ -19629,6 +20401,10 @@
           "bgBadge": "rgba(249, 115, 22, 0.2)",
           "borderBadge": "#f97316"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3519,
           "ref": "RA99",
@@ -19711,6 +20487,10 @@
           "bgBadge": "rgba(249, 115, 22, 0.2)",
           "borderBadge": "#f97316"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3520,
           "ref": "RA100",
@@ -19793,6 +20573,10 @@
           "bgBadge": "rgba(249, 115, 22, 0.2)",
           "borderBadge": "#f97316"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3523,
           "ref": "RA103",
@@ -19875,6 +20659,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": "./risk-photos/RA86_2025-03-04_00-19-RPS-outils_INRS.png",
+        "photoFallbackPath": "riskassessment/RA86/2025-03-04_00-19-RPS-outils_INRS.png",
+        "photoRaRef": "RA86",
+        "photoRawName": "2025-03-04_00-19-RPS-outils_INRS.png",
         "latestEvaluation": {
           "id": 3498,
           "ref": "RA86",
@@ -19957,6 +20745,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3517,
           "ref": "RA97",
@@ -20039,6 +20831,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3521,
           "ref": "RA101",
@@ -20121,6 +20917,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3522,
           "ref": "RA102",
@@ -20203,6 +21003,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": "./risk-photos/RA2_risque_routiers-en-mission_crash-voiture_600px.png",
+        "photoFallbackPath": "riskassessment/RA2/risque_routiers-en-mission_crash-voiture_600px.png",
+        "photoRaRef": "RA2",
+        "photoRawName": "risque_routiers-en-mission_crash-voiture_600px.png",
         "latestEvaluation": {
           "id": 2,
           "ref": "RA2",
@@ -20295,6 +21099,10 @@
           "bgBadge": "rgba(239, 68, 68, 0.2)",
           "borderBadge": "#ef4444"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3288,
           "ref": "RA74",
@@ -20387,6 +21195,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
         "latestEvaluation": {
           "id": 3495,
           "ref": "RA83",
@@ -20479,6 +21291,10 @@
           "bgBadge": "rgba(148, 163, 184, 0.18)",
           "borderBadge": "#94a3b8"
         },
+        "photoUrl": "./risk-photos/RA60_20211113_115816.jpg",
+        "photoFallbackPath": "riskassessment/RA60/20211113_115816.jpg",
+        "photoRaRef": "RA60",
+        "photoRawName": "20211113_115816.jpg",
         "latestEvaluation": {
           "id": 3264,
           "ref": "RA60",
@@ -20662,6 +21478,10 @@
             "bgBadge": "rgba(249, 115, 22, 0.2)",
             "borderBadge": "#f97316"
           },
+          "photoUrl": "./risk-photos/RA7_20210803_192804.jpg",
+          "photoFallbackPath": "riskassessment/RA7/20210803_192804.jpg",
+          "photoRaRef": "RA7",
+          "photoRawName": "20210803_192804.jpg",
           "latestEvaluation": {
             "id": 7,
             "ref": "RA7",
@@ -20754,6 +21574,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 1,
             "ref": "RA1",
@@ -20868,6 +21692,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": "./risk-photos/RA61_causeries_risque_15_ordinateur_1024px.png",
+              "photoFallbackPath": "riskassessment/RA61/causeries_risque_15_ordinateur_1024px.png",
+              "photoRaRef": "RA61",
+              "photoRawName": "causeries_risque_15_ordinateur_1024px.png",
               "latestEvaluation": {
                 "id": 3265,
                 "ref": "RA61",
@@ -20969,6 +21797,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": "./risk-photos/RA110_001.webp",
+              "photoFallbackPath": "riskassessment/RA110/001.webp",
+              "photoRaRef": "RA110",
+              "photoRawName": "001.webp",
               "latestEvaluation": {
                 "id": 3552,
                 "ref": "RA110",
@@ -21076,6 +21908,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": "./risk-photos/RA109_marches.png",
+              "photoFallbackPath": "riskassessment/RA109/marches.png",
+              "photoRaRef": "RA109",
+              "photoRawName": "marches.png",
               "latestEvaluation": {
                 "id": 3551,
                 "ref": "RA109",
@@ -21186,6 +22022,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": "./risk-photos/RA61_causeries_risque_15_ordinateur_1024px.png",
+              "photoFallbackPath": "riskassessment/RA61/causeries_risque_15_ordinateur_1024px.png",
+              "photoRaRef": "RA61",
+              "photoRawName": "causeries_risque_15_ordinateur_1024px.png",
               "latestEvaluation": {
                 "id": 3265,
                 "ref": "RA61",
@@ -21287,6 +22127,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": "./risk-photos/RA110_001.webp",
+              "photoFallbackPath": "riskassessment/RA110/001.webp",
+              "photoRaRef": "RA110",
+              "photoRawName": "001.webp",
               "latestEvaluation": {
                 "id": 3552,
                 "ref": "RA110",
@@ -21394,6 +22238,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": "./risk-photos/RA109_marches.png",
+              "photoFallbackPath": "riskassessment/RA109/marches.png",
+              "photoRaRef": "RA109",
+              "photoRawName": "marches.png",
               "latestEvaluation": {
                 "id": 3551,
                 "ref": "RA109",
@@ -21549,6 +22397,10 @@
                 "bgBadge": "rgba(239, 68, 68, 0.2)",
                 "borderBadge": "#ef4444"
               },
+              "photoUrl": "./risk-photos/RA117_2026-06-17_11-58.png",
+              "photoFallbackPath": "riskassessment/RA117/2026-06-17_11-58.png",
+              "photoRaRef": "RA117",
+              "photoRawName": "2026-06-17_11-58.png",
               "latestEvaluation": {
                 "id": 3559,
                 "ref": "RA117",
@@ -21631,6 +22483,10 @@
                 "bgBadge": "rgba(249, 115, 22, 0.2)",
                 "borderBadge": "#f97316"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3555,
                 "ref": "RA113",
@@ -21713,6 +22569,10 @@
                 "bgBadge": "rgba(249, 115, 22, 0.2)",
                 "borderBadge": "#f97316"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3556,
                 "ref": "RA114",
@@ -21795,6 +22655,10 @@
                 "bgBadge": "rgba(249, 115, 22, 0.2)",
                 "borderBadge": "#f97316"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3558,
                 "ref": "RA116",
@@ -21877,6 +22741,10 @@
                 "bgBadge": "rgba(249, 115, 22, 0.2)",
                 "borderBadge": "#f97316"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3560,
                 "ref": "RA118",
@@ -21959,6 +22827,10 @@
                 "bgBadge": "rgba(249, 115, 22, 0.2)",
                 "borderBadge": "#f97316"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3561,
                 "ref": "RA119",
@@ -22041,6 +22913,10 @@
                 "bgBadge": "rgba(249, 115, 22, 0.2)",
                 "borderBadge": "#f97316"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3562,
                 "ref": "RA120",
@@ -22123,6 +22999,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 8,
                 "ref": "RA8",
@@ -22215,6 +23095,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3284,
                 "ref": "RA70",
@@ -22307,6 +23191,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3557,
                 "ref": "RA115",
@@ -22392,6 +23280,10 @@
                 "bgBadge": "rgba(239, 68, 68, 0.2)",
                 "borderBadge": "#ef4444"
               },
+              "photoUrl": "./risk-photos/RA117_2026-06-17_11-58.png",
+              "photoFallbackPath": "riskassessment/RA117/2026-06-17_11-58.png",
+              "photoRaRef": "RA117",
+              "photoRawName": "2026-06-17_11-58.png",
               "latestEvaluation": {
                 "id": 3559,
                 "ref": "RA117",
@@ -22474,6 +23366,10 @@
                 "bgBadge": "rgba(249, 115, 22, 0.2)",
                 "borderBadge": "#f97316"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3555,
                 "ref": "RA113",
@@ -22556,6 +23452,10 @@
                 "bgBadge": "rgba(249, 115, 22, 0.2)",
                 "borderBadge": "#f97316"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3556,
                 "ref": "RA114",
@@ -22638,6 +23538,10 @@
                 "bgBadge": "rgba(249, 115, 22, 0.2)",
                 "borderBadge": "#f97316"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3558,
                 "ref": "RA116",
@@ -22720,6 +23624,10 @@
                 "bgBadge": "rgba(249, 115, 22, 0.2)",
                 "borderBadge": "#f97316"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3560,
                 "ref": "RA118",
@@ -22802,6 +23710,10 @@
                 "bgBadge": "rgba(249, 115, 22, 0.2)",
                 "borderBadge": "#f97316"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3561,
                 "ref": "RA119",
@@ -22884,6 +23796,10 @@
                 "bgBadge": "rgba(249, 115, 22, 0.2)",
                 "borderBadge": "#f97316"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3562,
                 "ref": "RA120",
@@ -22966,6 +23882,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 8,
                 "ref": "RA8",
@@ -23058,6 +23978,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3284,
                 "ref": "RA70",
@@ -23150,6 +24074,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3557,
                 "ref": "RA115",
@@ -23280,6 +24208,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": "./risk-photos/RA10_20210220_161046.jpg",
+              "photoFallbackPath": "riskassessment/RA10/20210220_161046.jpg",
+              "photoRaRef": "RA10",
+              "photoRawName": "20210220_161046.jpg",
               "latestEvaluation": {
                 "id": 10,
                 "ref": "RA10",
@@ -23381,6 +24313,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": "./risk-photos/RA104_udesk-bureau-ordinateur-768x655.jpg",
+              "photoFallbackPath": "riskassessment/RA104/udesk-bureau-ordinateur-768x655.jpg",
+              "photoRaRef": "RA104",
+              "photoRawName": "udesk-bureau-ordinateur-768x655.jpg",
               "latestEvaluation": {
                 "id": 3524,
                 "ref": "RA104",
@@ -23515,6 +24451,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": "./risk-photos/RA10_20210220_161046.jpg",
+              "photoFallbackPath": "riskassessment/RA10/20210220_161046.jpg",
+              "photoRaRef": "RA10",
+              "photoRawName": "20210220_161046.jpg",
               "latestEvaluation": {
                 "id": 10,
                 "ref": "RA10",
@@ -23616,6 +24556,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": "./risk-photos/RA104_udesk-bureau-ordinateur-768x655.jpg",
+              "photoFallbackPath": "riskassessment/RA104/udesk-bureau-ordinateur-768x655.jpg",
+              "photoRaRef": "RA104",
+              "photoRawName": "udesk-bureau-ordinateur-768x655.jpg",
               "latestEvaluation": {
                 "id": 3524,
                 "ref": "RA104",
@@ -23795,6 +24739,10 @@
                 "bgBadge": "rgba(249, 115, 22, 0.2)",
                 "borderBadge": "#f97316"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 9,
                 "ref": "RA9",
@@ -23890,6 +24838,10 @@
                 "bgBadge": "rgba(249, 115, 22, 0.2)",
                 "borderBadge": "#f97316"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 9,
                 "ref": "RA9",
@@ -24079,6 +25031,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": "./risk-photos/RA4_20211110_135913.jpg",
+              "photoFallbackPath": "riskassessment/RA4/20211110_135913.jpg",
+              "photoRaRef": "RA4",
+              "photoRawName": "20211110_135913.jpg",
               "latestEvaluation": {
                 "id": 4,
                 "ref": "RA4",
@@ -24180,6 +25136,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3285,
                 "ref": "RA71",
@@ -24275,6 +25235,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": "./risk-photos/RA4_20211110_135913.jpg",
+              "photoFallbackPath": "riskassessment/RA4/20211110_135913.jpg",
+              "photoRaRef": "RA4",
+              "photoRawName": "20211110_135913.jpg",
               "latestEvaluation": {
                 "id": 4,
                 "ref": "RA4",
@@ -24376,6 +25340,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3285,
                 "ref": "RA71",
@@ -24507,6 +25475,10 @@
             "bgBadge": "rgba(249, 115, 22, 0.2)",
             "borderBadge": "#f97316"
           },
+          "photoUrl": "./risk-photos/RA7_20210803_192804.jpg",
+          "photoFallbackPath": "riskassessment/RA7/20210803_192804.jpg",
+          "photoRaRef": "RA7",
+          "photoRawName": "20210803_192804.jpg",
           "latestEvaluation": {
             "id": 7,
             "ref": "RA7",
@@ -24599,6 +25571,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 1,
             "ref": "RA1",
@@ -24700,6 +25676,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": "./risk-photos/RA61_causeries_risque_15_ordinateur_1024px.png",
+          "photoFallbackPath": "riskassessment/RA61/causeries_risque_15_ordinateur_1024px.png",
+          "photoRaRef": "RA61",
+          "photoRawName": "causeries_risque_15_ordinateur_1024px.png",
           "latestEvaluation": {
             "id": 3265,
             "ref": "RA61",
@@ -24801,6 +25781,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": "./risk-photos/RA110_001.webp",
+          "photoFallbackPath": "riskassessment/RA110/001.webp",
+          "photoRaRef": "RA110",
+          "photoRawName": "001.webp",
           "latestEvaluation": {
             "id": 3552,
             "ref": "RA110",
@@ -24908,6 +25892,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": "./risk-photos/RA109_marches.png",
+          "photoFallbackPath": "riskassessment/RA109/marches.png",
+          "photoRaRef": "RA109",
+          "photoRawName": "marches.png",
           "latestEvaluation": {
             "id": 3551,
             "ref": "RA109",
@@ -25015,6 +26003,10 @@
             "bgBadge": "rgba(239, 68, 68, 0.2)",
             "borderBadge": "#ef4444"
           },
+          "photoUrl": "./risk-photos/RA117_2026-06-17_11-58.png",
+          "photoFallbackPath": "riskassessment/RA117/2026-06-17_11-58.png",
+          "photoRaRef": "RA117",
+          "photoRawName": "2026-06-17_11-58.png",
           "latestEvaluation": {
             "id": 3559,
             "ref": "RA117",
@@ -25097,6 +26089,10 @@
             "bgBadge": "rgba(249, 115, 22, 0.2)",
             "borderBadge": "#f97316"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3555,
             "ref": "RA113",
@@ -25179,6 +26175,10 @@
             "bgBadge": "rgba(249, 115, 22, 0.2)",
             "borderBadge": "#f97316"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3556,
             "ref": "RA114",
@@ -25261,6 +26261,10 @@
             "bgBadge": "rgba(249, 115, 22, 0.2)",
             "borderBadge": "#f97316"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3558,
             "ref": "RA116",
@@ -25343,6 +26347,10 @@
             "bgBadge": "rgba(249, 115, 22, 0.2)",
             "borderBadge": "#f97316"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3560,
             "ref": "RA118",
@@ -25425,6 +26433,10 @@
             "bgBadge": "rgba(249, 115, 22, 0.2)",
             "borderBadge": "#f97316"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3561,
             "ref": "RA119",
@@ -25507,6 +26519,10 @@
             "bgBadge": "rgba(249, 115, 22, 0.2)",
             "borderBadge": "#f97316"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3562,
             "ref": "RA120",
@@ -25589,6 +26605,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 8,
             "ref": "RA8",
@@ -25681,6 +26701,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3284,
             "ref": "RA70",
@@ -25773,6 +26797,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3557,
             "ref": "RA115",
@@ -25855,6 +26883,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": "./risk-photos/RA10_20210220_161046.jpg",
+          "photoFallbackPath": "riskassessment/RA10/20210220_161046.jpg",
+          "photoRaRef": "RA10",
+          "photoRawName": "20210220_161046.jpg",
           "latestEvaluation": {
             "id": 10,
             "ref": "RA10",
@@ -25956,6 +26988,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": "./risk-photos/RA104_udesk-bureau-ordinateur-768x655.jpg",
+          "photoFallbackPath": "riskassessment/RA104/udesk-bureau-ordinateur-768x655.jpg",
+          "photoRaRef": "RA104",
+          "photoRawName": "udesk-bureau-ordinateur-768x655.jpg",
           "latestEvaluation": {
             "id": 3524,
             "ref": "RA104",
@@ -26087,6 +27123,10 @@
             "bgBadge": "rgba(249, 115, 22, 0.2)",
             "borderBadge": "#f97316"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 9,
             "ref": "RA9",
@@ -26179,6 +27219,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": "./risk-photos/RA4_20211110_135913.jpg",
+          "photoFallbackPath": "riskassessment/RA4/20211110_135913.jpg",
+          "photoRaRef": "RA4",
+          "photoRawName": "20211110_135913.jpg",
           "latestEvaluation": {
             "id": 4,
             "ref": "RA4",
@@ -26280,6 +27324,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3285,
             "ref": "RA71",
@@ -26420,6 +27468,10 @@
             "bgBadge": "#09090b",
             "borderBadge": "#cbd5e1"
           },
+          "photoUrl": "./risk-photos/RA105_20210916_183635.jpg",
+          "photoFallbackPath": "riskassessment/RA105/20210916_183635.jpg",
+          "photoRaRef": "RA105",
+          "photoRawName": "20210916_183635.jpg",
           "latestEvaluation": {
             "id": 3525,
             "ref": "RA105",
@@ -26549,6 +27601,10 @@
                 "bgBadge": "#09090b",
                 "borderBadge": "#cbd5e1"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3266,
                 "ref": "RA62",
@@ -26674,6 +27730,10 @@
                 "bgBadge": "rgba(239, 68, 68, 0.2)",
                 "borderBadge": "#ef4444"
               },
+              "photoUrl": "./risk-photos/RA59_20220127_094415.jpg",
+              "photoFallbackPath": "riskassessment/RA59/20220127_094415.jpg",
+              "photoRaRef": "RA59",
+              "photoRawName": "20220127_094415.jpg",
               "latestEvaluation": {
                 "id": 3263,
                 "ref": "RA59",
@@ -26784,6 +27844,10 @@
                 "bgBadge": "rgba(239, 68, 68, 0.2)",
                 "borderBadge": "#ef4444"
               },
+              "photoUrl": "./risk-photos/RA73_causeries_risque5_charge_epaule_600px.png",
+              "photoFallbackPath": "riskassessment/RA73/causeries_risque5_charge_epaule_600px.png",
+              "photoRaRef": "RA73",
+              "photoRawName": "causeries_risque5_charge_epaule_600px.png",
               "latestEvaluation": {
                 "id": 3287,
                 "ref": "RA73",
@@ -26881,6 +27945,10 @@
                 "bgBadge": "rgba(239, 68, 68, 0.2)",
                 "borderBadge": "#ef4444"
               },
+              "photoUrl": "./risk-photos/RA72_20240613_141231.jpg",
+              "photoFallbackPath": "riskassessment/RA72/20240613_141231.jpg",
+              "photoRaRef": "RA72",
+              "photoRawName": "20240613_141231.jpg",
               "latestEvaluation": {
                 "id": 3286,
                 "ref": "RA72",
@@ -26973,6 +28041,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": "./risk-photos/RA64_causeries_risque5_charge_epaule_600px.png",
+              "photoFallbackPath": "riskassessment/RA64/causeries_risque5_charge_epaule_600px.png",
+              "photoRaRef": "RA64",
+              "photoRawName": "causeries_risque5_charge_epaule_600px.png",
               "latestEvaluation": {
                 "id": 3278,
                 "ref": "RA64",
@@ -27055,6 +28127,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3438,
                 "ref": "RA79",
@@ -27156,6 +28232,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": "./risk-photos/RA65_20240613_141231.jpg",
+              "photoFallbackPath": "riskassessment/RA65/20240613_141231.jpg",
+              "photoRaRef": "RA65",
+              "photoRawName": "20240613_141231.jpg",
               "latestEvaluation": {
                 "id": 3279,
                 "ref": "RA65",
@@ -27260,6 +28340,10 @@
                 "bgBadge": "#09090b",
                 "borderBadge": "#cbd5e1"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3266,
                 "ref": "RA62",
@@ -27385,6 +28469,10 @@
                 "bgBadge": "rgba(239, 68, 68, 0.2)",
                 "borderBadge": "#ef4444"
               },
+              "photoUrl": "./risk-photos/RA59_20220127_094415.jpg",
+              "photoFallbackPath": "riskassessment/RA59/20220127_094415.jpg",
+              "photoRaRef": "RA59",
+              "photoRawName": "20220127_094415.jpg",
               "latestEvaluation": {
                 "id": 3263,
                 "ref": "RA59",
@@ -27495,6 +28583,10 @@
                 "bgBadge": "rgba(239, 68, 68, 0.2)",
                 "borderBadge": "#ef4444"
               },
+              "photoUrl": "./risk-photos/RA73_causeries_risque5_charge_epaule_600px.png",
+              "photoFallbackPath": "riskassessment/RA73/causeries_risque5_charge_epaule_600px.png",
+              "photoRaRef": "RA73",
+              "photoRawName": "causeries_risque5_charge_epaule_600px.png",
               "latestEvaluation": {
                 "id": 3287,
                 "ref": "RA73",
@@ -27592,6 +28684,10 @@
                 "bgBadge": "rgba(239, 68, 68, 0.2)",
                 "borderBadge": "#ef4444"
               },
+              "photoUrl": "./risk-photos/RA72_20240613_141231.jpg",
+              "photoFallbackPath": "riskassessment/RA72/20240613_141231.jpg",
+              "photoRaRef": "RA72",
+              "photoRawName": "20240613_141231.jpg",
               "latestEvaluation": {
                 "id": 3286,
                 "ref": "RA72",
@@ -27684,6 +28780,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": "./risk-photos/RA64_causeries_risque5_charge_epaule_600px.png",
+              "photoFallbackPath": "riskassessment/RA64/causeries_risque5_charge_epaule_600px.png",
+              "photoRaRef": "RA64",
+              "photoRawName": "causeries_risque5_charge_epaule_600px.png",
               "latestEvaluation": {
                 "id": 3278,
                 "ref": "RA64",
@@ -27766,6 +28866,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3438,
                 "ref": "RA79",
@@ -27867,6 +28971,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": "./risk-photos/RA65_20240613_141231.jpg",
+              "photoFallbackPath": "riskassessment/RA65/20240613_141231.jpg",
+              "photoRaRef": "RA65",
+              "photoRawName": "20240613_141231.jpg",
               "latestEvaluation": {
                 "id": 3279,
                 "ref": "RA65",
@@ -28016,6 +29124,10 @@
                 "bgBadge": "rgba(239, 68, 68, 0.2)",
                 "borderBadge": "#ef4444"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3493,
                 "ref": "RA81",
@@ -28108,6 +29220,10 @@
                 "bgBadge": "rgba(239, 68, 68, 0.2)",
                 "borderBadge": "#ef4444"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3553,
                 "ref": "RA111",
@@ -28233,6 +29349,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3554,
                 "ref": "RA112",
@@ -28328,6 +29448,10 @@
                 "bgBadge": "rgba(239, 68, 68, 0.2)",
                 "borderBadge": "#ef4444"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3493,
                 "ref": "RA81",
@@ -28420,6 +29544,10 @@
                 "bgBadge": "rgba(239, 68, 68, 0.2)",
                 "borderBadge": "#ef4444"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3553,
                 "ref": "RA111",
@@ -28545,6 +29673,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3554,
                 "ref": "RA112",
@@ -28676,6 +29808,10 @@
             "bgBadge": "#09090b",
             "borderBadge": "#cbd5e1"
           },
+          "photoUrl": "./risk-photos/RA105_20210916_183635.jpg",
+          "photoFallbackPath": "riskassessment/RA105/20210916_183635.jpg",
+          "photoRaRef": "RA105",
+          "photoRawName": "20210916_183635.jpg",
           "latestEvaluation": {
             "id": 3525,
             "ref": "RA105",
@@ -28792,6 +29928,10 @@
             "bgBadge": "#09090b",
             "borderBadge": "#cbd5e1"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3266,
             "ref": "RA62",
@@ -28917,6 +30057,10 @@
             "bgBadge": "rgba(239, 68, 68, 0.2)",
             "borderBadge": "#ef4444"
           },
+          "photoUrl": "./risk-photos/RA59_20220127_094415.jpg",
+          "photoFallbackPath": "riskassessment/RA59/20220127_094415.jpg",
+          "photoRaRef": "RA59",
+          "photoRawName": "20220127_094415.jpg",
           "latestEvaluation": {
             "id": 3263,
             "ref": "RA59",
@@ -29027,6 +30171,10 @@
             "bgBadge": "rgba(239, 68, 68, 0.2)",
             "borderBadge": "#ef4444"
           },
+          "photoUrl": "./risk-photos/RA73_causeries_risque5_charge_epaule_600px.png",
+          "photoFallbackPath": "riskassessment/RA73/causeries_risque5_charge_epaule_600px.png",
+          "photoRaRef": "RA73",
+          "photoRawName": "causeries_risque5_charge_epaule_600px.png",
           "latestEvaluation": {
             "id": 3287,
             "ref": "RA73",
@@ -29124,6 +30272,10 @@
             "bgBadge": "rgba(239, 68, 68, 0.2)",
             "borderBadge": "#ef4444"
           },
+          "photoUrl": "./risk-photos/RA72_20240613_141231.jpg",
+          "photoFallbackPath": "riskassessment/RA72/20240613_141231.jpg",
+          "photoRaRef": "RA72",
+          "photoRawName": "20240613_141231.jpg",
           "latestEvaluation": {
             "id": 3286,
             "ref": "RA72",
@@ -29216,6 +30368,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": "./risk-photos/RA64_causeries_risque5_charge_epaule_600px.png",
+          "photoFallbackPath": "riskassessment/RA64/causeries_risque5_charge_epaule_600px.png",
+          "photoRaRef": "RA64",
+          "photoRawName": "causeries_risque5_charge_epaule_600px.png",
           "latestEvaluation": {
             "id": 3278,
             "ref": "RA64",
@@ -29298,6 +30454,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3438,
             "ref": "RA79",
@@ -29399,6 +30559,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": "./risk-photos/RA65_20240613_141231.jpg",
+          "photoFallbackPath": "riskassessment/RA65/20240613_141231.jpg",
+          "photoRaRef": "RA65",
+          "photoRawName": "20240613_141231.jpg",
           "latestEvaluation": {
             "id": 3279,
             "ref": "RA65",
@@ -29500,6 +30664,10 @@
             "bgBadge": "rgba(239, 68, 68, 0.2)",
             "borderBadge": "#ef4444"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3493,
             "ref": "RA81",
@@ -29592,6 +30760,10 @@
             "bgBadge": "rgba(239, 68, 68, 0.2)",
             "borderBadge": "#ef4444"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3553,
             "ref": "RA111",
@@ -29717,6 +30889,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3554,
             "ref": "RA112",
@@ -29869,6 +31045,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3280,
                 "ref": "RA66",
@@ -29964,6 +31144,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3280,
                 "ref": "RA66",
@@ -30153,6 +31337,10 @@
                 "bgBadge": "rgba(239, 68, 68, 0.2)",
                 "borderBadge": "#ef4444"
               },
+              "photoUrl": "./risk-photos/RA67_ATEX.jpg",
+              "photoFallbackPath": "riskassessment/RA67/ATEX.jpg",
+              "photoRaRef": "RA67",
+              "photoRawName": "ATEX.jpg",
               "latestEvaluation": {
                 "id": 3281,
                 "ref": "RA67",
@@ -30245,6 +31433,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3282,
                 "ref": "RA68",
@@ -30330,6 +31522,10 @@
                 "bgBadge": "rgba(239, 68, 68, 0.2)",
                 "borderBadge": "#ef4444"
               },
+              "photoUrl": "./risk-photos/RA67_ATEX.jpg",
+              "photoFallbackPath": "riskassessment/RA67/ATEX.jpg",
+              "photoRaRef": "RA67",
+              "photoRawName": "ATEX.jpg",
               "latestEvaluation": {
                 "id": 3281,
                 "ref": "RA67",
@@ -30422,6 +31618,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3282,
                 "ref": "RA68",
@@ -30552,6 +31752,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3499,
                 "ref": "RA87",
@@ -30647,6 +31851,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3499,
                 "ref": "RA87",
@@ -30778,6 +31986,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3280,
             "ref": "RA66",
@@ -30870,6 +32082,10 @@
             "bgBadge": "rgba(239, 68, 68, 0.2)",
             "borderBadge": "#ef4444"
           },
+          "photoUrl": "./risk-photos/RA67_ATEX.jpg",
+          "photoFallbackPath": "riskassessment/RA67/ATEX.jpg",
+          "photoRaRef": "RA67",
+          "photoRawName": "ATEX.jpg",
           "latestEvaluation": {
             "id": 3281,
             "ref": "RA67",
@@ -30962,6 +32178,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3282,
             "ref": "RA68",
@@ -31044,6 +32264,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3499,
             "ref": "RA87",
@@ -31184,6 +32408,10 @@
             "bgBadge": "rgba(239, 68, 68, 0.2)",
             "borderBadge": "#ef4444"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3496,
             "ref": "RA84",
@@ -31266,6 +32494,10 @@
             "bgBadge": "rgba(239, 68, 68, 0.2)",
             "borderBadge": "#ef4444"
           },
+          "photoUrl": "./risk-photos/RA96_TK2503-1157-2025-03-04_00-19-RPS-outils_INRS.png",
+          "photoFallbackPath": "riskassessment/RA96/TK2503-1157-2025-03-04_00-19-RPS-outils_INRS.png",
+          "photoRaRef": "RA96",
+          "photoRawName": "TK2503-1157-2025-03-04_00-19-RPS-outils_INRS.png",
           "latestEvaluation": {
             "id": 3516,
             "ref": "RA96",
@@ -31367,6 +32599,10 @@
             "bgBadge": "rgba(249, 115, 22, 0.2)",
             "borderBadge": "#f97316"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3497,
             "ref": "RA85",
@@ -31449,6 +32685,10 @@
             "bgBadge": "rgba(249, 115, 22, 0.2)",
             "borderBadge": "#f97316"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3518,
             "ref": "RA98",
@@ -31531,6 +32771,10 @@
             "bgBadge": "rgba(249, 115, 22, 0.2)",
             "borderBadge": "#f97316"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3519,
             "ref": "RA99",
@@ -31613,6 +32857,10 @@
             "bgBadge": "rgba(249, 115, 22, 0.2)",
             "borderBadge": "#f97316"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3520,
             "ref": "RA100",
@@ -31695,6 +32943,10 @@
             "bgBadge": "rgba(249, 115, 22, 0.2)",
             "borderBadge": "#f97316"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3523,
             "ref": "RA103",
@@ -31777,6 +33029,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": "./risk-photos/RA86_2025-03-04_00-19-RPS-outils_INRS.png",
+          "photoFallbackPath": "riskassessment/RA86/2025-03-04_00-19-RPS-outils_INRS.png",
+          "photoRaRef": "RA86",
+          "photoRawName": "2025-03-04_00-19-RPS-outils_INRS.png",
           "latestEvaluation": {
             "id": 3498,
             "ref": "RA86",
@@ -31859,6 +33115,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3517,
             "ref": "RA97",
@@ -31941,6 +33201,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3521,
             "ref": "RA101",
@@ -32023,6 +33287,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3522,
             "ref": "RA102",
@@ -32118,6 +33386,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": "./risk-photos/RA2_risque_routiers-en-mission_crash-voiture_600px.png",
+              "photoFallbackPath": "riskassessment/RA2/risque_routiers-en-mission_crash-voiture_600px.png",
+              "photoRaRef": "RA2",
+              "photoRawName": "risque_routiers-en-mission_crash-voiture_600px.png",
               "latestEvaluation": {
                 "id": 2,
                 "ref": "RA2",
@@ -32213,6 +33485,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": "./risk-photos/RA2_risque_routiers-en-mission_crash-voiture_600px.png",
+              "photoFallbackPath": "riskassessment/RA2/risque_routiers-en-mission_crash-voiture_600px.png",
+              "photoRaRef": "RA2",
+              "photoRawName": "risque_routiers-en-mission_crash-voiture_600px.png",
               "latestEvaluation": {
                 "id": 2,
                 "ref": "RA2",
@@ -32353,6 +33629,10 @@
                 "bgBadge": "rgba(239, 68, 68, 0.2)",
                 "borderBadge": "#ef4444"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3288,
                 "ref": "RA74",
@@ -32445,6 +33725,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3495,
                 "ref": "RA83",
@@ -32537,6 +33821,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": "./risk-photos/RA60_20211113_115816.jpg",
+              "photoFallbackPath": "riskassessment/RA60/20211113_115816.jpg",
+              "photoRaRef": "RA60",
+              "photoRawName": "20211113_115816.jpg",
               "latestEvaluation": {
                 "id": 3264,
                 "ref": "RA60",
@@ -32674,6 +33962,10 @@
                 "bgBadge": "rgba(239, 68, 68, 0.2)",
                 "borderBadge": "#ef4444"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3288,
                 "ref": "RA74",
@@ -32766,6 +34058,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
               "latestEvaluation": {
                 "id": 3495,
                 "ref": "RA83",
@@ -32858,6 +34154,10 @@
                 "bgBadge": "rgba(148, 163, 184, 0.18)",
                 "borderBadge": "#94a3b8"
               },
+              "photoUrl": "./risk-photos/RA60_20211113_115816.jpg",
+              "photoFallbackPath": "riskassessment/RA60/20211113_115816.jpg",
+              "photoRaRef": "RA60",
+              "photoRawName": "20211113_115816.jpg",
               "latestEvaluation": {
                 "id": 3264,
                 "ref": "RA60",
@@ -33080,6 +34380,10 @@
             "bgBadge": "rgba(239, 68, 68, 0.2)",
             "borderBadge": "#ef4444"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3496,
             "ref": "RA84",
@@ -33162,6 +34466,10 @@
             "bgBadge": "rgba(239, 68, 68, 0.2)",
             "borderBadge": "#ef4444"
           },
+          "photoUrl": "./risk-photos/RA96_TK2503-1157-2025-03-04_00-19-RPS-outils_INRS.png",
+          "photoFallbackPath": "riskassessment/RA96/TK2503-1157-2025-03-04_00-19-RPS-outils_INRS.png",
+          "photoRaRef": "RA96",
+          "photoRawName": "TK2503-1157-2025-03-04_00-19-RPS-outils_INRS.png",
           "latestEvaluation": {
             "id": 3516,
             "ref": "RA96",
@@ -33263,6 +34571,10 @@
             "bgBadge": "rgba(249, 115, 22, 0.2)",
             "borderBadge": "#f97316"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3497,
             "ref": "RA85",
@@ -33345,6 +34657,10 @@
             "bgBadge": "rgba(249, 115, 22, 0.2)",
             "borderBadge": "#f97316"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3518,
             "ref": "RA98",
@@ -33427,6 +34743,10 @@
             "bgBadge": "rgba(249, 115, 22, 0.2)",
             "borderBadge": "#f97316"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3519,
             "ref": "RA99",
@@ -33509,6 +34829,10 @@
             "bgBadge": "rgba(249, 115, 22, 0.2)",
             "borderBadge": "#f97316"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3520,
             "ref": "RA100",
@@ -33591,6 +34915,10 @@
             "bgBadge": "rgba(249, 115, 22, 0.2)",
             "borderBadge": "#f97316"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3523,
             "ref": "RA103",
@@ -33673,6 +35001,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": "./risk-photos/RA86_2025-03-04_00-19-RPS-outils_INRS.png",
+          "photoFallbackPath": "riskassessment/RA86/2025-03-04_00-19-RPS-outils_INRS.png",
+          "photoRaRef": "RA86",
+          "photoRawName": "2025-03-04_00-19-RPS-outils_INRS.png",
           "latestEvaluation": {
             "id": 3498,
             "ref": "RA86",
@@ -33755,6 +35087,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3517,
             "ref": "RA97",
@@ -33837,6 +35173,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3521,
             "ref": "RA101",
@@ -33919,6 +35259,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3522,
             "ref": "RA102",
@@ -34001,6 +35345,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": "./risk-photos/RA2_risque_routiers-en-mission_crash-voiture_600px.png",
+          "photoFallbackPath": "riskassessment/RA2/risque_routiers-en-mission_crash-voiture_600px.png",
+          "photoRaRef": "RA2",
+          "photoRawName": "risque_routiers-en-mission_crash-voiture_600px.png",
           "latestEvaluation": {
             "id": 2,
             "ref": "RA2",
@@ -34093,6 +35441,10 @@
             "bgBadge": "rgba(239, 68, 68, 0.2)",
             "borderBadge": "#ef4444"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3288,
             "ref": "RA74",
@@ -34185,6 +35537,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
           "latestEvaluation": {
             "id": 3495,
             "ref": "RA83",
@@ -34277,6 +35633,10 @@
             "bgBadge": "rgba(148, 163, 184, 0.18)",
             "borderBadge": "#94a3b8"
           },
+          "photoUrl": "./risk-photos/RA60_20211113_115816.jpg",
+          "photoFallbackPath": "riskassessment/RA60/20211113_115816.jpg",
+          "photoRaRef": "RA60",
+          "photoRawName": "20211113_115816.jpg",
           "latestEvaluation": {
             "id": 3264,
             "ref": "RA60",

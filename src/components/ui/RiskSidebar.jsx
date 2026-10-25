@@ -320,9 +320,34 @@ function RiskDetailCard({ risk, cotationMode }) {
         </div>
       </div>
 
-      {/* Description du risque */}
-      {risk.description && (
-        <p className="risk-desc-text">{risk.description}</p>
+      {/* Photo du risque (issue de l'évaluation RA) + Description */}
+      {(risk.photoUrl || risk.description) && (
+        <div className="risk-media-row">
+          {risk.photoUrl && (
+            <div className="risk-photo-wrapper">
+              <img
+                src={risk.photoUrl}
+                alt={`Photo ${risk.ref}`}
+                className="risk-photo-thumb"
+                loading="lazy"
+                onError={(e) => {
+                  const fallback = risk.photoFallbackPath
+                    ? `./api-proxy.php?photo=${encodeURIComponent(risk.photoFallbackPath)}`
+                    : null;
+                  if (fallback && !e.currentTarget.dataset.retried) {
+                    e.currentTarget.dataset.retried = '1';
+                    e.currentTarget.src = fallback;
+                  } else {
+                    e.currentTarget.parentElement.style.display = 'none';
+                  }
+                }}
+              />
+            </div>
+          )}
+          {risk.description && (
+            <p className="risk-desc-text">{risk.description}</p>
+          )}
+        </div>
       )}
 
       {/* Comparaison Brute -> Résiduelle si atténuation */}

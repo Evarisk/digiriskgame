@@ -290,6 +290,11 @@ function transformRawToHierarchy({ tree, risks, assessments, creationOptions, ta
       comment: '',
     };
     const latestEval = evals[evals.length - 1] || initialEval;
+    const evalWithPhoto = [...evals].reverse().find((e) => e.photo) || latestEval;
+    const safePhotoSlug = evalWithPhoto.photo
+      ? `${evalWithPhoto.ref}_${evalWithPhoto.photo.replace(/[^a-zA-Z0-9._-]/g, '_')}`
+      : null;
+
     const categoryInfo = categoriesByPos[Number(r.category)] || {
       position: Number(r.category),
       name: 'Risque professionnel',
@@ -321,6 +326,12 @@ function transformRawToHierarchy({ tree, risks, assessments, creationOptions, ta
       cotationResiduelle: residualCotation,
       scaleBrute: getCotationScale(rawCotation),
       scaleResiduelle: getCotationScale(residualCotation),
+      photoUrl: safePhotoSlug ? `./risk-photos/${safePhotoSlug}` : null,
+      photoFallbackPath: evalWithPhoto.photo
+        ? `riskassessment/${evalWithPhoto.ref}/${evalWithPhoto.photo}`
+        : null,
+      photoRaRef: evalWithPhoto.photo ? evalWithPhoto.ref : null,
+      photoRawName: evalWithPhoto.photo || null,
       latestEvaluation: latestEval,
       initialEvaluation: initialEval,
       evaluationsCount: evals.length,
