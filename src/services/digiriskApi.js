@@ -160,12 +160,15 @@ export async function loadDigiRiskData({ apiKey = DEFAULT_API_KEY, forceSnapshot
 
   try {
     const headers = {
-      DOLAPIKEY: apiKey,
       Accept: 'application/json',
+      ...(apiKey ? { DOLAPIKEY: apiKey } : {}),
     };
 
     const fetchJson = async (endpoint) => {
-      const res = await fetch(`/digirisk-api${endpoint}`, { headers });
+      const url = import.meta.env.DEV
+        ? `/digirisk-api${endpoint}`
+        : `./api-proxy.php?endpoint=${encodeURIComponent(endpoint)}`;
+      const res = await fetch(url, { headers });
       if (!res.ok) throw new Error(`API HTTP ${res.status} (${endpoint})`);
       return res.json();
     };

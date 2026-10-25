@@ -17,7 +17,18 @@ Jumeau numérique 3D WebGL temps réel (**React + Vite + React Three Fiber + Dre
 5. **IHM & Raycasting (Sidebar Interactive)**
    - Clic 3D sur n'importe quel atelier ou bâtiment pour cibler la caméra et ouvrir le détail des risques INRS (pictogrammes officiels, cotations Brute vs Résiduelle, 5 critères avancés `Gravité`, `Exposition`, `Occurrence`, `Formation`, `Protection`) ainsi que le Plan d'Actions (`TKx`, avancement `%` et budget `€`).
 
-## Commandes
+## Déploiement direct sur serveur web (o2switch / Apache / PHP) — Sans npm
+
+Le dossier `dist/` pré-compilé, le fichier `.htaccess` et le relais `api-proxy.php` sont inclus dans le dépôt :
+
+```bash
+git clone -b develop https://github.com/Evarisk/digiriskgame.git
+cd digiriskgame
+cp .env.example .env
+# Renseignez VITE_DOLAPIKEY dans le fichier .env (ou directement via le bouton clé dans l'interface)
+```
+
+## Commandes de développement local (Node.js)
 
 ```bash
 # Synchroniser le snapshot JSON depuis l'API demodoli.digirisk.com
