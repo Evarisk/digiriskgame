@@ -40,7 +40,11 @@ export default function TopHudBar({
       {/* Bloc Identité & Statut API DigiRisk */}
       <div className="hud-brand">
         <div className="brand-logo">
-          <ShieldAlert size={20} />
+          <img
+            src="/digirisk-logo.png"
+            alt="Logo DigiRisk"
+            className="brand-logo-img"
+          />
         </div>
         <div>
           <div className="brand-title-row">
