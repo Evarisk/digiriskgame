@@ -179,13 +179,8 @@ export function buildDigiRiskHierarchy({ tree, risks, assessments, creationOptio
         ? linkedTasks.reduce((acc, item) => acc + item.progress, 0) / linkedTasks.length
         : 0;
 
-    const rawCotation = Math.max(initialEval.cotation, latestEval.cotation);
-    const residualCotation =
-      evals.length > 1
-        ? latestEval.cotation
-        : avgTaskProgress > 0
-        ? Math.max(10, Math.round(rawCotation * (1 - (avgTaskProgress / 100) * 0.45)))
-        : latestEval.cotation;
+    const rawCotation = latestEval.cotation;
+    const residualCotation = latestEval.cotation;
 
     const enriched = {
       id: riskId,

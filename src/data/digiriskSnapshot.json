@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-25T22:34:10.364Z",
+  "fetchedAt": "2026-10-25T22:47:52.915Z",
   "sourceUrl": "https://demodoli.digirisk.com/htdocs/api/index.php",
   "entityName": "MetalOandCo-Industrie",
   "rootEntity": {
@@ -13,6 +13,120 @@
     "ranks": 1,
     "photo": "20210212_191945.jpg",
     "directRisks": [
+      {
+        "id": 3431,
+        "ref": "RK41",
+        "fkElement": 22,
+        "categoryPosition": 4,
+        "categoryName": "Risques routiers en mission",
+        "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/circulation_v2.png",
+        "description": "Risques routiers en mission",
+        "cotationBrute": 90,
+        "cotationResiduelle": 90,
+        "scaleBrute": {
+          "scale": 4,
+          "level": "critical",
+          "label": "Critique (Noir)",
+          "color": "#111827",
+          "strokeColor": "#e2e8f0",
+          "textColor": "#ffffff",
+          "scoreTextColor": "#f8fafc",
+          "bgBadge": "#09090b",
+          "borderBadge": "#cbd5e1"
+        },
+        "scaleResiduelle": {
+          "scale": 4,
+          "level": "critical",
+          "label": "Critique (Noir)",
+          "color": "#111827",
+          "strokeColor": "#e2e8f0",
+          "textColor": "#ffffff",
+          "scoreTextColor": "#f8fafc",
+          "bgBadge": "#09090b",
+          "borderBadge": "#cbd5e1"
+        },
+        "photoUrl": "./risk-photos/RA94_homme_trottinette_casque_velo-en-ville.png",
+        "photoFallbackPath": "riskassessment/RA94/homme_trottinette_casque_velo-en-ville.png",
+        "photoRaRef": "RA94",
+        "photoRawName": "homme_trottinette_casque_velo-en-ville.png",
+        "latestEvaluation": {
+          "id": 3506,
+          "ref": "RA94",
+          "cotation": 90,
+          "method": "advanced",
+          "gravite": 4,
+          "exposition": 4,
+          "occurrence": 2,
+          "formation": 4,
+          "protection": 3,
+          "comment": "Le salarié vient tous les jours au bureau en trottinette. Il est respectueux des feux, signalisations présentes. Il a bien eu son BSR. Il roule à une vitesse de 45 km/h pour les 25 Km/h autorisé. Le véhicule n'est pas adapté car il a été débridé. Il est équipé d'un casque de vélo. Nous avons eu 2 accidents l'an dernier sur la population de trottinette de l'entreprise.",
+          "photo": "homme_trottinette_casque_velo-en-ville.png",
+          "dateCreation": 1753036153,
+          "status": 1
+        },
+        "initialEvaluation": {
+          "id": 3506,
+          "ref": "RA94",
+          "cotation": 90,
+          "method": "advanced",
+          "gravite": 4,
+          "exposition": 4,
+          "occurrence": 2,
+          "formation": 4,
+          "protection": 3,
+          "comment": "Le salarié vient tous les jours au bureau en trottinette. Il est respectueux des feux, signalisations présentes. Il a bien eu son BSR. Il roule à une vitesse de 45 km/h pour les 25 Km/h autorisé. Le véhicule n'est pas adapté car il a été débridé. Il est équipé d'un casque de vélo. Nous avons eu 2 accidents l'an dernier sur la population de trottinette de l'entreprise.",
+          "photo": "homme_trottinette_casque_velo-en-ville.png",
+          "dateCreation": 1753036153,
+          "status": 1
+        },
+        "evaluationsCount": 1,
+        "evaluations": [
+          {
+            "id": 3506,
+            "ref": "RA94",
+            "cotation": 90,
+            "method": "advanced",
+            "gravite": 4,
+            "exposition": 4,
+            "occurrence": 2,
+            "formation": 4,
+            "protection": 3,
+            "comment": "Le salarié vient tous les jours au bureau en trottinette. Il est respectueux des feux, signalisations présentes. Il a bien eu son BSR. Il roule à une vitesse de 45 km/h pour les 25 Km/h autorisé. Le véhicule n'est pas adapté car il a été débridé. Il est équipé d'un casque de vélo. Nous avons eu 2 accidents l'an dernier sur la population de trottinette de l'entreprise.",
+            "photo": "homme_trottinette_casque_velo-en-ville.png",
+            "dateCreation": 1753036153,
+            "status": 1
+          }
+        ],
+        "tasks": [
+          {
+            "id": 1187,
+            "ref": "TK2508-1178",
+            "label": "Sensibiliser aux dangers de la trottinette électrique et des EDPM",
+            "description": "",
+            "progress": 100,
+            "budget": 800,
+            "color": "#16a085"
+          },
+          {
+            "id": 1188,
+            "ref": "TK2508-1179",
+            "label": "Contrôle sur la présence des assurances pour les EDPM",
+            "description": "Premier lien video sensibilisation :&nbsp;<a href=\"https://www.youtube.com/watch?v=XEUADqk5EDo\" target=\"_blank\">https://www.youtube.com/watch?v=XEUADqk5EDo</a>",
+            "progress": 100,
+            "budget": 100,
+            "color": "#16a085"
+          },
+          {
+            "id": 1242,
+            "ref": "TK2601-1232",
+            "label": "Maintenir les controles du bridages des EPDM et le suivi du nombre EPDM débridés trouvés",
+            "description": "",
+            "progress": 0,
+            "budget": 1500,
+            "color": "#16a085"
+          }
+        ]
+      },
       {
         "id": 3430,
         "ref": "RK40",
@@ -98,120 +212,6 @@
           }
         ],
         "tasks": []
-      },
-      {
-        "id": 3431,
-        "ref": "RK41",
-        "fkElement": 22,
-        "categoryPosition": 4,
-        "categoryName": "Risques routiers en mission",
-        "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/circulation_v2.png",
-        "description": "Risques routiers en mission",
-        "cotationBrute": 90,
-        "cotationResiduelle": 63,
-        "scaleBrute": {
-          "scale": 4,
-          "level": "critical",
-          "label": "Critique (Noir)",
-          "color": "#111827",
-          "strokeColor": "#e2e8f0",
-          "textColor": "#ffffff",
-          "scoreTextColor": "#f8fafc",
-          "bgBadge": "#09090b",
-          "borderBadge": "#cbd5e1"
-        },
-        "scaleResiduelle": {
-          "scale": 3,
-          "level": "high",
-          "label": "Élevé (Rouge)",
-          "color": "#ef4444",
-          "strokeColor": "#ef4444",
-          "textColor": "#ffffff",
-          "scoreTextColor": "#ef4444",
-          "bgBadge": "rgba(239, 68, 68, 0.2)",
-          "borderBadge": "#ef4444"
-        },
-        "photoUrl": "./risk-photos/RA94_homme_trottinette_casque_velo-en-ville.png",
-        "photoFallbackPath": "riskassessment/RA94/homme_trottinette_casque_velo-en-ville.png",
-        "photoRaRef": "RA94",
-        "photoRawName": "homme_trottinette_casque_velo-en-ville.png",
-        "latestEvaluation": {
-          "id": 3506,
-          "ref": "RA94",
-          "cotation": 90,
-          "method": "advanced",
-          "gravite": 4,
-          "exposition": 4,
-          "occurrence": 2,
-          "formation": 4,
-          "protection": 3,
-          "comment": "Le salarié vient tous les jours au bureau en trottinette. Il est respectueux des feux, signalisations présentes. Il a bien eu son BSR. Il roule à une vitesse de 45 km/h pour les 25 Km/h autorisé. Le véhicule n'est pas adapté car il a été débridé. Il est équipé d'un casque de vélo. Nous avons eu 2 accidents l'an dernier sur la population de trottinette de l'entreprise.",
-          "photo": "homme_trottinette_casque_velo-en-ville.png",
-          "dateCreation": 1753036153,
-          "status": 1
-        },
-        "initialEvaluation": {
-          "id": 3506,
-          "ref": "RA94",
-          "cotation": 90,
-          "method": "advanced",
-          "gravite": 4,
-          "exposition": 4,
-          "occurrence": 2,
-          "formation": 4,
-          "protection": 3,
-          "comment": "Le salarié vient tous les jours au bureau en trottinette. Il est respectueux des feux, signalisations présentes. Il a bien eu son BSR. Il roule à une vitesse de 45 km/h pour les 25 Km/h autorisé. Le véhicule n'est pas adapté car il a été débridé. Il est équipé d'un casque de vélo. Nous avons eu 2 accidents l'an dernier sur la population de trottinette de l'entreprise.",
-          "photo": "homme_trottinette_casque_velo-en-ville.png",
-          "dateCreation": 1753036153,
-          "status": 1
-        },
-        "evaluationsCount": 1,
-        "evaluations": [
-          {
-            "id": 3506,
-            "ref": "RA94",
-            "cotation": 90,
-            "method": "advanced",
-            "gravite": 4,
-            "exposition": 4,
-            "occurrence": 2,
-            "formation": 4,
-            "protection": 3,
-            "comment": "Le salarié vient tous les jours au bureau en trottinette. Il est respectueux des feux, signalisations présentes. Il a bien eu son BSR. Il roule à une vitesse de 45 km/h pour les 25 Km/h autorisé. Le véhicule n'est pas adapté car il a été débridé. Il est équipé d'un casque de vélo. Nous avons eu 2 accidents l'an dernier sur la population de trottinette de l'entreprise.",
-            "photo": "homme_trottinette_casque_velo-en-ville.png",
-            "dateCreation": 1753036153,
-            "status": 1
-          }
-        ],
-        "tasks": [
-          {
-            "id": 1187,
-            "ref": "TK2508-1178",
-            "label": "Sensibiliser aux dangers de la trottinette électrique et des EDPM",
-            "description": "",
-            "progress": 100,
-            "budget": 800,
-            "color": "#16a085"
-          },
-          {
-            "id": 1188,
-            "ref": "TK2508-1179",
-            "label": "Contrôle sur la présence des assurances pour les EDPM",
-            "description": "Premier lien video sensibilisation :&nbsp;<a href=\"https://www.youtube.com/watch?v=XEUADqk5EDo\" target=\"_blank\">https://www.youtube.com/watch?v=XEUADqk5EDo</a>",
-            "progress": 100,
-            "budget": 100,
-            "color": "#16a085"
-          },
-          {
-            "id": 1242,
-            "ref": "TK2601-1232",
-            "label": "Maintenir les controles du bridages des EPDM et le suivi du nombre EPDM débridés trouvés",
-            "description": "",
-            "progress": 0,
-            "budget": 1500,
-            "color": "#16a085"
-          }
-        ]
       },
       {
         "id": 3428,
@@ -332,18 +332,18 @@
         "categoryName": "Risques liés aux ambiances lumineuses",
         "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/eclairage_PictoCategorie_v2.png",
         "description": "Risques liés aux ambiances lumineuses",
-        "cotationBrute": 100,
+        "cotationBrute": 48,
         "cotationResiduelle": 48,
         "scaleBrute": {
-          "scale": 4,
-          "level": "critical",
-          "label": "Critique (Noir)",
-          "color": "#111827",
-          "strokeColor": "#e2e8f0",
+          "scale": 2,
+          "level": "medium",
+          "label": "Modéré (Orange)",
+          "color": "#f97316",
+          "strokeColor": "#f97316",
           "textColor": "#ffffff",
-          "scoreTextColor": "#f8fafc",
-          "bgBadge": "#09090b",
-          "borderBadge": "#cbd5e1"
+          "scoreTextColor": "#f97316",
+          "bgBadge": "rgba(249, 115, 22, 0.2)",
+          "borderBadge": "#f97316"
         },
         "scaleResiduelle": {
           "scale": 2,
@@ -539,7 +539,7 @@
         "categoryName": "Risques routiers en mission",
         "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/circulation_v2.png",
         "description": "Risques routiers en mission",
-        "cotationBrute": 31,
+        "cotationBrute": 17,
         "cotationResiduelle": 17,
         "scaleBrute": {
           "scale": 1,
@@ -650,18 +650,18 @@
         "categoryName": "Risques psychosociaux",
         "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/rps_v2.png",
         "description": "Risques psychosociaux",
-        "cotationBrute": 51,
+        "cotationBrute": 0,
         "cotationResiduelle": 0,
         "scaleBrute": {
-          "scale": 3,
-          "level": "high",
-          "label": "Élevé (Rouge)",
-          "color": "#ef4444",
-          "strokeColor": "#ef4444",
-          "textColor": "#ffffff",
-          "scoreTextColor": "#ef4444",
-          "bgBadge": "rgba(239, 68, 68, 0.2)",
-          "borderBadge": "#ef4444"
+          "scale": 1,
+          "level": "low",
+          "label": "Faible (Gris)",
+          "color": "#94a3b8",
+          "strokeColor": "#94a3b8",
+          "textColor": "#0f172a",
+          "scoreTextColor": "#cbd5e1",
+          "bgBadge": "rgba(148, 163, 184, 0.18)",
+          "borderBadge": "#94a3b8"
         },
         "scaleResiduelle": {
           "scale": 1,
@@ -815,18 +815,18 @@
         "categoryName": "Risques liés aux agents biologiques",
         "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/manqueHygiene_PictoCategorie_v2.png",
         "description": "Risques liés aux agents biologiques",
-        "cotationBrute": 51,
+        "cotationBrute": 0,
         "cotationResiduelle": 0,
         "scaleBrute": {
-          "scale": 3,
-          "level": "high",
-          "label": "Élevé (Rouge)",
-          "color": "#ef4444",
-          "strokeColor": "#ef4444",
-          "textColor": "#ffffff",
-          "scoreTextColor": "#ef4444",
-          "bgBadge": "rgba(239, 68, 68, 0.2)",
-          "borderBadge": "#ef4444"
+          "scale": 1,
+          "level": "low",
+          "label": "Faible (Gris)",
+          "color": "#94a3b8",
+          "strokeColor": "#94a3b8",
+          "textColor": "#0f172a",
+          "scoreTextColor": "#cbd5e1",
+          "bgBadge": "rgba(148, 163, 184, 0.18)",
+          "borderBadge": "#94a3b8"
         },
         "scaleResiduelle": {
           "scale": 1,
@@ -1325,7 +1325,7 @@
                 "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/activitePhysique_v2.png",
                 "description": "Risques liés à la charge physique de travail",
                 "cotationBrute": 40,
-                "cotationResiduelle": 28,
+                "cotationResiduelle": 40,
                 "scaleBrute": {
                   "scale": 1,
                   "level": "low",
@@ -1429,18 +1429,18 @@
                 "categoryName": "Risques de chute de plain-pied",
                 "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
                 "description": "Risques de chute de plain-pied",
-                "cotationBrute": 48,
+                "cotationBrute": 0,
                 "cotationResiduelle": 0,
                 "scaleBrute": {
-                  "scale": 2,
-                  "level": "medium",
-                  "label": "Modéré (Orange)",
-                  "color": "#f97316",
-                  "strokeColor": "#f97316",
-                  "textColor": "#ffffff",
-                  "scoreTextColor": "#f97316",
-                  "bgBadge": "rgba(249, 115, 22, 0.2)",
-                  "borderBadge": "#f97316"
+                  "scale": 1,
+                  "level": "low",
+                  "label": "Faible (Gris)",
+                  "color": "#94a3b8",
+                  "strokeColor": "#94a3b8",
+                  "textColor": "#0f172a",
+                  "scoreTextColor": "#cbd5e1",
+                  "bgBadge": "rgba(148, 163, 184, 0.18)",
+                  "borderBadge": "#94a3b8"
                 },
                 "scaleResiduelle": {
                   "scale": 1,
@@ -1540,18 +1540,18 @@
                 "categoryName": "Risques de chute de plain-pied",
                 "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
                 "description": "Risques de chute de plain-pied",
-                "cotationBrute": 51,
+                "cotationBrute": 0,
                 "cotationResiduelle": 0,
                 "scaleBrute": {
-                  "scale": 3,
-                  "level": "high",
-                  "label": "Élevé (Rouge)",
-                  "color": "#ef4444",
-                  "strokeColor": "#ef4444",
-                  "textColor": "#ffffff",
-                  "scoreTextColor": "#ef4444",
-                  "bgBadge": "rgba(239, 68, 68, 0.2)",
-                  "borderBadge": "#ef4444"
+                  "scale": 1,
+                  "level": "low",
+                  "label": "Faible (Gris)",
+                  "color": "#94a3b8",
+                  "strokeColor": "#94a3b8",
+                  "textColor": "#0f172a",
+                  "scoreTextColor": "#cbd5e1",
+                  "bgBadge": "rgba(148, 163, 184, 0.18)",
+                  "borderBadge": "#94a3b8"
                 },
                 "scaleResiduelle": {
                   "scale": 1,
@@ -1655,7 +1655,7 @@
                 "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/activitePhysique_v2.png",
                 "description": "Risques liés à la charge physique de travail",
                 "cotationBrute": 40,
-                "cotationResiduelle": 28,
+                "cotationResiduelle": 40,
                 "scaleBrute": {
                   "scale": 1,
                   "level": "low",
@@ -1759,18 +1759,18 @@
                 "categoryName": "Risques de chute de plain-pied",
                 "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
                 "description": "Risques de chute de plain-pied",
-                "cotationBrute": 48,
+                "cotationBrute": 0,
                 "cotationResiduelle": 0,
                 "scaleBrute": {
-                  "scale": 2,
-                  "level": "medium",
-                  "label": "Modéré (Orange)",
-                  "color": "#f97316",
-                  "strokeColor": "#f97316",
-                  "textColor": "#ffffff",
-                  "scoreTextColor": "#f97316",
-                  "bgBadge": "rgba(249, 115, 22, 0.2)",
-                  "borderBadge": "#f97316"
+                  "scale": 1,
+                  "level": "low",
+                  "label": "Faible (Gris)",
+                  "color": "#94a3b8",
+                  "strokeColor": "#94a3b8",
+                  "textColor": "#0f172a",
+                  "scoreTextColor": "#cbd5e1",
+                  "bgBadge": "rgba(148, 163, 184, 0.18)",
+                  "borderBadge": "#94a3b8"
                 },
                 "scaleResiduelle": {
                   "scale": 1,
@@ -1870,18 +1870,18 @@
                 "categoryName": "Risques de chute de plain-pied",
                 "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
                 "description": "Risques de chute de plain-pied",
-                "cotationBrute": 51,
+                "cotationBrute": 0,
                 "cotationResiduelle": 0,
                 "scaleBrute": {
-                  "scale": 3,
-                  "level": "high",
-                  "label": "Élevé (Rouge)",
-                  "color": "#ef4444",
-                  "strokeColor": "#ef4444",
-                  "textColor": "#ffffff",
-                  "scoreTextColor": "#ef4444",
-                  "bgBadge": "rgba(239, 68, 68, 0.2)",
-                  "borderBadge": "#ef4444"
+                  "scale": 1,
+                  "level": "low",
+                  "label": "Faible (Gris)",
+                  "color": "#94a3b8",
+                  "strokeColor": "#94a3b8",
+                  "textColor": "#0f172a",
+                  "scoreTextColor": "#cbd5e1",
+                  "bgBadge": "rgba(148, 163, 184, 0.18)",
+                  "borderBadge": "#94a3b8"
                 },
                 "scaleResiduelle": {
                   "scale": 1,
@@ -1977,20 +1977,20 @@
             "stats": {
               "totalRisks": 3,
               "directRisksCount": 3,
-              "maxBrute": 51,
-              "maxResiduelle": 28,
-              "avgBrute": 46,
-              "avgResiduelle": 9,
+              "maxBrute": 40,
+              "maxResiduelle": 40,
+              "avgBrute": 13,
+              "avgResiduelle": 13,
               "scaleBrute": {
-                "scale": 3,
-                "level": "high",
-                "label": "Élevé (Rouge)",
-                "color": "#ef4444",
-                "strokeColor": "#ef4444",
-                "textColor": "#ffffff",
-                "scoreTextColor": "#ef4444",
-                "bgBadge": "rgba(239, 68, 68, 0.2)",
-                "borderBadge": "#ef4444"
+                "scale": 1,
+                "level": "low",
+                "label": "Faible (Gris)",
+                "color": "#94a3b8",
+                "strokeColor": "#94a3b8",
+                "textColor": "#0f172a",
+                "scoreTextColor": "#cbd5e1",
+                "bgBadge": "rgba(148, 163, 184, 0.18)",
+                "borderBadge": "#94a3b8"
               },
               "scaleResiduelle": {
                 "scale": 1,
@@ -3841,7 +3841,7 @@
                 "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/circulation_v2.png",
                 "description": "Déplacement trop rapide",
                 "cotationBrute": 48,
-                "cotationResiduelle": 35,
+                "cotationResiduelle": 48,
                 "scaleBrute": {
                   "scale": 2,
                   "level": "medium",
@@ -3854,15 +3854,15 @@
                   "borderBadge": "#f97316"
                 },
                 "scaleResiduelle": {
-                  "scale": 1,
-                  "level": "low",
-                  "label": "Faible (Gris)",
-                  "color": "#94a3b8",
-                  "strokeColor": "#94a3b8",
-                  "textColor": "#0f172a",
-                  "scoreTextColor": "#cbd5e1",
-                  "bgBadge": "rgba(148, 163, 184, 0.18)",
-                  "borderBadge": "#94a3b8"
+                  "scale": 2,
+                  "level": "medium",
+                  "label": "Modéré (Orange)",
+                  "color": "#f97316",
+                  "strokeColor": "#f97316",
+                  "textColor": "#ffffff",
+                  "scoreTextColor": "#f97316",
+                  "bgBadge": "rgba(249, 115, 22, 0.2)",
+                  "borderBadge": "#f97316"
                 },
                 "photoUrl": "./risk-photos/RA10_20210220_161046.jpg",
                 "photoFallbackPath": "riskassessment/RA10/20210220_161046.jpg",
@@ -3945,7 +3945,7 @@
                 "categoryName": "Risques liés à la charge physique de travail",
                 "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/activitePhysique_v2.png",
                 "description": "Risques liés à la charge physique de travail",
-                "cotationBrute": 42,
+                "cotationBrute": 31,
                 "cotationResiduelle": 31,
                 "scaleBrute": {
                   "scale": 1,
@@ -4084,7 +4084,7 @@
                 "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/circulation_v2.png",
                 "description": "Déplacement trop rapide",
                 "cotationBrute": 48,
-                "cotationResiduelle": 35,
+                "cotationResiduelle": 48,
                 "scaleBrute": {
                   "scale": 2,
                   "level": "medium",
@@ -4097,15 +4097,15 @@
                   "borderBadge": "#f97316"
                 },
                 "scaleResiduelle": {
-                  "scale": 1,
-                  "level": "low",
-                  "label": "Faible (Gris)",
-                  "color": "#94a3b8",
-                  "strokeColor": "#94a3b8",
-                  "textColor": "#0f172a",
-                  "scoreTextColor": "#cbd5e1",
-                  "bgBadge": "rgba(148, 163, 184, 0.18)",
-                  "borderBadge": "#94a3b8"
+                  "scale": 2,
+                  "level": "medium",
+                  "label": "Modéré (Orange)",
+                  "color": "#f97316",
+                  "strokeColor": "#f97316",
+                  "textColor": "#ffffff",
+                  "scoreTextColor": "#f97316",
+                  "bgBadge": "rgba(249, 115, 22, 0.2)",
+                  "borderBadge": "#f97316"
                 },
                 "photoUrl": "./risk-photos/RA10_20210220_161046.jpg",
                 "photoFallbackPath": "riskassessment/RA10/20210220_161046.jpg",
@@ -4188,7 +4188,7 @@
                 "categoryName": "Risques liés à la charge physique de travail",
                 "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/activitePhysique_v2.png",
                 "description": "Risques liés à la charge physique de travail",
-                "cotationBrute": 42,
+                "cotationBrute": 31,
                 "cotationResiduelle": 31,
                 "scaleBrute": {
                   "scale": 1,
@@ -4320,9 +4320,9 @@
               "totalRisks": 2,
               "directRisksCount": 2,
               "maxBrute": 48,
-              "maxResiduelle": 35,
-              "avgBrute": 45,
-              "avgResiduelle": 33,
+              "maxResiduelle": 48,
+              "avgBrute": 40,
+              "avgResiduelle": 40,
               "scaleBrute": {
                 "scale": 2,
                 "level": "medium",
@@ -4335,20 +4335,20 @@
                 "borderBadge": "#f97316"
               },
               "scaleResiduelle": {
-                "scale": 1,
-                "level": "low",
-                "label": "Faible (Gris)",
-                "color": "#94a3b8",
-                "strokeColor": "#94a3b8",
-                "textColor": "#0f172a",
-                "scoreTextColor": "#cbd5e1",
-                "bgBadge": "rgba(148, 163, 184, 0.18)",
-                "borderBadge": "#94a3b8"
+                "scale": 2,
+                "level": "medium",
+                "label": "Modéré (Orange)",
+                "color": "#f97316",
+                "strokeColor": "#f97316",
+                "textColor": "#ffffff",
+                "scoreTextColor": "#f97316",
+                "bgBadge": "rgba(249, 115, 22, 0.2)",
+                "borderBadge": "#f97316"
               },
               "criticalCount": 0,
               "highCount": 0,
-              "mediumCount": 0,
-              "lowCount": 2,
+              "mediumCount": 1,
+              "lowCount": 1,
               "totalTasks": 4
             }
           },
@@ -4664,7 +4664,7 @@
                 "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/rps_v2.png",
                 "description": "Accueil des clients",
                 "cotationBrute": 48,
-                "cotationResiduelle": 37,
+                "cotationResiduelle": 48,
                 "scaleBrute": {
                   "scale": 2,
                   "level": "medium",
@@ -4677,15 +4677,15 @@
                   "borderBadge": "#f97316"
                 },
                 "scaleResiduelle": {
-                  "scale": 1,
-                  "level": "low",
-                  "label": "Faible (Gris)",
-                  "color": "#94a3b8",
-                  "strokeColor": "#94a3b8",
-                  "textColor": "#0f172a",
-                  "scoreTextColor": "#cbd5e1",
-                  "bgBadge": "rgba(148, 163, 184, 0.18)",
-                  "borderBadge": "#94a3b8"
+                  "scale": 2,
+                  "level": "medium",
+                  "label": "Modéré (Orange)",
+                  "color": "#f97316",
+                  "strokeColor": "#f97316",
+                  "textColor": "#ffffff",
+                  "scoreTextColor": "#f97316",
+                  "bgBadge": "rgba(249, 115, 22, 0.2)",
+                  "borderBadge": "#f97316"
                 },
                 "photoUrl": "./risk-photos/RA4_20211110_135913.jpg",
                 "photoFallbackPath": "riskassessment/RA4/20211110_135913.jpg",
@@ -4868,7 +4868,7 @@
                 "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/rps_v2.png",
                 "description": "Accueil des clients",
                 "cotationBrute": 48,
-                "cotationResiduelle": 37,
+                "cotationResiduelle": 48,
                 "scaleBrute": {
                   "scale": 2,
                   "level": "medium",
@@ -4881,15 +4881,15 @@
                   "borderBadge": "#f97316"
                 },
                 "scaleResiduelle": {
-                  "scale": 1,
-                  "level": "low",
-                  "label": "Faible (Gris)",
-                  "color": "#94a3b8",
-                  "strokeColor": "#94a3b8",
-                  "textColor": "#0f172a",
-                  "scoreTextColor": "#cbd5e1",
-                  "bgBadge": "rgba(148, 163, 184, 0.18)",
-                  "borderBadge": "#94a3b8"
+                  "scale": 2,
+                  "level": "medium",
+                  "label": "Modéré (Orange)",
+                  "color": "#f97316",
+                  "strokeColor": "#f97316",
+                  "textColor": "#ffffff",
+                  "scoreTextColor": "#f97316",
+                  "bgBadge": "rgba(249, 115, 22, 0.2)",
+                  "borderBadge": "#f97316"
                 },
                 "photoUrl": "./risk-photos/RA4_20211110_135913.jpg",
                 "photoFallbackPath": "riskassessment/RA4/20211110_135913.jpg",
@@ -5065,9 +5065,9 @@
               "totalRisks": 2,
               "directRisksCount": 2,
               "maxBrute": 48,
-              "maxResiduelle": 37,
+              "maxResiduelle": 48,
               "avgBrute": 40,
-              "avgResiduelle": 34,
+              "avgResiduelle": 40,
               "scaleBrute": {
                 "scale": 2,
                 "level": "medium",
@@ -5080,20 +5080,20 @@
                 "borderBadge": "#f97316"
               },
               "scaleResiduelle": {
-                "scale": 1,
-                "level": "low",
-                "label": "Faible (Gris)",
-                "color": "#94a3b8",
-                "strokeColor": "#94a3b8",
-                "textColor": "#0f172a",
-                "scoreTextColor": "#cbd5e1",
-                "bgBadge": "rgba(148, 163, 184, 0.18)",
-                "borderBadge": "#94a3b8"
+                "scale": 2,
+                "level": "medium",
+                "label": "Modéré (Orange)",
+                "color": "#f97316",
+                "strokeColor": "#f97316",
+                "textColor": "#ffffff",
+                "scoreTextColor": "#f97316",
+                "bgBadge": "rgba(249, 115, 22, 0.2)",
+                "borderBadge": "#f97316"
               },
               "criticalCount": 0,
               "highCount": 0,
-              "mediumCount": 0,
-              "lowCount": 2,
+              "mediumCount": 1,
+              "lowCount": 1,
               "totalTasks": 3
             }
           }
@@ -5309,7 +5309,7 @@
             "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/activitePhysique_v2.png",
             "description": "Risques liés à la charge physique de travail",
             "cotationBrute": 40,
-            "cotationResiduelle": 28,
+            "cotationResiduelle": 40,
             "scaleBrute": {
               "scale": 1,
               "level": "low",
@@ -5413,18 +5413,18 @@
             "categoryName": "Risques de chute de plain-pied",
             "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
             "description": "Risques de chute de plain-pied",
-            "cotationBrute": 48,
+            "cotationBrute": 0,
             "cotationResiduelle": 0,
             "scaleBrute": {
-              "scale": 2,
-              "level": "medium",
-              "label": "Modéré (Orange)",
-              "color": "#f97316",
-              "strokeColor": "#f97316",
-              "textColor": "#ffffff",
-              "scoreTextColor": "#f97316",
-              "bgBadge": "rgba(249, 115, 22, 0.2)",
-              "borderBadge": "#f97316"
+              "scale": 1,
+              "level": "low",
+              "label": "Faible (Gris)",
+              "color": "#94a3b8",
+              "strokeColor": "#94a3b8",
+              "textColor": "#0f172a",
+              "scoreTextColor": "#cbd5e1",
+              "bgBadge": "rgba(148, 163, 184, 0.18)",
+              "borderBadge": "#94a3b8"
             },
             "scaleResiduelle": {
               "scale": 1,
@@ -5524,18 +5524,18 @@
             "categoryName": "Risques de chute de plain-pied",
             "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
             "description": "Risques de chute de plain-pied",
-            "cotationBrute": 51,
+            "cotationBrute": 0,
             "cotationResiduelle": 0,
             "scaleBrute": {
-              "scale": 3,
-              "level": "high",
-              "label": "Élevé (Rouge)",
-              "color": "#ef4444",
-              "strokeColor": "#ef4444",
-              "textColor": "#ffffff",
-              "scoreTextColor": "#ef4444",
-              "bgBadge": "rgba(239, 68, 68, 0.2)",
-              "borderBadge": "#ef4444"
+              "scale": 1,
+              "level": "low",
+              "label": "Faible (Gris)",
+              "color": "#94a3b8",
+              "strokeColor": "#94a3b8",
+              "textColor": "#0f172a",
+              "scoreTextColor": "#cbd5e1",
+              "bgBadge": "rgba(148, 163, 184, 0.18)",
+              "borderBadge": "#94a3b8"
             },
             "scaleResiduelle": {
               "scale": 1,
@@ -6516,7 +6516,7 @@
             "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/circulation_v2.png",
             "description": "Déplacement trop rapide",
             "cotationBrute": 48,
-            "cotationResiduelle": 35,
+            "cotationResiduelle": 48,
             "scaleBrute": {
               "scale": 2,
               "level": "medium",
@@ -6529,15 +6529,15 @@
               "borderBadge": "#f97316"
             },
             "scaleResiduelle": {
-              "scale": 1,
-              "level": "low",
-              "label": "Faible (Gris)",
-              "color": "#94a3b8",
-              "strokeColor": "#94a3b8",
-              "textColor": "#0f172a",
-              "scoreTextColor": "#cbd5e1",
-              "bgBadge": "rgba(148, 163, 184, 0.18)",
-              "borderBadge": "#94a3b8"
+              "scale": 2,
+              "level": "medium",
+              "label": "Modéré (Orange)",
+              "color": "#f97316",
+              "strokeColor": "#f97316",
+              "textColor": "#ffffff",
+              "scoreTextColor": "#f97316",
+              "bgBadge": "rgba(249, 115, 22, 0.2)",
+              "borderBadge": "#f97316"
             },
             "photoUrl": "./risk-photos/RA10_20210220_161046.jpg",
             "photoFallbackPath": "riskassessment/RA10/20210220_161046.jpg",
@@ -6620,7 +6620,7 @@
             "categoryName": "Risques liés à la charge physique de travail",
             "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/activitePhysique_v2.png",
             "description": "Risques liés à la charge physique de travail",
-            "cotationBrute": 42,
+            "cotationBrute": 31,
             "cotationResiduelle": 31,
             "scaleBrute": {
               "scale": 1,
@@ -6852,7 +6852,7 @@
             "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/rps_v2.png",
             "description": "Accueil des clients",
             "cotationBrute": 48,
-            "cotationResiduelle": 37,
+            "cotationResiduelle": 48,
             "scaleBrute": {
               "scale": 2,
               "level": "medium",
@@ -6865,15 +6865,15 @@
               "borderBadge": "#f97316"
             },
             "scaleResiduelle": {
-              "scale": 1,
-              "level": "low",
-              "label": "Faible (Gris)",
-              "color": "#94a3b8",
-              "strokeColor": "#94a3b8",
-              "textColor": "#0f172a",
-              "scoreTextColor": "#cbd5e1",
-              "bgBadge": "rgba(148, 163, 184, 0.18)",
-              "borderBadge": "#94a3b8"
+              "scale": 2,
+              "level": "medium",
+              "label": "Modéré (Orange)",
+              "color": "#f97316",
+              "strokeColor": "#f97316",
+              "textColor": "#ffffff",
+              "scoreTextColor": "#f97316",
+              "bgBadge": "rgba(249, 115, 22, 0.2)",
+              "borderBadge": "#f97316"
             },
             "photoUrl": "./risk-photos/RA4_20211110_135913.jpg",
             "photoFallbackPath": "riskassessment/RA4/20211110_135913.jpg",
@@ -7050,8 +7050,8 @@
           "directRisksCount": 2,
           "maxBrute": 51,
           "maxResiduelle": 51,
-          "avgBrute": 44,
-          "avgResiduelle": 36,
+          "avgBrute": 38,
+          "avgResiduelle": 38,
           "scaleBrute": {
             "scale": 3,
             "level": "high",
@@ -7076,8 +7076,8 @@
           },
           "criticalCount": 0,
           "highCount": 1,
-          "mediumCount": 8,
-          "lowCount": 11,
+          "mediumCount": 10,
+          "lowCount": 9,
           "totalTasks": 17
         }
       },
@@ -7363,7 +7363,7 @@
                 "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/electricite_PictoCategorie_v2.png",
                 "description": "Perceuse à colonne",
                 "cotationBrute": 100,
-                "cotationResiduelle": 58,
+                "cotationResiduelle": 100,
                 "scaleBrute": {
                   "scale": 4,
                   "level": "critical",
@@ -7376,15 +7376,15 @@
                   "borderBadge": "#cbd5e1"
                 },
                 "scaleResiduelle": {
-                  "scale": 3,
-                  "level": "high",
-                  "label": "Élevé (Rouge)",
-                  "color": "#ef4444",
-                  "strokeColor": "#ef4444",
+                  "scale": 4,
+                  "level": "critical",
+                  "label": "Critique (Noir)",
+                  "color": "#111827",
+                  "strokeColor": "#e2e8f0",
                   "textColor": "#ffffff",
-                  "scoreTextColor": "#ef4444",
-                  "bgBadge": "rgba(239, 68, 68, 0.2)",
-                  "borderBadge": "#ef4444"
+                  "scoreTextColor": "#f8fafc",
+                  "bgBadge": "#09090b",
+                  "borderBadge": "#cbd5e1"
                 },
                 "photoUrl": "./risk-photos/RA59_20220127_094415.jpg",
                 "photoFallbackPath": "riskassessment/RA59/20220127_094415.jpg",
@@ -7666,6 +7666,111 @@
                 ]
               },
               {
+                "id": 3366,
+                "ref": "RK29",
+                "fkElement": 36,
+                "categoryPosition": 0,
+                "categoryName": "Risques de chute de plain-pied",
+                "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
+                "description": "Déplacement entre les postes Percage, découpe, soudage",
+                "cotationBrute": 51,
+                "cotationResiduelle": 51,
+                "scaleBrute": {
+                  "scale": 3,
+                  "level": "high",
+                  "label": "Élevé (Rouge)",
+                  "color": "#ef4444",
+                  "strokeColor": "#ef4444",
+                  "textColor": "#ffffff",
+                  "scoreTextColor": "#ef4444",
+                  "bgBadge": "rgba(239, 68, 68, 0.2)",
+                  "borderBadge": "#ef4444"
+                },
+                "scaleResiduelle": {
+                  "scale": 3,
+                  "level": "high",
+                  "label": "Élevé (Rouge)",
+                  "color": "#ef4444",
+                  "strokeColor": "#ef4444",
+                  "textColor": "#ffffff",
+                  "scoreTextColor": "#ef4444",
+                  "bgBadge": "rgba(239, 68, 68, 0.2)",
+                  "borderBadge": "#ef4444"
+                },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
+                "latestEvaluation": {
+                  "id": 3438,
+                  "ref": "RA79",
+                  "cotation": 51,
+                  "method": "standard",
+                  "gravite": 1,
+                  "exposition": 1,
+                  "occurrence": 1,
+                  "formation": 1,
+                  "protection": 1,
+                  "comment": "Câbles au sol",
+                  "photo": null,
+                  "dateCreation": 1727792457,
+                  "status": 1
+                },
+                "initialEvaluation": {
+                  "id": 3438,
+                  "ref": "RA79",
+                  "cotation": 51,
+                  "method": "standard",
+                  "gravite": 1,
+                  "exposition": 1,
+                  "occurrence": 1,
+                  "formation": 1,
+                  "protection": 1,
+                  "comment": "Câbles au sol",
+                  "photo": null,
+                  "dateCreation": 1727792457,
+                  "status": 1
+                },
+                "evaluationsCount": 1,
+                "evaluations": [
+                  {
+                    "id": 3438,
+                    "ref": "RA79",
+                    "cotation": 51,
+                    "method": "standard",
+                    "gravite": 1,
+                    "exposition": 1,
+                    "occurrence": 1,
+                    "formation": 1,
+                    "protection": 1,
+                    "comment": "Câbles au sol",
+                    "photo": null,
+                    "dateCreation": 1727792457,
+                    "status": 1
+                  }
+                ],
+                "tasks": [
+                  {
+                    "id": 1131,
+                    "ref": "TK2410-1122",
+                    "label": "Passer les câbles en aérien afin de ne pas avoir de différence de niveau au niveau du sol",
+                    "description": "",
+                    "progress": 25,
+                    "budget": 900,
+                    "color": "#16a085"
+                  },
+                  {
+                    "id": 1132,
+                    "ref": "TK2410-1123",
+                    "label": "Réaliser une formation afin de mettre en place les méthodes des 5S dans l'atelier",
+                    "description": "",
+                    "progress": 100,
+                    "budget": 500,
+                    "color": "#16a085"
+                  }
+                ]
+              },
+              {
                 "id": 3211,
                 "ref": "RK17",
                 "fkElement": 36,
@@ -7750,111 +7855,6 @@
                   }
                 ],
                 "tasks": []
-              },
-              {
-                "id": 3366,
-                "ref": "RK29",
-                "fkElement": 36,
-                "categoryPosition": 0,
-                "categoryName": "Risques de chute de plain-pied",
-                "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
-                "description": "Déplacement entre les postes Percage, découpe, soudage",
-                "cotationBrute": 51,
-                "cotationResiduelle": 37,
-                "scaleBrute": {
-                  "scale": 3,
-                  "level": "high",
-                  "label": "Élevé (Rouge)",
-                  "color": "#ef4444",
-                  "strokeColor": "#ef4444",
-                  "textColor": "#ffffff",
-                  "scoreTextColor": "#ef4444",
-                  "bgBadge": "rgba(239, 68, 68, 0.2)",
-                  "borderBadge": "#ef4444"
-                },
-                "scaleResiduelle": {
-                  "scale": 1,
-                  "level": "low",
-                  "label": "Faible (Gris)",
-                  "color": "#94a3b8",
-                  "strokeColor": "#94a3b8",
-                  "textColor": "#0f172a",
-                  "scoreTextColor": "#cbd5e1",
-                  "bgBadge": "rgba(148, 163, 184, 0.18)",
-                  "borderBadge": "#94a3b8"
-                },
-                "photoUrl": null,
-                "photoFallbackPath": null,
-                "photoRaRef": null,
-                "photoRawName": null,
-                "latestEvaluation": {
-                  "id": 3438,
-                  "ref": "RA79",
-                  "cotation": 51,
-                  "method": "standard",
-                  "gravite": 1,
-                  "exposition": 1,
-                  "occurrence": 1,
-                  "formation": 1,
-                  "protection": 1,
-                  "comment": "Câbles au sol",
-                  "photo": null,
-                  "dateCreation": 1727792457,
-                  "status": 1
-                },
-                "initialEvaluation": {
-                  "id": 3438,
-                  "ref": "RA79",
-                  "cotation": 51,
-                  "method": "standard",
-                  "gravite": 1,
-                  "exposition": 1,
-                  "occurrence": 1,
-                  "formation": 1,
-                  "protection": 1,
-                  "comment": "Câbles au sol",
-                  "photo": null,
-                  "dateCreation": 1727792457,
-                  "status": 1
-                },
-                "evaluationsCount": 1,
-                "evaluations": [
-                  {
-                    "id": 3438,
-                    "ref": "RA79",
-                    "cotation": 51,
-                    "method": "standard",
-                    "gravite": 1,
-                    "exposition": 1,
-                    "occurrence": 1,
-                    "formation": 1,
-                    "protection": 1,
-                    "comment": "Câbles au sol",
-                    "photo": null,
-                    "dateCreation": 1727792457,
-                    "status": 1
-                  }
-                ],
-                "tasks": [
-                  {
-                    "id": 1131,
-                    "ref": "TK2410-1122",
-                    "label": "Passer les câbles en aérien afin de ne pas avoir de différence de niveau au niveau du sol",
-                    "description": "",
-                    "progress": 25,
-                    "budget": 900,
-                    "color": "#16a085"
-                  },
-                  {
-                    "id": 1132,
-                    "ref": "TK2410-1123",
-                    "label": "Réaliser une formation afin de mettre en place les méthodes des 5S dans l'atelier",
-                    "description": "",
-                    "progress": 100,
-                    "budget": 500,
-                    "color": "#16a085"
-                  }
-                ]
               },
               {
                 "id": 3212,
@@ -8102,7 +8102,7 @@
                 "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/electricite_PictoCategorie_v2.png",
                 "description": "Perceuse à colonne",
                 "cotationBrute": 100,
-                "cotationResiduelle": 58,
+                "cotationResiduelle": 100,
                 "scaleBrute": {
                   "scale": 4,
                   "level": "critical",
@@ -8115,15 +8115,15 @@
                   "borderBadge": "#cbd5e1"
                 },
                 "scaleResiduelle": {
-                  "scale": 3,
-                  "level": "high",
-                  "label": "Élevé (Rouge)",
-                  "color": "#ef4444",
-                  "strokeColor": "#ef4444",
+                  "scale": 4,
+                  "level": "critical",
+                  "label": "Critique (Noir)",
+                  "color": "#111827",
+                  "strokeColor": "#e2e8f0",
                   "textColor": "#ffffff",
-                  "scoreTextColor": "#ef4444",
-                  "bgBadge": "rgba(239, 68, 68, 0.2)",
-                  "borderBadge": "#ef4444"
+                  "scoreTextColor": "#f8fafc",
+                  "bgBadge": "#09090b",
+                  "borderBadge": "#cbd5e1"
                 },
                 "photoUrl": "./risk-photos/RA59_20220127_094415.jpg",
                 "photoFallbackPath": "riskassessment/RA59/20220127_094415.jpg",
@@ -8405,6 +8405,111 @@
                 ]
               },
               {
+                "id": 3366,
+                "ref": "RK29",
+                "fkElement": 36,
+                "categoryPosition": 0,
+                "categoryName": "Risques de chute de plain-pied",
+                "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
+                "description": "Déplacement entre les postes Percage, découpe, soudage",
+                "cotationBrute": 51,
+                "cotationResiduelle": 51,
+                "scaleBrute": {
+                  "scale": 3,
+                  "level": "high",
+                  "label": "Élevé (Rouge)",
+                  "color": "#ef4444",
+                  "strokeColor": "#ef4444",
+                  "textColor": "#ffffff",
+                  "scoreTextColor": "#ef4444",
+                  "bgBadge": "rgba(239, 68, 68, 0.2)",
+                  "borderBadge": "#ef4444"
+                },
+                "scaleResiduelle": {
+                  "scale": 3,
+                  "level": "high",
+                  "label": "Élevé (Rouge)",
+                  "color": "#ef4444",
+                  "strokeColor": "#ef4444",
+                  "textColor": "#ffffff",
+                  "scoreTextColor": "#ef4444",
+                  "bgBadge": "rgba(239, 68, 68, 0.2)",
+                  "borderBadge": "#ef4444"
+                },
+                "photoUrl": null,
+                "photoFallbackPath": null,
+                "photoRaRef": null,
+                "photoRawName": null,
+                "latestEvaluation": {
+                  "id": 3438,
+                  "ref": "RA79",
+                  "cotation": 51,
+                  "method": "standard",
+                  "gravite": 1,
+                  "exposition": 1,
+                  "occurrence": 1,
+                  "formation": 1,
+                  "protection": 1,
+                  "comment": "Câbles au sol",
+                  "photo": null,
+                  "dateCreation": 1727792457,
+                  "status": 1
+                },
+                "initialEvaluation": {
+                  "id": 3438,
+                  "ref": "RA79",
+                  "cotation": 51,
+                  "method": "standard",
+                  "gravite": 1,
+                  "exposition": 1,
+                  "occurrence": 1,
+                  "formation": 1,
+                  "protection": 1,
+                  "comment": "Câbles au sol",
+                  "photo": null,
+                  "dateCreation": 1727792457,
+                  "status": 1
+                },
+                "evaluationsCount": 1,
+                "evaluations": [
+                  {
+                    "id": 3438,
+                    "ref": "RA79",
+                    "cotation": 51,
+                    "method": "standard",
+                    "gravite": 1,
+                    "exposition": 1,
+                    "occurrence": 1,
+                    "formation": 1,
+                    "protection": 1,
+                    "comment": "Câbles au sol",
+                    "photo": null,
+                    "dateCreation": 1727792457,
+                    "status": 1
+                  }
+                ],
+                "tasks": [
+                  {
+                    "id": 1131,
+                    "ref": "TK2410-1122",
+                    "label": "Passer les câbles en aérien afin de ne pas avoir de différence de niveau au niveau du sol",
+                    "description": "",
+                    "progress": 25,
+                    "budget": 900,
+                    "color": "#16a085"
+                  },
+                  {
+                    "id": 1132,
+                    "ref": "TK2410-1123",
+                    "label": "Réaliser une formation afin de mettre en place les méthodes des 5S dans l'atelier",
+                    "description": "",
+                    "progress": 100,
+                    "budget": 500,
+                    "color": "#16a085"
+                  }
+                ]
+              },
+              {
                 "id": 3211,
                 "ref": "RK17",
                 "fkElement": 36,
@@ -8489,111 +8594,6 @@
                   }
                 ],
                 "tasks": []
-              },
-              {
-                "id": 3366,
-                "ref": "RK29",
-                "fkElement": 36,
-                "categoryPosition": 0,
-                "categoryName": "Risques de chute de plain-pied",
-                "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
-                "description": "Déplacement entre les postes Percage, découpe, soudage",
-                "cotationBrute": 51,
-                "cotationResiduelle": 37,
-                "scaleBrute": {
-                  "scale": 3,
-                  "level": "high",
-                  "label": "Élevé (Rouge)",
-                  "color": "#ef4444",
-                  "strokeColor": "#ef4444",
-                  "textColor": "#ffffff",
-                  "scoreTextColor": "#ef4444",
-                  "bgBadge": "rgba(239, 68, 68, 0.2)",
-                  "borderBadge": "#ef4444"
-                },
-                "scaleResiduelle": {
-                  "scale": 1,
-                  "level": "low",
-                  "label": "Faible (Gris)",
-                  "color": "#94a3b8",
-                  "strokeColor": "#94a3b8",
-                  "textColor": "#0f172a",
-                  "scoreTextColor": "#cbd5e1",
-                  "bgBadge": "rgba(148, 163, 184, 0.18)",
-                  "borderBadge": "#94a3b8"
-                },
-                "photoUrl": null,
-                "photoFallbackPath": null,
-                "photoRaRef": null,
-                "photoRawName": null,
-                "latestEvaluation": {
-                  "id": 3438,
-                  "ref": "RA79",
-                  "cotation": 51,
-                  "method": "standard",
-                  "gravite": 1,
-                  "exposition": 1,
-                  "occurrence": 1,
-                  "formation": 1,
-                  "protection": 1,
-                  "comment": "Câbles au sol",
-                  "photo": null,
-                  "dateCreation": 1727792457,
-                  "status": 1
-                },
-                "initialEvaluation": {
-                  "id": 3438,
-                  "ref": "RA79",
-                  "cotation": 51,
-                  "method": "standard",
-                  "gravite": 1,
-                  "exposition": 1,
-                  "occurrence": 1,
-                  "formation": 1,
-                  "protection": 1,
-                  "comment": "Câbles au sol",
-                  "photo": null,
-                  "dateCreation": 1727792457,
-                  "status": 1
-                },
-                "evaluationsCount": 1,
-                "evaluations": [
-                  {
-                    "id": 3438,
-                    "ref": "RA79",
-                    "cotation": 51,
-                    "method": "standard",
-                    "gravite": 1,
-                    "exposition": 1,
-                    "occurrence": 1,
-                    "formation": 1,
-                    "protection": 1,
-                    "comment": "Câbles au sol",
-                    "photo": null,
-                    "dateCreation": 1727792457,
-                    "status": 1
-                  }
-                ],
-                "tasks": [
-                  {
-                    "id": 1131,
-                    "ref": "TK2410-1122",
-                    "label": "Passer les câbles en aérien afin de ne pas avoir de différence de niveau au niveau du sol",
-                    "description": "",
-                    "progress": 25,
-                    "budget": 900,
-                    "color": "#16a085"
-                  },
-                  {
-                    "id": 1132,
-                    "ref": "TK2410-1123",
-                    "label": "Réaliser une formation afin de mettre en place les méthodes des 5S dans l'atelier",
-                    "description": "",
-                    "progress": 100,
-                    "budget": 500,
-                    "color": "#16a085"
-                  }
-                ]
               },
               {
                 "id": 3212,
@@ -8707,7 +8707,7 @@
               "maxBrute": 100,
               "maxResiduelle": 100,
               "avgBrute": 60,
-              "avgResiduelle": 52,
+              "avgResiduelle": 60,
               "scaleBrute": {
                 "scale": 4,
                 "level": "critical",
@@ -8730,10 +8730,10 @@
                 "bgBadge": "#09090b",
                 "borderBadge": "#cbd5e1"
               },
-              "criticalCount": 1,
+              "criticalCount": 2,
               "highCount": 3,
               "mediumCount": 0,
-              "lowCount": 3,
+              "lowCount": 2,
               "totalTasks": 11
             }
           },
@@ -9690,7 +9690,7 @@
             "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/electricite_PictoCategorie_v2.png",
             "description": "Perceuse à colonne",
             "cotationBrute": 100,
-            "cotationResiduelle": 58,
+            "cotationResiduelle": 100,
             "scaleBrute": {
               "scale": 4,
               "level": "critical",
@@ -9703,15 +9703,15 @@
               "borderBadge": "#cbd5e1"
             },
             "scaleResiduelle": {
-              "scale": 3,
-              "level": "high",
-              "label": "Élevé (Rouge)",
-              "color": "#ef4444",
-              "strokeColor": "#ef4444",
+              "scale": 4,
+              "level": "critical",
+              "label": "Critique (Noir)",
+              "color": "#111827",
+              "strokeColor": "#e2e8f0",
               "textColor": "#ffffff",
-              "scoreTextColor": "#ef4444",
-              "bgBadge": "rgba(239, 68, 68, 0.2)",
-              "borderBadge": "#ef4444"
+              "scoreTextColor": "#f8fafc",
+              "bgBadge": "#09090b",
+              "borderBadge": "#cbd5e1"
             },
             "photoUrl": "./risk-photos/RA59_20220127_094415.jpg",
             "photoFallbackPath": "riskassessment/RA59/20220127_094415.jpg",
@@ -9993,6 +9993,111 @@
             ]
           },
           {
+            "id": 3366,
+            "ref": "RK29",
+            "fkElement": 36,
+            "categoryPosition": 0,
+            "categoryName": "Risques de chute de plain-pied",
+            "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
+            "description": "Déplacement entre les postes Percage, découpe, soudage",
+            "cotationBrute": 51,
+            "cotationResiduelle": 51,
+            "scaleBrute": {
+              "scale": 3,
+              "level": "high",
+              "label": "Élevé (Rouge)",
+              "color": "#ef4444",
+              "strokeColor": "#ef4444",
+              "textColor": "#ffffff",
+              "scoreTextColor": "#ef4444",
+              "bgBadge": "rgba(239, 68, 68, 0.2)",
+              "borderBadge": "#ef4444"
+            },
+            "scaleResiduelle": {
+              "scale": 3,
+              "level": "high",
+              "label": "Élevé (Rouge)",
+              "color": "#ef4444",
+              "strokeColor": "#ef4444",
+              "textColor": "#ffffff",
+              "scoreTextColor": "#ef4444",
+              "bgBadge": "rgba(239, 68, 68, 0.2)",
+              "borderBadge": "#ef4444"
+            },
+            "photoUrl": null,
+            "photoFallbackPath": null,
+            "photoRaRef": null,
+            "photoRawName": null,
+            "latestEvaluation": {
+              "id": 3438,
+              "ref": "RA79",
+              "cotation": 51,
+              "method": "standard",
+              "gravite": 1,
+              "exposition": 1,
+              "occurrence": 1,
+              "formation": 1,
+              "protection": 1,
+              "comment": "Câbles au sol",
+              "photo": null,
+              "dateCreation": 1727792457,
+              "status": 1
+            },
+            "initialEvaluation": {
+              "id": 3438,
+              "ref": "RA79",
+              "cotation": 51,
+              "method": "standard",
+              "gravite": 1,
+              "exposition": 1,
+              "occurrence": 1,
+              "formation": 1,
+              "protection": 1,
+              "comment": "Câbles au sol",
+              "photo": null,
+              "dateCreation": 1727792457,
+              "status": 1
+            },
+            "evaluationsCount": 1,
+            "evaluations": [
+              {
+                "id": 3438,
+                "ref": "RA79",
+                "cotation": 51,
+                "method": "standard",
+                "gravite": 1,
+                "exposition": 1,
+                "occurrence": 1,
+                "formation": 1,
+                "protection": 1,
+                "comment": "Câbles au sol",
+                "photo": null,
+                "dateCreation": 1727792457,
+                "status": 1
+              }
+            ],
+            "tasks": [
+              {
+                "id": 1131,
+                "ref": "TK2410-1122",
+                "label": "Passer les câbles en aérien afin de ne pas avoir de différence de niveau au niveau du sol",
+                "description": "",
+                "progress": 25,
+                "budget": 900,
+                "color": "#16a085"
+              },
+              {
+                "id": 1132,
+                "ref": "TK2410-1123",
+                "label": "Réaliser une formation afin de mettre en place les méthodes des 5S dans l'atelier",
+                "description": "",
+                "progress": 100,
+                "budget": 500,
+                "color": "#16a085"
+              }
+            ]
+          },
+          {
             "id": 3211,
             "ref": "RK17",
             "fkElement": 36,
@@ -10077,111 +10182,6 @@
               }
             ],
             "tasks": []
-          },
-          {
-            "id": 3366,
-            "ref": "RK29",
-            "fkElement": 36,
-            "categoryPosition": 0,
-            "categoryName": "Risques de chute de plain-pied",
-            "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
-            "description": "Déplacement entre les postes Percage, découpe, soudage",
-            "cotationBrute": 51,
-            "cotationResiduelle": 37,
-            "scaleBrute": {
-              "scale": 3,
-              "level": "high",
-              "label": "Élevé (Rouge)",
-              "color": "#ef4444",
-              "strokeColor": "#ef4444",
-              "textColor": "#ffffff",
-              "scoreTextColor": "#ef4444",
-              "bgBadge": "rgba(239, 68, 68, 0.2)",
-              "borderBadge": "#ef4444"
-            },
-            "scaleResiduelle": {
-              "scale": 1,
-              "level": "low",
-              "label": "Faible (Gris)",
-              "color": "#94a3b8",
-              "strokeColor": "#94a3b8",
-              "textColor": "#0f172a",
-              "scoreTextColor": "#cbd5e1",
-              "bgBadge": "rgba(148, 163, 184, 0.18)",
-              "borderBadge": "#94a3b8"
-            },
-            "photoUrl": null,
-            "photoFallbackPath": null,
-            "photoRaRef": null,
-            "photoRawName": null,
-            "latestEvaluation": {
-              "id": 3438,
-              "ref": "RA79",
-              "cotation": 51,
-              "method": "standard",
-              "gravite": 1,
-              "exposition": 1,
-              "occurrence": 1,
-              "formation": 1,
-              "protection": 1,
-              "comment": "Câbles au sol",
-              "photo": null,
-              "dateCreation": 1727792457,
-              "status": 1
-            },
-            "initialEvaluation": {
-              "id": 3438,
-              "ref": "RA79",
-              "cotation": 51,
-              "method": "standard",
-              "gravite": 1,
-              "exposition": 1,
-              "occurrence": 1,
-              "formation": 1,
-              "protection": 1,
-              "comment": "Câbles au sol",
-              "photo": null,
-              "dateCreation": 1727792457,
-              "status": 1
-            },
-            "evaluationsCount": 1,
-            "evaluations": [
-              {
-                "id": 3438,
-                "ref": "RA79",
-                "cotation": 51,
-                "method": "standard",
-                "gravite": 1,
-                "exposition": 1,
-                "occurrence": 1,
-                "formation": 1,
-                "protection": 1,
-                "comment": "Câbles au sol",
-                "photo": null,
-                "dateCreation": 1727792457,
-                "status": 1
-              }
-            ],
-            "tasks": [
-              {
-                "id": 1131,
-                "ref": "TK2410-1122",
-                "label": "Passer les câbles en aérien afin de ne pas avoir de différence de niveau au niveau du sol",
-                "description": "",
-                "progress": 25,
-                "budget": 900,
-                "color": "#16a085"
-              },
-              {
-                "id": 1132,
-                "ref": "TK2410-1123",
-                "label": "Réaliser une formation afin de mettre en place les méthodes des 5S dans l'atelier",
-                "description": "",
-                "progress": 100,
-                "budget": 500,
-                "color": "#16a085"
-              }
-            ]
           },
           {
             "id": 3212,
@@ -10616,7 +10616,7 @@
           "maxBrute": 100,
           "maxResiduelle": 100,
           "avgBrute": 58,
-          "avgResiduelle": 53,
+          "avgResiduelle": 58,
           "scaleBrute": {
             "scale": 4,
             "level": "critical",
@@ -10639,10 +10639,10 @@
             "bgBadge": "#09090b",
             "borderBadge": "#cbd5e1"
           },
-          "criticalCount": 2,
+          "criticalCount": 3,
           "highCount": 5,
           "mediumCount": 0,
-          "lowCount": 4,
+          "lowCount": 3,
           "totalTasks": 18
         }
       },
@@ -10970,7 +10970,7 @@
                 "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/incendies_PictoCategorie_v2.png",
                 "description": "Risques d'incendie et d'explosion",
                 "cotationBrute": 100,
-                "cotationResiduelle": 55,
+                "cotationResiduelle": 100,
                 "scaleBrute": {
                   "scale": 4,
                   "level": "critical",
@@ -10983,15 +10983,15 @@
                   "borderBadge": "#cbd5e1"
                 },
                 "scaleResiduelle": {
-                  "scale": 3,
-                  "level": "high",
-                  "label": "Élevé (Rouge)",
-                  "color": "#ef4444",
-                  "strokeColor": "#ef4444",
+                  "scale": 4,
+                  "level": "critical",
+                  "label": "Critique (Noir)",
+                  "color": "#111827",
+                  "strokeColor": "#e2e8f0",
                   "textColor": "#ffffff",
-                  "scoreTextColor": "#ef4444",
-                  "bgBadge": "rgba(239, 68, 68, 0.2)",
-                  "borderBadge": "#ef4444"
+                  "scoreTextColor": "#f8fafc",
+                  "bgBadge": "#09090b",
+                  "borderBadge": "#cbd5e1"
                 },
                 "photoUrl": "./risk-photos/RA67_ATEX.jpg",
                 "photoFallbackPath": "riskassessment/RA67/ATEX.jpg",
@@ -11155,7 +11155,7 @@
                 "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/incendies_PictoCategorie_v2.png",
                 "description": "Risques d'incendie et d'explosion",
                 "cotationBrute": 100,
-                "cotationResiduelle": 55,
+                "cotationResiduelle": 100,
                 "scaleBrute": {
                   "scale": 4,
                   "level": "critical",
@@ -11168,15 +11168,15 @@
                   "borderBadge": "#cbd5e1"
                 },
                 "scaleResiduelle": {
-                  "scale": 3,
-                  "level": "high",
-                  "label": "Élevé (Rouge)",
-                  "color": "#ef4444",
-                  "strokeColor": "#ef4444",
+                  "scale": 4,
+                  "level": "critical",
+                  "label": "Critique (Noir)",
+                  "color": "#111827",
+                  "strokeColor": "#e2e8f0",
                   "textColor": "#ffffff",
-                  "scoreTextColor": "#ef4444",
-                  "bgBadge": "rgba(239, 68, 68, 0.2)",
-                  "borderBadge": "#ef4444"
+                  "scoreTextColor": "#f8fafc",
+                  "bgBadge": "#09090b",
+                  "borderBadge": "#cbd5e1"
                 },
                 "photoUrl": "./risk-photos/RA67_ATEX.jpg",
                 "photoFallbackPath": "riskassessment/RA67/ATEX.jpg",
@@ -11333,9 +11333,9 @@
               "totalRisks": 2,
               "directRisksCount": 2,
               "maxBrute": 100,
-              "maxResiduelle": 55,
+              "maxResiduelle": 100,
               "avgBrute": 55,
-              "avgResiduelle": 33,
+              "avgResiduelle": 55,
               "scaleBrute": {
                 "scale": 4,
                 "level": "critical",
@@ -11348,18 +11348,18 @@
                 "borderBadge": "#cbd5e1"
               },
               "scaleResiduelle": {
-                "scale": 3,
-                "level": "high",
-                "label": "Élevé (Rouge)",
-                "color": "#ef4444",
-                "strokeColor": "#ef4444",
+                "scale": 4,
+                "level": "critical",
+                "label": "Critique (Noir)",
+                "color": "#111827",
+                "strokeColor": "#e2e8f0",
                 "textColor": "#ffffff",
-                "scoreTextColor": "#ef4444",
-                "bgBadge": "rgba(239, 68, 68, 0.2)",
-                "borderBadge": "#ef4444"
+                "scoreTextColor": "#f8fafc",
+                "bgBadge": "#09090b",
+                "borderBadge": "#cbd5e1"
               },
-              "criticalCount": 0,
-              "highCount": 1,
+              "criticalCount": 1,
+              "highCount": 0,
               "mediumCount": 0,
               "lowCount": 1,
               "totalTasks": 1
@@ -11715,7 +11715,7 @@
             "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/incendies_PictoCategorie_v2.png",
             "description": "Risques d'incendie et d'explosion",
             "cotationBrute": 100,
-            "cotationResiduelle": 55,
+            "cotationResiduelle": 100,
             "scaleBrute": {
               "scale": 4,
               "level": "critical",
@@ -11728,15 +11728,15 @@
               "borderBadge": "#cbd5e1"
             },
             "scaleResiduelle": {
-              "scale": 3,
-              "level": "high",
-              "label": "Élevé (Rouge)",
-              "color": "#ef4444",
-              "strokeColor": "#ef4444",
+              "scale": 4,
+              "level": "critical",
+              "label": "Critique (Noir)",
+              "color": "#111827",
+              "strokeColor": "#e2e8f0",
               "textColor": "#ffffff",
-              "scoreTextColor": "#ef4444",
-              "bgBadge": "rgba(239, 68, 68, 0.2)",
-              "borderBadge": "#ef4444"
+              "scoreTextColor": "#f8fafc",
+              "bgBadge": "#09090b",
+              "borderBadge": "#cbd5e1"
             },
             "photoUrl": "./risk-photos/RA67_ATEX.jpg",
             "photoFallbackPath": "riskassessment/RA67/ATEX.jpg",
@@ -11989,9 +11989,9 @@
           "totalRisks": 4,
           "directRisksCount": 0,
           "maxBrute": 100,
-          "maxResiduelle": 55,
+          "maxResiduelle": 100,
           "avgBrute": 35,
-          "avgResiduelle": 24,
+          "avgResiduelle": 35,
           "scaleBrute": {
             "scale": 4,
             "level": "critical",
@@ -12004,18 +12004,18 @@
             "borderBadge": "#cbd5e1"
           },
           "scaleResiduelle": {
-            "scale": 3,
-            "level": "high",
-            "label": "Élevé (Rouge)",
-            "color": "#ef4444",
-            "strokeColor": "#ef4444",
+            "scale": 4,
+            "level": "critical",
+            "label": "Critique (Noir)",
+            "color": "#111827",
+            "strokeColor": "#e2e8f0",
             "textColor": "#ffffff",
-            "scoreTextColor": "#ef4444",
-            "bgBadge": "rgba(239, 68, 68, 0.2)",
-            "borderBadge": "#ef4444"
+            "scoreTextColor": "#f8fafc",
+            "bgBadge": "#09090b",
+            "borderBadge": "#cbd5e1"
           },
-          "criticalCount": 0,
-          "highCount": 1,
+          "criticalCount": 1,
+          "highCount": 0,
           "mediumCount": 0,
           "lowCount": 3,
           "totalTasks": 3
@@ -13019,7 +13019,7 @@
                 "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/circulation_v2.png",
                 "description": "Livraison et courses Rapide",
                 "cotationBrute": 66,
-                "cotationResiduelle": 36,
+                "cotationResiduelle": 66,
                 "scaleBrute": {
                   "scale": 3,
                   "level": "high",
@@ -13032,15 +13032,15 @@
                   "borderBadge": "#ef4444"
                 },
                 "scaleResiduelle": {
-                  "scale": 1,
-                  "level": "low",
-                  "label": "Faible (Gris)",
-                  "color": "#94a3b8",
-                  "strokeColor": "#94a3b8",
-                  "textColor": "#0f172a",
-                  "scoreTextColor": "#cbd5e1",
-                  "bgBadge": "rgba(148, 163, 184, 0.18)",
-                  "borderBadge": "#94a3b8"
+                  "scale": 3,
+                  "level": "high",
+                  "label": "Élevé (Rouge)",
+                  "color": "#ef4444",
+                  "strokeColor": "#ef4444",
+                  "textColor": "#ffffff",
+                  "scoreTextColor": "#ef4444",
+                  "bgBadge": "rgba(239, 68, 68, 0.2)",
+                  "borderBadge": "#ef4444"
                 },
                 "photoUrl": "./risk-photos/RA2_risque_routiers-en-mission_crash-voiture_600px.png",
                 "photoFallbackPath": "riskassessment/RA2/risque_routiers-en-mission_crash-voiture_600px.png",
@@ -13118,7 +13118,7 @@
                 "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/circulation_v2.png",
                 "description": "Livraison et courses Rapide",
                 "cotationBrute": 66,
-                "cotationResiduelle": 36,
+                "cotationResiduelle": 66,
                 "scaleBrute": {
                   "scale": 3,
                   "level": "high",
@@ -13131,15 +13131,15 @@
                   "borderBadge": "#ef4444"
                 },
                 "scaleResiduelle": {
-                  "scale": 1,
-                  "level": "low",
-                  "label": "Faible (Gris)",
-                  "color": "#94a3b8",
-                  "strokeColor": "#94a3b8",
-                  "textColor": "#0f172a",
-                  "scoreTextColor": "#cbd5e1",
-                  "bgBadge": "rgba(148, 163, 184, 0.18)",
-                  "borderBadge": "#94a3b8"
+                  "scale": 3,
+                  "level": "high",
+                  "label": "Élevé (Rouge)",
+                  "color": "#ef4444",
+                  "strokeColor": "#ef4444",
+                  "textColor": "#ffffff",
+                  "scoreTextColor": "#ef4444",
+                  "bgBadge": "rgba(239, 68, 68, 0.2)",
+                  "borderBadge": "#ef4444"
                 },
                 "photoUrl": "./risk-photos/RA2_risque_routiers-en-mission_crash-voiture_600px.png",
                 "photoFallbackPath": "riskassessment/RA2/risque_routiers-en-mission_crash-voiture_600px.png",
@@ -13210,9 +13210,9 @@
               "totalRisks": 1,
               "directRisksCount": 1,
               "maxBrute": 66,
-              "maxResiduelle": 36,
+              "maxResiduelle": 66,
               "avgBrute": 66,
-              "avgResiduelle": 36,
+              "avgResiduelle": 66,
               "scaleBrute": {
                 "scale": 3,
                 "level": "high",
@@ -13225,20 +13225,20 @@
                 "borderBadge": "#ef4444"
               },
               "scaleResiduelle": {
-                "scale": 1,
-                "level": "low",
-                "label": "Faible (Gris)",
-                "color": "#94a3b8",
-                "strokeColor": "#94a3b8",
-                "textColor": "#0f172a",
-                "scoreTextColor": "#cbd5e1",
-                "bgBadge": "rgba(148, 163, 184, 0.18)",
-                "borderBadge": "#94a3b8"
+                "scale": 3,
+                "level": "high",
+                "label": "Élevé (Rouge)",
+                "color": "#ef4444",
+                "strokeColor": "#ef4444",
+                "textColor": "#ffffff",
+                "scoreTextColor": "#ef4444",
+                "bgBadge": "rgba(239, 68, 68, 0.2)",
+                "borderBadge": "#ef4444"
               },
               "criticalCount": 0,
-              "highCount": 0,
+              "highCount": 1,
               "mediumCount": 0,
-              "lowCount": 1,
+              "lowCount": 0,
               "totalTasks": 1
             }
           },
@@ -13453,18 +13453,18 @@
                 "categoryName": "Risques de chute de hauteur",
                 "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chuteH_PictoCategorie_v2.png",
                 "description": "Chute de l'avion et des personnes à bord",
-                "cotationBrute": 66,
+                "cotationBrute": 25,
                 "cotationResiduelle": 25,
                 "scaleBrute": {
-                  "scale": 3,
-                  "level": "high",
-                  "label": "Élevé (Rouge)",
-                  "color": "#ef4444",
-                  "strokeColor": "#ef4444",
-                  "textColor": "#ffffff",
-                  "scoreTextColor": "#ef4444",
-                  "bgBadge": "rgba(239, 68, 68, 0.2)",
-                  "borderBadge": "#ef4444"
+                  "scale": 1,
+                  "level": "low",
+                  "label": "Faible (Gris)",
+                  "color": "#94a3b8",
+                  "strokeColor": "#94a3b8",
+                  "textColor": "#0f172a",
+                  "scoreTextColor": "#cbd5e1",
+                  "bgBadge": "rgba(148, 163, 184, 0.18)",
+                  "borderBadge": "#94a3b8"
                 },
                 "scaleResiduelle": {
                   "scale": 1,
@@ -13786,18 +13786,18 @@
                 "categoryName": "Risques de chute de hauteur",
                 "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chuteH_PictoCategorie_v2.png",
                 "description": "Chute de l'avion et des personnes à bord",
-                "cotationBrute": 66,
+                "cotationBrute": 25,
                 "cotationResiduelle": 25,
                 "scaleBrute": {
-                  "scale": 3,
-                  "level": "high",
-                  "label": "Élevé (Rouge)",
-                  "color": "#ef4444",
-                  "strokeColor": "#ef4444",
-                  "textColor": "#ffffff",
-                  "scoreTextColor": "#ef4444",
-                  "bgBadge": "rgba(239, 68, 68, 0.2)",
-                  "borderBadge": "#ef4444"
+                  "scale": 1,
+                  "level": "low",
+                  "label": "Faible (Gris)",
+                  "color": "#94a3b8",
+                  "strokeColor": "#94a3b8",
+                  "textColor": "#0f172a",
+                  "scoreTextColor": "#cbd5e1",
+                  "bgBadge": "rgba(148, 163, 184, 0.18)",
+                  "borderBadge": "#94a3b8"
                 },
                 "scaleResiduelle": {
                   "scale": 1,
@@ -13922,7 +13922,7 @@
               "directRisksCount": 3,
               "maxBrute": 66,
               "maxResiduelle": 66,
-              "avgBrute": 58,
+              "avgBrute": 44,
               "avgResiduelle": 44,
               "scaleBrute": {
                 "scale": 3,
@@ -14978,7 +14978,7 @@
             "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/circulation_v2.png",
             "description": "Livraison et courses Rapide",
             "cotationBrute": 66,
-            "cotationResiduelle": 36,
+            "cotationResiduelle": 66,
             "scaleBrute": {
               "scale": 3,
               "level": "high",
@@ -14991,15 +14991,15 @@
               "borderBadge": "#ef4444"
             },
             "scaleResiduelle": {
-              "scale": 1,
-              "level": "low",
-              "label": "Faible (Gris)",
-              "color": "#94a3b8",
-              "strokeColor": "#94a3b8",
-              "textColor": "#0f172a",
-              "scoreTextColor": "#cbd5e1",
-              "bgBadge": "rgba(148, 163, 184, 0.18)",
-              "borderBadge": "#94a3b8"
+              "scale": 3,
+              "level": "high",
+              "label": "Élevé (Rouge)",
+              "color": "#ef4444",
+              "strokeColor": "#ef4444",
+              "textColor": "#ffffff",
+              "scoreTextColor": "#ef4444",
+              "bgBadge": "rgba(239, 68, 68, 0.2)",
+              "borderBadge": "#ef4444"
             },
             "photoUrl": "./risk-photos/RA2_risque_routiers-en-mission_crash-voiture_600px.png",
             "photoFallbackPath": "riskassessment/RA2/risque_routiers-en-mission_crash-voiture_600px.png",
@@ -15265,18 +15265,18 @@
             "categoryName": "Risques de chute de hauteur",
             "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chuteH_PictoCategorie_v2.png",
             "description": "Chute de l'avion et des personnes à bord",
-            "cotationBrute": 66,
+            "cotationBrute": 25,
             "cotationResiduelle": 25,
             "scaleBrute": {
-              "scale": 3,
-              "level": "high",
-              "label": "Élevé (Rouge)",
-              "color": "#ef4444",
-              "strokeColor": "#ef4444",
-              "textColor": "#ffffff",
-              "scoreTextColor": "#ef4444",
-              "bgBadge": "rgba(239, 68, 68, 0.2)",
-              "borderBadge": "#ef4444"
+              "scale": 1,
+              "level": "low",
+              "label": "Faible (Gris)",
+              "color": "#94a3b8",
+              "strokeColor": "#94a3b8",
+              "textColor": "#0f172a",
+              "scoreTextColor": "#cbd5e1",
+              "bgBadge": "rgba(148, 163, 184, 0.18)",
+              "borderBadge": "#94a3b8"
             },
             "scaleResiduelle": {
               "scale": 1,
@@ -15401,8 +15401,8 @@
           "directRisksCount": 11,
           "maxBrute": 66,
           "maxResiduelle": 66,
-          "avgBrute": 39,
-          "avgResiduelle": 34,
+          "avgBrute": 36,
+          "avgResiduelle": 36,
           "scaleBrute": {
             "scale": 3,
             "level": "high",
@@ -15426,14 +15426,128 @@
             "borderBadge": "#ef4444"
           },
           "criticalCount": 0,
-          "highCount": 3,
+          "highCount": 4,
           "mediumCount": 5,
-          "lowCount": 7,
+          "lowCount": 6,
           "totalTasks": 9
         }
       }
     ],
     "allRisks": [
+      {
+        "id": 3431,
+        "ref": "RK41",
+        "fkElement": 22,
+        "categoryPosition": 4,
+        "categoryName": "Risques routiers en mission",
+        "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/circulation_v2.png",
+        "description": "Risques routiers en mission",
+        "cotationBrute": 90,
+        "cotationResiduelle": 90,
+        "scaleBrute": {
+          "scale": 4,
+          "level": "critical",
+          "label": "Critique (Noir)",
+          "color": "#111827",
+          "strokeColor": "#e2e8f0",
+          "textColor": "#ffffff",
+          "scoreTextColor": "#f8fafc",
+          "bgBadge": "#09090b",
+          "borderBadge": "#cbd5e1"
+        },
+        "scaleResiduelle": {
+          "scale": 4,
+          "level": "critical",
+          "label": "Critique (Noir)",
+          "color": "#111827",
+          "strokeColor": "#e2e8f0",
+          "textColor": "#ffffff",
+          "scoreTextColor": "#f8fafc",
+          "bgBadge": "#09090b",
+          "borderBadge": "#cbd5e1"
+        },
+        "photoUrl": "./risk-photos/RA94_homme_trottinette_casque_velo-en-ville.png",
+        "photoFallbackPath": "riskassessment/RA94/homme_trottinette_casque_velo-en-ville.png",
+        "photoRaRef": "RA94",
+        "photoRawName": "homme_trottinette_casque_velo-en-ville.png",
+        "latestEvaluation": {
+          "id": 3506,
+          "ref": "RA94",
+          "cotation": 90,
+          "method": "advanced",
+          "gravite": 4,
+          "exposition": 4,
+          "occurrence": 2,
+          "formation": 4,
+          "protection": 3,
+          "comment": "Le salarié vient tous les jours au bureau en trottinette. Il est respectueux des feux, signalisations présentes. Il a bien eu son BSR. Il roule à une vitesse de 45 km/h pour les 25 Km/h autorisé. Le véhicule n'est pas adapté car il a été débridé. Il est équipé d'un casque de vélo. Nous avons eu 2 accidents l'an dernier sur la population de trottinette de l'entreprise.",
+          "photo": "homme_trottinette_casque_velo-en-ville.png",
+          "dateCreation": 1753036153,
+          "status": 1
+        },
+        "initialEvaluation": {
+          "id": 3506,
+          "ref": "RA94",
+          "cotation": 90,
+          "method": "advanced",
+          "gravite": 4,
+          "exposition": 4,
+          "occurrence": 2,
+          "formation": 4,
+          "protection": 3,
+          "comment": "Le salarié vient tous les jours au bureau en trottinette. Il est respectueux des feux, signalisations présentes. Il a bien eu son BSR. Il roule à une vitesse de 45 km/h pour les 25 Km/h autorisé. Le véhicule n'est pas adapté car il a été débridé. Il est équipé d'un casque de vélo. Nous avons eu 2 accidents l'an dernier sur la population de trottinette de l'entreprise.",
+          "photo": "homme_trottinette_casque_velo-en-ville.png",
+          "dateCreation": 1753036153,
+          "status": 1
+        },
+        "evaluationsCount": 1,
+        "evaluations": [
+          {
+            "id": 3506,
+            "ref": "RA94",
+            "cotation": 90,
+            "method": "advanced",
+            "gravite": 4,
+            "exposition": 4,
+            "occurrence": 2,
+            "formation": 4,
+            "protection": 3,
+            "comment": "Le salarié vient tous les jours au bureau en trottinette. Il est respectueux des feux, signalisations présentes. Il a bien eu son BSR. Il roule à une vitesse de 45 km/h pour les 25 Km/h autorisé. Le véhicule n'est pas adapté car il a été débridé. Il est équipé d'un casque de vélo. Nous avons eu 2 accidents l'an dernier sur la population de trottinette de l'entreprise.",
+            "photo": "homme_trottinette_casque_velo-en-ville.png",
+            "dateCreation": 1753036153,
+            "status": 1
+          }
+        ],
+        "tasks": [
+          {
+            "id": 1187,
+            "ref": "TK2508-1178",
+            "label": "Sensibiliser aux dangers de la trottinette électrique et des EDPM",
+            "description": "",
+            "progress": 100,
+            "budget": 800,
+            "color": "#16a085"
+          },
+          {
+            "id": 1188,
+            "ref": "TK2508-1179",
+            "label": "Contrôle sur la présence des assurances pour les EDPM",
+            "description": "Premier lien video sensibilisation :&nbsp;<a href=\"https://www.youtube.com/watch?v=XEUADqk5EDo\" target=\"_blank\">https://www.youtube.com/watch?v=XEUADqk5EDo</a>",
+            "progress": 100,
+            "budget": 100,
+            "color": "#16a085"
+          },
+          {
+            "id": 1242,
+            "ref": "TK2601-1232",
+            "label": "Maintenir les controles du bridages des EPDM et le suivi du nombre EPDM débridés trouvés",
+            "description": "",
+            "progress": 0,
+            "budget": 1500,
+            "color": "#16a085"
+          }
+        ]
+      },
       {
         "id": 3430,
         "ref": "RK40",
@@ -15519,120 +15633,6 @@
           }
         ],
         "tasks": []
-      },
-      {
-        "id": 3431,
-        "ref": "RK41",
-        "fkElement": 22,
-        "categoryPosition": 4,
-        "categoryName": "Risques routiers en mission",
-        "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/circulation_v2.png",
-        "description": "Risques routiers en mission",
-        "cotationBrute": 90,
-        "cotationResiduelle": 63,
-        "scaleBrute": {
-          "scale": 4,
-          "level": "critical",
-          "label": "Critique (Noir)",
-          "color": "#111827",
-          "strokeColor": "#e2e8f0",
-          "textColor": "#ffffff",
-          "scoreTextColor": "#f8fafc",
-          "bgBadge": "#09090b",
-          "borderBadge": "#cbd5e1"
-        },
-        "scaleResiduelle": {
-          "scale": 3,
-          "level": "high",
-          "label": "Élevé (Rouge)",
-          "color": "#ef4444",
-          "strokeColor": "#ef4444",
-          "textColor": "#ffffff",
-          "scoreTextColor": "#ef4444",
-          "bgBadge": "rgba(239, 68, 68, 0.2)",
-          "borderBadge": "#ef4444"
-        },
-        "photoUrl": "./risk-photos/RA94_homme_trottinette_casque_velo-en-ville.png",
-        "photoFallbackPath": "riskassessment/RA94/homme_trottinette_casque_velo-en-ville.png",
-        "photoRaRef": "RA94",
-        "photoRawName": "homme_trottinette_casque_velo-en-ville.png",
-        "latestEvaluation": {
-          "id": 3506,
-          "ref": "RA94",
-          "cotation": 90,
-          "method": "advanced",
-          "gravite": 4,
-          "exposition": 4,
-          "occurrence": 2,
-          "formation": 4,
-          "protection": 3,
-          "comment": "Le salarié vient tous les jours au bureau en trottinette. Il est respectueux des feux, signalisations présentes. Il a bien eu son BSR. Il roule à une vitesse de 45 km/h pour les 25 Km/h autorisé. Le véhicule n'est pas adapté car il a été débridé. Il est équipé d'un casque de vélo. Nous avons eu 2 accidents l'an dernier sur la population de trottinette de l'entreprise.",
-          "photo": "homme_trottinette_casque_velo-en-ville.png",
-          "dateCreation": 1753036153,
-          "status": 1
-        },
-        "initialEvaluation": {
-          "id": 3506,
-          "ref": "RA94",
-          "cotation": 90,
-          "method": "advanced",
-          "gravite": 4,
-          "exposition": 4,
-          "occurrence": 2,
-          "formation": 4,
-          "protection": 3,
-          "comment": "Le salarié vient tous les jours au bureau en trottinette. Il est respectueux des feux, signalisations présentes. Il a bien eu son BSR. Il roule à une vitesse de 45 km/h pour les 25 Km/h autorisé. Le véhicule n'est pas adapté car il a été débridé. Il est équipé d'un casque de vélo. Nous avons eu 2 accidents l'an dernier sur la population de trottinette de l'entreprise.",
-          "photo": "homme_trottinette_casque_velo-en-ville.png",
-          "dateCreation": 1753036153,
-          "status": 1
-        },
-        "evaluationsCount": 1,
-        "evaluations": [
-          {
-            "id": 3506,
-            "ref": "RA94",
-            "cotation": 90,
-            "method": "advanced",
-            "gravite": 4,
-            "exposition": 4,
-            "occurrence": 2,
-            "formation": 4,
-            "protection": 3,
-            "comment": "Le salarié vient tous les jours au bureau en trottinette. Il est respectueux des feux, signalisations présentes. Il a bien eu son BSR. Il roule à une vitesse de 45 km/h pour les 25 Km/h autorisé. Le véhicule n'est pas adapté car il a été débridé. Il est équipé d'un casque de vélo. Nous avons eu 2 accidents l'an dernier sur la population de trottinette de l'entreprise.",
-            "photo": "homme_trottinette_casque_velo-en-ville.png",
-            "dateCreation": 1753036153,
-            "status": 1
-          }
-        ],
-        "tasks": [
-          {
-            "id": 1187,
-            "ref": "TK2508-1178",
-            "label": "Sensibiliser aux dangers de la trottinette électrique et des EDPM",
-            "description": "",
-            "progress": 100,
-            "budget": 800,
-            "color": "#16a085"
-          },
-          {
-            "id": 1188,
-            "ref": "TK2508-1179",
-            "label": "Contrôle sur la présence des assurances pour les EDPM",
-            "description": "Premier lien video sensibilisation :&nbsp;<a href=\"https://www.youtube.com/watch?v=XEUADqk5EDo\" target=\"_blank\">https://www.youtube.com/watch?v=XEUADqk5EDo</a>",
-            "progress": 100,
-            "budget": 100,
-            "color": "#16a085"
-          },
-          {
-            "id": 1242,
-            "ref": "TK2601-1232",
-            "label": "Maintenir les controles du bridages des EPDM et le suivi du nombre EPDM débridés trouvés",
-            "description": "",
-            "progress": 0,
-            "budget": 1500,
-            "color": "#16a085"
-          }
-        ]
       },
       {
         "id": 3428,
@@ -15753,18 +15753,18 @@
         "categoryName": "Risques liés aux ambiances lumineuses",
         "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/eclairage_PictoCategorie_v2.png",
         "description": "Risques liés aux ambiances lumineuses",
-        "cotationBrute": 100,
+        "cotationBrute": 48,
         "cotationResiduelle": 48,
         "scaleBrute": {
-          "scale": 4,
-          "level": "critical",
-          "label": "Critique (Noir)",
-          "color": "#111827",
-          "strokeColor": "#e2e8f0",
+          "scale": 2,
+          "level": "medium",
+          "label": "Modéré (Orange)",
+          "color": "#f97316",
+          "strokeColor": "#f97316",
           "textColor": "#ffffff",
-          "scoreTextColor": "#f8fafc",
-          "bgBadge": "#09090b",
-          "borderBadge": "#cbd5e1"
+          "scoreTextColor": "#f97316",
+          "bgBadge": "rgba(249, 115, 22, 0.2)",
+          "borderBadge": "#f97316"
         },
         "scaleResiduelle": {
           "scale": 2,
@@ -15960,7 +15960,7 @@
         "categoryName": "Risques routiers en mission",
         "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/circulation_v2.png",
         "description": "Risques routiers en mission",
-        "cotationBrute": 31,
+        "cotationBrute": 17,
         "cotationResiduelle": 17,
         "scaleBrute": {
           "scale": 1,
@@ -16071,18 +16071,18 @@
         "categoryName": "Risques psychosociaux",
         "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/rps_v2.png",
         "description": "Risques psychosociaux",
-        "cotationBrute": 51,
+        "cotationBrute": 0,
         "cotationResiduelle": 0,
         "scaleBrute": {
-          "scale": 3,
-          "level": "high",
-          "label": "Élevé (Rouge)",
-          "color": "#ef4444",
-          "strokeColor": "#ef4444",
-          "textColor": "#ffffff",
-          "scoreTextColor": "#ef4444",
-          "bgBadge": "rgba(239, 68, 68, 0.2)",
-          "borderBadge": "#ef4444"
+          "scale": 1,
+          "level": "low",
+          "label": "Faible (Gris)",
+          "color": "#94a3b8",
+          "strokeColor": "#94a3b8",
+          "textColor": "#0f172a",
+          "scoreTextColor": "#cbd5e1",
+          "bgBadge": "rgba(148, 163, 184, 0.18)",
+          "borderBadge": "#94a3b8"
         },
         "scaleResiduelle": {
           "scale": 1,
@@ -16236,18 +16236,18 @@
         "categoryName": "Risques liés aux agents biologiques",
         "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/manqueHygiene_PictoCategorie_v2.png",
         "description": "Risques liés aux agents biologiques",
-        "cotationBrute": 51,
+        "cotationBrute": 0,
         "cotationResiduelle": 0,
         "scaleBrute": {
-          "scale": 3,
-          "level": "high",
-          "label": "Élevé (Rouge)",
-          "color": "#ef4444",
-          "strokeColor": "#ef4444",
-          "textColor": "#ffffff",
-          "scoreTextColor": "#ef4444",
-          "bgBadge": "rgba(239, 68, 68, 0.2)",
-          "borderBadge": "#ef4444"
+          "scale": 1,
+          "level": "low",
+          "label": "Faible (Gris)",
+          "color": "#94a3b8",
+          "strokeColor": "#94a3b8",
+          "textColor": "#0f172a",
+          "scoreTextColor": "#cbd5e1",
+          "bgBadge": "rgba(148, 163, 184, 0.18)",
+          "borderBadge": "#94a3b8"
         },
         "scaleResiduelle": {
           "scale": 1,
@@ -16720,7 +16720,7 @@
         "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/activitePhysique_v2.png",
         "description": "Risques liés à la charge physique de travail",
         "cotationBrute": 40,
-        "cotationResiduelle": 28,
+        "cotationResiduelle": 40,
         "scaleBrute": {
           "scale": 1,
           "level": "low",
@@ -16824,18 +16824,18 @@
         "categoryName": "Risques de chute de plain-pied",
         "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
         "description": "Risques de chute de plain-pied",
-        "cotationBrute": 48,
+        "cotationBrute": 0,
         "cotationResiduelle": 0,
         "scaleBrute": {
-          "scale": 2,
-          "level": "medium",
-          "label": "Modéré (Orange)",
-          "color": "#f97316",
-          "strokeColor": "#f97316",
-          "textColor": "#ffffff",
-          "scoreTextColor": "#f97316",
-          "bgBadge": "rgba(249, 115, 22, 0.2)",
-          "borderBadge": "#f97316"
+          "scale": 1,
+          "level": "low",
+          "label": "Faible (Gris)",
+          "color": "#94a3b8",
+          "strokeColor": "#94a3b8",
+          "textColor": "#0f172a",
+          "scoreTextColor": "#cbd5e1",
+          "bgBadge": "rgba(148, 163, 184, 0.18)",
+          "borderBadge": "#94a3b8"
         },
         "scaleResiduelle": {
           "scale": 1,
@@ -16935,18 +16935,18 @@
         "categoryName": "Risques de chute de plain-pied",
         "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
         "description": "Risques de chute de plain-pied",
-        "cotationBrute": 51,
+        "cotationBrute": 0,
         "cotationResiduelle": 0,
         "scaleBrute": {
-          "scale": 3,
-          "level": "high",
-          "label": "Élevé (Rouge)",
-          "color": "#ef4444",
-          "strokeColor": "#ef4444",
-          "textColor": "#ffffff",
-          "scoreTextColor": "#ef4444",
-          "bgBadge": "rgba(239, 68, 68, 0.2)",
-          "borderBadge": "#ef4444"
+          "scale": 1,
+          "level": "low",
+          "label": "Faible (Gris)",
+          "color": "#94a3b8",
+          "strokeColor": "#94a3b8",
+          "textColor": "#0f172a",
+          "scoreTextColor": "#cbd5e1",
+          "bgBadge": "rgba(148, 163, 184, 0.18)",
+          "borderBadge": "#94a3b8"
         },
         "scaleResiduelle": {
           "scale": 1,
@@ -17927,7 +17927,7 @@
         "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/circulation_v2.png",
         "description": "Déplacement trop rapide",
         "cotationBrute": 48,
-        "cotationResiduelle": 35,
+        "cotationResiduelle": 48,
         "scaleBrute": {
           "scale": 2,
           "level": "medium",
@@ -17940,15 +17940,15 @@
           "borderBadge": "#f97316"
         },
         "scaleResiduelle": {
-          "scale": 1,
-          "level": "low",
-          "label": "Faible (Gris)",
-          "color": "#94a3b8",
-          "strokeColor": "#94a3b8",
-          "textColor": "#0f172a",
-          "scoreTextColor": "#cbd5e1",
-          "bgBadge": "rgba(148, 163, 184, 0.18)",
-          "borderBadge": "#94a3b8"
+          "scale": 2,
+          "level": "medium",
+          "label": "Modéré (Orange)",
+          "color": "#f97316",
+          "strokeColor": "#f97316",
+          "textColor": "#ffffff",
+          "scoreTextColor": "#f97316",
+          "bgBadge": "rgba(249, 115, 22, 0.2)",
+          "borderBadge": "#f97316"
         },
         "photoUrl": "./risk-photos/RA10_20210220_161046.jpg",
         "photoFallbackPath": "riskassessment/RA10/20210220_161046.jpg",
@@ -18031,7 +18031,7 @@
         "categoryName": "Risques liés à la charge physique de travail",
         "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/activitePhysique_v2.png",
         "description": "Risques liés à la charge physique de travail",
-        "cotationBrute": 42,
+        "cotationBrute": 31,
         "cotationResiduelle": 31,
         "scaleBrute": {
           "scale": 1,
@@ -18263,7 +18263,7 @@
         "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/rps_v2.png",
         "description": "Accueil des clients",
         "cotationBrute": 48,
-        "cotationResiduelle": 37,
+        "cotationResiduelle": 48,
         "scaleBrute": {
           "scale": 2,
           "level": "medium",
@@ -18276,15 +18276,15 @@
           "borderBadge": "#f97316"
         },
         "scaleResiduelle": {
-          "scale": 1,
-          "level": "low",
-          "label": "Faible (Gris)",
-          "color": "#94a3b8",
-          "strokeColor": "#94a3b8",
-          "textColor": "#0f172a",
-          "scoreTextColor": "#cbd5e1",
-          "bgBadge": "rgba(148, 163, 184, 0.18)",
-          "borderBadge": "#94a3b8"
+          "scale": 2,
+          "level": "medium",
+          "label": "Modéré (Orange)",
+          "color": "#f97316",
+          "strokeColor": "#f97316",
+          "textColor": "#ffffff",
+          "scoreTextColor": "#f97316",
+          "bgBadge": "rgba(249, 115, 22, 0.2)",
+          "borderBadge": "#f97316"
         },
         "photoUrl": "./risk-photos/RA4_20211110_135913.jpg",
         "photoFallbackPath": "riskassessment/RA4/20211110_135913.jpg",
@@ -18713,7 +18713,7 @@
         "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/electricite_PictoCategorie_v2.png",
         "description": "Perceuse à colonne",
         "cotationBrute": 100,
-        "cotationResiduelle": 58,
+        "cotationResiduelle": 100,
         "scaleBrute": {
           "scale": 4,
           "level": "critical",
@@ -18726,15 +18726,15 @@
           "borderBadge": "#cbd5e1"
         },
         "scaleResiduelle": {
-          "scale": 3,
-          "level": "high",
-          "label": "Élevé (Rouge)",
-          "color": "#ef4444",
-          "strokeColor": "#ef4444",
+          "scale": 4,
+          "level": "critical",
+          "label": "Critique (Noir)",
+          "color": "#111827",
+          "strokeColor": "#e2e8f0",
           "textColor": "#ffffff",
-          "scoreTextColor": "#ef4444",
-          "bgBadge": "rgba(239, 68, 68, 0.2)",
-          "borderBadge": "#ef4444"
+          "scoreTextColor": "#f8fafc",
+          "bgBadge": "#09090b",
+          "borderBadge": "#cbd5e1"
         },
         "photoUrl": "./risk-photos/RA59_20220127_094415.jpg",
         "photoFallbackPath": "riskassessment/RA59/20220127_094415.jpg",
@@ -19016,6 +19016,111 @@
         ]
       },
       {
+        "id": 3366,
+        "ref": "RK29",
+        "fkElement": 36,
+        "categoryPosition": 0,
+        "categoryName": "Risques de chute de plain-pied",
+        "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
+        "description": "Déplacement entre les postes Percage, découpe, soudage",
+        "cotationBrute": 51,
+        "cotationResiduelle": 51,
+        "scaleBrute": {
+          "scale": 3,
+          "level": "high",
+          "label": "Élevé (Rouge)",
+          "color": "#ef4444",
+          "strokeColor": "#ef4444",
+          "textColor": "#ffffff",
+          "scoreTextColor": "#ef4444",
+          "bgBadge": "rgba(239, 68, 68, 0.2)",
+          "borderBadge": "#ef4444"
+        },
+        "scaleResiduelle": {
+          "scale": 3,
+          "level": "high",
+          "label": "Élevé (Rouge)",
+          "color": "#ef4444",
+          "strokeColor": "#ef4444",
+          "textColor": "#ffffff",
+          "scoreTextColor": "#ef4444",
+          "bgBadge": "rgba(239, 68, 68, 0.2)",
+          "borderBadge": "#ef4444"
+        },
+        "photoUrl": null,
+        "photoFallbackPath": null,
+        "photoRaRef": null,
+        "photoRawName": null,
+        "latestEvaluation": {
+          "id": 3438,
+          "ref": "RA79",
+          "cotation": 51,
+          "method": "standard",
+          "gravite": 1,
+          "exposition": 1,
+          "occurrence": 1,
+          "formation": 1,
+          "protection": 1,
+          "comment": "Câbles au sol",
+          "photo": null,
+          "dateCreation": 1727792457,
+          "status": 1
+        },
+        "initialEvaluation": {
+          "id": 3438,
+          "ref": "RA79",
+          "cotation": 51,
+          "method": "standard",
+          "gravite": 1,
+          "exposition": 1,
+          "occurrence": 1,
+          "formation": 1,
+          "protection": 1,
+          "comment": "Câbles au sol",
+          "photo": null,
+          "dateCreation": 1727792457,
+          "status": 1
+        },
+        "evaluationsCount": 1,
+        "evaluations": [
+          {
+            "id": 3438,
+            "ref": "RA79",
+            "cotation": 51,
+            "method": "standard",
+            "gravite": 1,
+            "exposition": 1,
+            "occurrence": 1,
+            "formation": 1,
+            "protection": 1,
+            "comment": "Câbles au sol",
+            "photo": null,
+            "dateCreation": 1727792457,
+            "status": 1
+          }
+        ],
+        "tasks": [
+          {
+            "id": 1131,
+            "ref": "TK2410-1122",
+            "label": "Passer les câbles en aérien afin de ne pas avoir de différence de niveau au niveau du sol",
+            "description": "",
+            "progress": 25,
+            "budget": 900,
+            "color": "#16a085"
+          },
+          {
+            "id": 1132,
+            "ref": "TK2410-1123",
+            "label": "Réaliser une formation afin de mettre en place les méthodes des 5S dans l'atelier",
+            "description": "",
+            "progress": 100,
+            "budget": 500,
+            "color": "#16a085"
+          }
+        ]
+      },
+      {
         "id": 3211,
         "ref": "RK17",
         "fkElement": 36,
@@ -19100,111 +19205,6 @@
           }
         ],
         "tasks": []
-      },
-      {
-        "id": 3366,
-        "ref": "RK29",
-        "fkElement": 36,
-        "categoryPosition": 0,
-        "categoryName": "Risques de chute de plain-pied",
-        "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
-        "description": "Déplacement entre les postes Percage, découpe, soudage",
-        "cotationBrute": 51,
-        "cotationResiduelle": 37,
-        "scaleBrute": {
-          "scale": 3,
-          "level": "high",
-          "label": "Élevé (Rouge)",
-          "color": "#ef4444",
-          "strokeColor": "#ef4444",
-          "textColor": "#ffffff",
-          "scoreTextColor": "#ef4444",
-          "bgBadge": "rgba(239, 68, 68, 0.2)",
-          "borderBadge": "#ef4444"
-        },
-        "scaleResiduelle": {
-          "scale": 1,
-          "level": "low",
-          "label": "Faible (Gris)",
-          "color": "#94a3b8",
-          "strokeColor": "#94a3b8",
-          "textColor": "#0f172a",
-          "scoreTextColor": "#cbd5e1",
-          "bgBadge": "rgba(148, 163, 184, 0.18)",
-          "borderBadge": "#94a3b8"
-        },
-        "photoUrl": null,
-        "photoFallbackPath": null,
-        "photoRaRef": null,
-        "photoRawName": null,
-        "latestEvaluation": {
-          "id": 3438,
-          "ref": "RA79",
-          "cotation": 51,
-          "method": "standard",
-          "gravite": 1,
-          "exposition": 1,
-          "occurrence": 1,
-          "formation": 1,
-          "protection": 1,
-          "comment": "Câbles au sol",
-          "photo": null,
-          "dateCreation": 1727792457,
-          "status": 1
-        },
-        "initialEvaluation": {
-          "id": 3438,
-          "ref": "RA79",
-          "cotation": 51,
-          "method": "standard",
-          "gravite": 1,
-          "exposition": 1,
-          "occurrence": 1,
-          "formation": 1,
-          "protection": 1,
-          "comment": "Câbles au sol",
-          "photo": null,
-          "dateCreation": 1727792457,
-          "status": 1
-        },
-        "evaluationsCount": 1,
-        "evaluations": [
-          {
-            "id": 3438,
-            "ref": "RA79",
-            "cotation": 51,
-            "method": "standard",
-            "gravite": 1,
-            "exposition": 1,
-            "occurrence": 1,
-            "formation": 1,
-            "protection": 1,
-            "comment": "Câbles au sol",
-            "photo": null,
-            "dateCreation": 1727792457,
-            "status": 1
-          }
-        ],
-        "tasks": [
-          {
-            "id": 1131,
-            "ref": "TK2410-1122",
-            "label": "Passer les câbles en aérien afin de ne pas avoir de différence de niveau au niveau du sol",
-            "description": "",
-            "progress": 25,
-            "budget": 900,
-            "color": "#16a085"
-          },
-          {
-            "id": 1132,
-            "ref": "TK2410-1123",
-            "label": "Réaliser une formation afin de mettre en place les méthodes des 5S dans l'atelier",
-            "description": "",
-            "progress": 100,
-            "budget": 500,
-            "color": "#16a085"
-          }
-        ]
       },
       {
         "id": 3212,
@@ -19737,7 +19737,7 @@
         "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/incendies_PictoCategorie_v2.png",
         "description": "Risques d'incendie et d'explosion",
         "cotationBrute": 100,
-        "cotationResiduelle": 55,
+        "cotationResiduelle": 100,
         "scaleBrute": {
           "scale": 4,
           "level": "critical",
@@ -19750,15 +19750,15 @@
           "borderBadge": "#cbd5e1"
         },
         "scaleResiduelle": {
-          "scale": 3,
-          "level": "high",
-          "label": "Élevé (Rouge)",
-          "color": "#ef4444",
-          "strokeColor": "#ef4444",
+          "scale": 4,
+          "level": "critical",
+          "label": "Critique (Noir)",
+          "color": "#111827",
+          "strokeColor": "#e2e8f0",
           "textColor": "#ffffff",
-          "scoreTextColor": "#ef4444",
-          "bgBadge": "rgba(239, 68, 68, 0.2)",
-          "borderBadge": "#ef4444"
+          "scoreTextColor": "#f8fafc",
+          "bgBadge": "#09090b",
+          "borderBadge": "#cbd5e1"
         },
         "photoUrl": "./risk-photos/RA67_ATEX.jpg",
         "photoFallbackPath": "riskassessment/RA67/ATEX.jpg",
@@ -20980,7 +20980,7 @@
         "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/circulation_v2.png",
         "description": "Livraison et courses Rapide",
         "cotationBrute": 66,
-        "cotationResiduelle": 36,
+        "cotationResiduelle": 66,
         "scaleBrute": {
           "scale": 3,
           "level": "high",
@@ -20993,15 +20993,15 @@
           "borderBadge": "#ef4444"
         },
         "scaleResiduelle": {
-          "scale": 1,
-          "level": "low",
-          "label": "Faible (Gris)",
-          "color": "#94a3b8",
-          "strokeColor": "#94a3b8",
-          "textColor": "#0f172a",
-          "scoreTextColor": "#cbd5e1",
-          "bgBadge": "rgba(148, 163, 184, 0.18)",
-          "borderBadge": "#94a3b8"
+          "scale": 3,
+          "level": "high",
+          "label": "Élevé (Rouge)",
+          "color": "#ef4444",
+          "strokeColor": "#ef4444",
+          "textColor": "#ffffff",
+          "scoreTextColor": "#ef4444",
+          "bgBadge": "rgba(239, 68, 68, 0.2)",
+          "borderBadge": "#ef4444"
         },
         "photoUrl": "./risk-photos/RA2_risque_routiers-en-mission_crash-voiture_600px.png",
         "photoFallbackPath": "riskassessment/RA2/risque_routiers-en-mission_crash-voiture_600px.png",
@@ -21267,18 +21267,18 @@
         "categoryName": "Risques de chute de hauteur",
         "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chuteH_PictoCategorie_v2.png",
         "description": "Chute de l'avion et des personnes à bord",
-        "cotationBrute": 66,
+        "cotationBrute": 25,
         "cotationResiduelle": 25,
         "scaleBrute": {
-          "scale": 3,
-          "level": "high",
-          "label": "Élevé (Rouge)",
-          "color": "#ef4444",
-          "strokeColor": "#ef4444",
-          "textColor": "#ffffff",
-          "scoreTextColor": "#ef4444",
-          "bgBadge": "rgba(239, 68, 68, 0.2)",
-          "borderBadge": "#ef4444"
+          "scale": 1,
+          "level": "low",
+          "label": "Faible (Gris)",
+          "color": "#94a3b8",
+          "strokeColor": "#94a3b8",
+          "textColor": "#0f172a",
+          "scoreTextColor": "#cbd5e1",
+          "bgBadge": "rgba(148, 163, 184, 0.18)",
+          "borderBadge": "#94a3b8"
         },
         "scaleResiduelle": {
           "scale": 1,
@@ -21403,8 +21403,8 @@
       "directRisksCount": 9,
       "maxBrute": 100,
       "maxResiduelle": 100,
-      "avgBrute": 46,
-      "avgResiduelle": 37,
+      "avgBrute": 41,
+      "avgResiduelle": 41,
       "scaleBrute": {
         "scale": 4,
         "level": "critical",
@@ -21427,10 +21427,10 @@
         "bgBadge": "#09090b",
         "borderBadge": "#cbd5e1"
       },
-      "criticalCount": 2,
-      "highCount": 12,
-      "mediumCount": 15,
-      "lowCount": 30,
+      "criticalCount": 5,
+      "highCount": 11,
+      "mediumCount": 17,
+      "lowCount": 26,
       "totalTasks": 68
     }
   },
@@ -21669,7 +21669,7 @@
               "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/activitePhysique_v2.png",
               "description": "Risques liés à la charge physique de travail",
               "cotationBrute": 40,
-              "cotationResiduelle": 28,
+              "cotationResiduelle": 40,
               "scaleBrute": {
                 "scale": 1,
                 "level": "low",
@@ -21773,18 +21773,18 @@
               "categoryName": "Risques de chute de plain-pied",
               "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
               "description": "Risques de chute de plain-pied",
-              "cotationBrute": 48,
+              "cotationBrute": 0,
               "cotationResiduelle": 0,
               "scaleBrute": {
-                "scale": 2,
-                "level": "medium",
-                "label": "Modéré (Orange)",
-                "color": "#f97316",
-                "strokeColor": "#f97316",
-                "textColor": "#ffffff",
-                "scoreTextColor": "#f97316",
-                "bgBadge": "rgba(249, 115, 22, 0.2)",
-                "borderBadge": "#f97316"
+                "scale": 1,
+                "level": "low",
+                "label": "Faible (Gris)",
+                "color": "#94a3b8",
+                "strokeColor": "#94a3b8",
+                "textColor": "#0f172a",
+                "scoreTextColor": "#cbd5e1",
+                "bgBadge": "rgba(148, 163, 184, 0.18)",
+                "borderBadge": "#94a3b8"
               },
               "scaleResiduelle": {
                 "scale": 1,
@@ -21884,18 +21884,18 @@
               "categoryName": "Risques de chute de plain-pied",
               "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
               "description": "Risques de chute de plain-pied",
-              "cotationBrute": 51,
+              "cotationBrute": 0,
               "cotationResiduelle": 0,
               "scaleBrute": {
-                "scale": 3,
-                "level": "high",
-                "label": "Élevé (Rouge)",
-                "color": "#ef4444",
-                "strokeColor": "#ef4444",
-                "textColor": "#ffffff",
-                "scoreTextColor": "#ef4444",
-                "bgBadge": "rgba(239, 68, 68, 0.2)",
-                "borderBadge": "#ef4444"
+                "scale": 1,
+                "level": "low",
+                "label": "Faible (Gris)",
+                "color": "#94a3b8",
+                "strokeColor": "#94a3b8",
+                "textColor": "#0f172a",
+                "scoreTextColor": "#cbd5e1",
+                "bgBadge": "rgba(148, 163, 184, 0.18)",
+                "borderBadge": "#94a3b8"
               },
               "scaleResiduelle": {
                 "scale": 1,
@@ -21999,7 +21999,7 @@
               "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/activitePhysique_v2.png",
               "description": "Risques liés à la charge physique de travail",
               "cotationBrute": 40,
-              "cotationResiduelle": 28,
+              "cotationResiduelle": 40,
               "scaleBrute": {
                 "scale": 1,
                 "level": "low",
@@ -22103,18 +22103,18 @@
               "categoryName": "Risques de chute de plain-pied",
               "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
               "description": "Risques de chute de plain-pied",
-              "cotationBrute": 48,
+              "cotationBrute": 0,
               "cotationResiduelle": 0,
               "scaleBrute": {
-                "scale": 2,
-                "level": "medium",
-                "label": "Modéré (Orange)",
-                "color": "#f97316",
-                "strokeColor": "#f97316",
-                "textColor": "#ffffff",
-                "scoreTextColor": "#f97316",
-                "bgBadge": "rgba(249, 115, 22, 0.2)",
-                "borderBadge": "#f97316"
+                "scale": 1,
+                "level": "low",
+                "label": "Faible (Gris)",
+                "color": "#94a3b8",
+                "strokeColor": "#94a3b8",
+                "textColor": "#0f172a",
+                "scoreTextColor": "#cbd5e1",
+                "bgBadge": "rgba(148, 163, 184, 0.18)",
+                "borderBadge": "#94a3b8"
               },
               "scaleResiduelle": {
                 "scale": 1,
@@ -22214,18 +22214,18 @@
               "categoryName": "Risques de chute de plain-pied",
               "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
               "description": "Risques de chute de plain-pied",
-              "cotationBrute": 51,
+              "cotationBrute": 0,
               "cotationResiduelle": 0,
               "scaleBrute": {
-                "scale": 3,
-                "level": "high",
-                "label": "Élevé (Rouge)",
-                "color": "#ef4444",
-                "strokeColor": "#ef4444",
-                "textColor": "#ffffff",
-                "scoreTextColor": "#ef4444",
-                "bgBadge": "rgba(239, 68, 68, 0.2)",
-                "borderBadge": "#ef4444"
+                "scale": 1,
+                "level": "low",
+                "label": "Faible (Gris)",
+                "color": "#94a3b8",
+                "strokeColor": "#94a3b8",
+                "textColor": "#0f172a",
+                "scoreTextColor": "#cbd5e1",
+                "bgBadge": "rgba(148, 163, 184, 0.18)",
+                "borderBadge": "#94a3b8"
               },
               "scaleResiduelle": {
                 "scale": 1,
@@ -22321,20 +22321,20 @@
           "stats": {
             "totalRisks": 3,
             "directRisksCount": 3,
-            "maxBrute": 51,
-            "maxResiduelle": 28,
-            "avgBrute": 46,
-            "avgResiduelle": 9,
+            "maxBrute": 40,
+            "maxResiduelle": 40,
+            "avgBrute": 13,
+            "avgResiduelle": 13,
             "scaleBrute": {
-              "scale": 3,
-              "level": "high",
-              "label": "Élevé (Rouge)",
-              "color": "#ef4444",
-              "strokeColor": "#ef4444",
-              "textColor": "#ffffff",
-              "scoreTextColor": "#ef4444",
-              "bgBadge": "rgba(239, 68, 68, 0.2)",
-              "borderBadge": "#ef4444"
+              "scale": 1,
+              "level": "low",
+              "label": "Faible (Gris)",
+              "color": "#94a3b8",
+              "strokeColor": "#94a3b8",
+              "textColor": "#0f172a",
+              "scoreTextColor": "#cbd5e1",
+              "bgBadge": "rgba(148, 163, 184, 0.18)",
+              "borderBadge": "#94a3b8"
             },
             "scaleResiduelle": {
               "scale": 1,
@@ -24185,7 +24185,7 @@
               "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/circulation_v2.png",
               "description": "Déplacement trop rapide",
               "cotationBrute": 48,
-              "cotationResiduelle": 35,
+              "cotationResiduelle": 48,
               "scaleBrute": {
                 "scale": 2,
                 "level": "medium",
@@ -24198,15 +24198,15 @@
                 "borderBadge": "#f97316"
               },
               "scaleResiduelle": {
-                "scale": 1,
-                "level": "low",
-                "label": "Faible (Gris)",
-                "color": "#94a3b8",
-                "strokeColor": "#94a3b8",
-                "textColor": "#0f172a",
-                "scoreTextColor": "#cbd5e1",
-                "bgBadge": "rgba(148, 163, 184, 0.18)",
-                "borderBadge": "#94a3b8"
+                "scale": 2,
+                "level": "medium",
+                "label": "Modéré (Orange)",
+                "color": "#f97316",
+                "strokeColor": "#f97316",
+                "textColor": "#ffffff",
+                "scoreTextColor": "#f97316",
+                "bgBadge": "rgba(249, 115, 22, 0.2)",
+                "borderBadge": "#f97316"
               },
               "photoUrl": "./risk-photos/RA10_20210220_161046.jpg",
               "photoFallbackPath": "riskassessment/RA10/20210220_161046.jpg",
@@ -24289,7 +24289,7 @@
               "categoryName": "Risques liés à la charge physique de travail",
               "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/activitePhysique_v2.png",
               "description": "Risques liés à la charge physique de travail",
-              "cotationBrute": 42,
+              "cotationBrute": 31,
               "cotationResiduelle": 31,
               "scaleBrute": {
                 "scale": 1,
@@ -24428,7 +24428,7 @@
               "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/circulation_v2.png",
               "description": "Déplacement trop rapide",
               "cotationBrute": 48,
-              "cotationResiduelle": 35,
+              "cotationResiduelle": 48,
               "scaleBrute": {
                 "scale": 2,
                 "level": "medium",
@@ -24441,15 +24441,15 @@
                 "borderBadge": "#f97316"
               },
               "scaleResiduelle": {
-                "scale": 1,
-                "level": "low",
-                "label": "Faible (Gris)",
-                "color": "#94a3b8",
-                "strokeColor": "#94a3b8",
-                "textColor": "#0f172a",
-                "scoreTextColor": "#cbd5e1",
-                "bgBadge": "rgba(148, 163, 184, 0.18)",
-                "borderBadge": "#94a3b8"
+                "scale": 2,
+                "level": "medium",
+                "label": "Modéré (Orange)",
+                "color": "#f97316",
+                "strokeColor": "#f97316",
+                "textColor": "#ffffff",
+                "scoreTextColor": "#f97316",
+                "bgBadge": "rgba(249, 115, 22, 0.2)",
+                "borderBadge": "#f97316"
               },
               "photoUrl": "./risk-photos/RA10_20210220_161046.jpg",
               "photoFallbackPath": "riskassessment/RA10/20210220_161046.jpg",
@@ -24532,7 +24532,7 @@
               "categoryName": "Risques liés à la charge physique de travail",
               "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/activitePhysique_v2.png",
               "description": "Risques liés à la charge physique de travail",
-              "cotationBrute": 42,
+              "cotationBrute": 31,
               "cotationResiduelle": 31,
               "scaleBrute": {
                 "scale": 1,
@@ -24664,9 +24664,9 @@
             "totalRisks": 2,
             "directRisksCount": 2,
             "maxBrute": 48,
-            "maxResiduelle": 35,
-            "avgBrute": 45,
-            "avgResiduelle": 33,
+            "maxResiduelle": 48,
+            "avgBrute": 40,
+            "avgResiduelle": 40,
             "scaleBrute": {
               "scale": 2,
               "level": "medium",
@@ -24679,20 +24679,20 @@
               "borderBadge": "#f97316"
             },
             "scaleResiduelle": {
-              "scale": 1,
-              "level": "low",
-              "label": "Faible (Gris)",
-              "color": "#94a3b8",
-              "strokeColor": "#94a3b8",
-              "textColor": "#0f172a",
-              "scoreTextColor": "#cbd5e1",
-              "bgBadge": "rgba(148, 163, 184, 0.18)",
-              "borderBadge": "#94a3b8"
+              "scale": 2,
+              "level": "medium",
+              "label": "Modéré (Orange)",
+              "color": "#f97316",
+              "strokeColor": "#f97316",
+              "textColor": "#ffffff",
+              "scoreTextColor": "#f97316",
+              "bgBadge": "rgba(249, 115, 22, 0.2)",
+              "borderBadge": "#f97316"
             },
             "criticalCount": 0,
             "highCount": 0,
-            "mediumCount": 0,
-            "lowCount": 2,
+            "mediumCount": 1,
+            "lowCount": 1,
             "totalTasks": 4
           }
         },
@@ -25008,7 +25008,7 @@
               "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/rps_v2.png",
               "description": "Accueil des clients",
               "cotationBrute": 48,
-              "cotationResiduelle": 37,
+              "cotationResiduelle": 48,
               "scaleBrute": {
                 "scale": 2,
                 "level": "medium",
@@ -25021,15 +25021,15 @@
                 "borderBadge": "#f97316"
               },
               "scaleResiduelle": {
-                "scale": 1,
-                "level": "low",
-                "label": "Faible (Gris)",
-                "color": "#94a3b8",
-                "strokeColor": "#94a3b8",
-                "textColor": "#0f172a",
-                "scoreTextColor": "#cbd5e1",
-                "bgBadge": "rgba(148, 163, 184, 0.18)",
-                "borderBadge": "#94a3b8"
+                "scale": 2,
+                "level": "medium",
+                "label": "Modéré (Orange)",
+                "color": "#f97316",
+                "strokeColor": "#f97316",
+                "textColor": "#ffffff",
+                "scoreTextColor": "#f97316",
+                "bgBadge": "rgba(249, 115, 22, 0.2)",
+                "borderBadge": "#f97316"
               },
               "photoUrl": "./risk-photos/RA4_20211110_135913.jpg",
               "photoFallbackPath": "riskassessment/RA4/20211110_135913.jpg",
@@ -25212,7 +25212,7 @@
               "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/rps_v2.png",
               "description": "Accueil des clients",
               "cotationBrute": 48,
-              "cotationResiduelle": 37,
+              "cotationResiduelle": 48,
               "scaleBrute": {
                 "scale": 2,
                 "level": "medium",
@@ -25225,15 +25225,15 @@
                 "borderBadge": "#f97316"
               },
               "scaleResiduelle": {
-                "scale": 1,
-                "level": "low",
-                "label": "Faible (Gris)",
-                "color": "#94a3b8",
-                "strokeColor": "#94a3b8",
-                "textColor": "#0f172a",
-                "scoreTextColor": "#cbd5e1",
-                "bgBadge": "rgba(148, 163, 184, 0.18)",
-                "borderBadge": "#94a3b8"
+                "scale": 2,
+                "level": "medium",
+                "label": "Modéré (Orange)",
+                "color": "#f97316",
+                "strokeColor": "#f97316",
+                "textColor": "#ffffff",
+                "scoreTextColor": "#f97316",
+                "bgBadge": "rgba(249, 115, 22, 0.2)",
+                "borderBadge": "#f97316"
               },
               "photoUrl": "./risk-photos/RA4_20211110_135913.jpg",
               "photoFallbackPath": "riskassessment/RA4/20211110_135913.jpg",
@@ -25409,9 +25409,9 @@
             "totalRisks": 2,
             "directRisksCount": 2,
             "maxBrute": 48,
-            "maxResiduelle": 37,
+            "maxResiduelle": 48,
             "avgBrute": 40,
-            "avgResiduelle": 34,
+            "avgResiduelle": 40,
             "scaleBrute": {
               "scale": 2,
               "level": "medium",
@@ -25424,20 +25424,20 @@
               "borderBadge": "#f97316"
             },
             "scaleResiduelle": {
-              "scale": 1,
-              "level": "low",
-              "label": "Faible (Gris)",
-              "color": "#94a3b8",
-              "strokeColor": "#94a3b8",
-              "textColor": "#0f172a",
-              "scoreTextColor": "#cbd5e1",
-              "bgBadge": "rgba(148, 163, 184, 0.18)",
-              "borderBadge": "#94a3b8"
+              "scale": 2,
+              "level": "medium",
+              "label": "Modéré (Orange)",
+              "color": "#f97316",
+              "strokeColor": "#f97316",
+              "textColor": "#ffffff",
+              "scoreTextColor": "#f97316",
+              "bgBadge": "rgba(249, 115, 22, 0.2)",
+              "borderBadge": "#f97316"
             },
             "criticalCount": 0,
             "highCount": 0,
-            "mediumCount": 0,
-            "lowCount": 2,
+            "mediumCount": 1,
+            "lowCount": 1,
             "totalTasks": 3
           }
         }
@@ -25653,7 +25653,7 @@
           "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/activitePhysique_v2.png",
           "description": "Risques liés à la charge physique de travail",
           "cotationBrute": 40,
-          "cotationResiduelle": 28,
+          "cotationResiduelle": 40,
           "scaleBrute": {
             "scale": 1,
             "level": "low",
@@ -25757,18 +25757,18 @@
           "categoryName": "Risques de chute de plain-pied",
           "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
           "description": "Risques de chute de plain-pied",
-          "cotationBrute": 48,
+          "cotationBrute": 0,
           "cotationResiduelle": 0,
           "scaleBrute": {
-            "scale": 2,
-            "level": "medium",
-            "label": "Modéré (Orange)",
-            "color": "#f97316",
-            "strokeColor": "#f97316",
-            "textColor": "#ffffff",
-            "scoreTextColor": "#f97316",
-            "bgBadge": "rgba(249, 115, 22, 0.2)",
-            "borderBadge": "#f97316"
+            "scale": 1,
+            "level": "low",
+            "label": "Faible (Gris)",
+            "color": "#94a3b8",
+            "strokeColor": "#94a3b8",
+            "textColor": "#0f172a",
+            "scoreTextColor": "#cbd5e1",
+            "bgBadge": "rgba(148, 163, 184, 0.18)",
+            "borderBadge": "#94a3b8"
           },
           "scaleResiduelle": {
             "scale": 1,
@@ -25868,18 +25868,18 @@
           "categoryName": "Risques de chute de plain-pied",
           "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
           "description": "Risques de chute de plain-pied",
-          "cotationBrute": 51,
+          "cotationBrute": 0,
           "cotationResiduelle": 0,
           "scaleBrute": {
-            "scale": 3,
-            "level": "high",
-            "label": "Élevé (Rouge)",
-            "color": "#ef4444",
-            "strokeColor": "#ef4444",
-            "textColor": "#ffffff",
-            "scoreTextColor": "#ef4444",
-            "bgBadge": "rgba(239, 68, 68, 0.2)",
-            "borderBadge": "#ef4444"
+            "scale": 1,
+            "level": "low",
+            "label": "Faible (Gris)",
+            "color": "#94a3b8",
+            "strokeColor": "#94a3b8",
+            "textColor": "#0f172a",
+            "scoreTextColor": "#cbd5e1",
+            "bgBadge": "rgba(148, 163, 184, 0.18)",
+            "borderBadge": "#94a3b8"
           },
           "scaleResiduelle": {
             "scale": 1,
@@ -26860,7 +26860,7 @@
           "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/circulation_v2.png",
           "description": "Déplacement trop rapide",
           "cotationBrute": 48,
-          "cotationResiduelle": 35,
+          "cotationResiduelle": 48,
           "scaleBrute": {
             "scale": 2,
             "level": "medium",
@@ -26873,15 +26873,15 @@
             "borderBadge": "#f97316"
           },
           "scaleResiduelle": {
-            "scale": 1,
-            "level": "low",
-            "label": "Faible (Gris)",
-            "color": "#94a3b8",
-            "strokeColor": "#94a3b8",
-            "textColor": "#0f172a",
-            "scoreTextColor": "#cbd5e1",
-            "bgBadge": "rgba(148, 163, 184, 0.18)",
-            "borderBadge": "#94a3b8"
+            "scale": 2,
+            "level": "medium",
+            "label": "Modéré (Orange)",
+            "color": "#f97316",
+            "strokeColor": "#f97316",
+            "textColor": "#ffffff",
+            "scoreTextColor": "#f97316",
+            "bgBadge": "rgba(249, 115, 22, 0.2)",
+            "borderBadge": "#f97316"
           },
           "photoUrl": "./risk-photos/RA10_20210220_161046.jpg",
           "photoFallbackPath": "riskassessment/RA10/20210220_161046.jpg",
@@ -26964,7 +26964,7 @@
           "categoryName": "Risques liés à la charge physique de travail",
           "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/activitePhysique_v2.png",
           "description": "Risques liés à la charge physique de travail",
-          "cotationBrute": 42,
+          "cotationBrute": 31,
           "cotationResiduelle": 31,
           "scaleBrute": {
             "scale": 1,
@@ -27196,7 +27196,7 @@
           "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/rps_v2.png",
           "description": "Accueil des clients",
           "cotationBrute": 48,
-          "cotationResiduelle": 37,
+          "cotationResiduelle": 48,
           "scaleBrute": {
             "scale": 2,
             "level": "medium",
@@ -27209,15 +27209,15 @@
             "borderBadge": "#f97316"
           },
           "scaleResiduelle": {
-            "scale": 1,
-            "level": "low",
-            "label": "Faible (Gris)",
-            "color": "#94a3b8",
-            "strokeColor": "#94a3b8",
-            "textColor": "#0f172a",
-            "scoreTextColor": "#cbd5e1",
-            "bgBadge": "rgba(148, 163, 184, 0.18)",
-            "borderBadge": "#94a3b8"
+            "scale": 2,
+            "level": "medium",
+            "label": "Modéré (Orange)",
+            "color": "#f97316",
+            "strokeColor": "#f97316",
+            "textColor": "#ffffff",
+            "scoreTextColor": "#f97316",
+            "bgBadge": "rgba(249, 115, 22, 0.2)",
+            "borderBadge": "#f97316"
           },
           "photoUrl": "./risk-photos/RA4_20211110_135913.jpg",
           "photoFallbackPath": "riskassessment/RA4/20211110_135913.jpg",
@@ -27394,8 +27394,8 @@
         "directRisksCount": 2,
         "maxBrute": 51,
         "maxResiduelle": 51,
-        "avgBrute": 44,
-        "avgResiduelle": 36,
+        "avgBrute": 38,
+        "avgResiduelle": 38,
         "scaleBrute": {
           "scale": 3,
           "level": "high",
@@ -27420,8 +27420,8 @@
         },
         "criticalCount": 0,
         "highCount": 1,
-        "mediumCount": 8,
-        "lowCount": 11,
+        "mediumCount": 10,
+        "lowCount": 9,
         "totalTasks": 17
       }
     },
@@ -27707,7 +27707,7 @@
               "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/electricite_PictoCategorie_v2.png",
               "description": "Perceuse à colonne",
               "cotationBrute": 100,
-              "cotationResiduelle": 58,
+              "cotationResiduelle": 100,
               "scaleBrute": {
                 "scale": 4,
                 "level": "critical",
@@ -27720,15 +27720,15 @@
                 "borderBadge": "#cbd5e1"
               },
               "scaleResiduelle": {
-                "scale": 3,
-                "level": "high",
-                "label": "Élevé (Rouge)",
-                "color": "#ef4444",
-                "strokeColor": "#ef4444",
+                "scale": 4,
+                "level": "critical",
+                "label": "Critique (Noir)",
+                "color": "#111827",
+                "strokeColor": "#e2e8f0",
                 "textColor": "#ffffff",
-                "scoreTextColor": "#ef4444",
-                "bgBadge": "rgba(239, 68, 68, 0.2)",
-                "borderBadge": "#ef4444"
+                "scoreTextColor": "#f8fafc",
+                "bgBadge": "#09090b",
+                "borderBadge": "#cbd5e1"
               },
               "photoUrl": "./risk-photos/RA59_20220127_094415.jpg",
               "photoFallbackPath": "riskassessment/RA59/20220127_094415.jpg",
@@ -28010,6 +28010,111 @@
               ]
             },
             {
+              "id": 3366,
+              "ref": "RK29",
+              "fkElement": 36,
+              "categoryPosition": 0,
+              "categoryName": "Risques de chute de plain-pied",
+              "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
+              "description": "Déplacement entre les postes Percage, découpe, soudage",
+              "cotationBrute": 51,
+              "cotationResiduelle": 51,
+              "scaleBrute": {
+                "scale": 3,
+                "level": "high",
+                "label": "Élevé (Rouge)",
+                "color": "#ef4444",
+                "strokeColor": "#ef4444",
+                "textColor": "#ffffff",
+                "scoreTextColor": "#ef4444",
+                "bgBadge": "rgba(239, 68, 68, 0.2)",
+                "borderBadge": "#ef4444"
+              },
+              "scaleResiduelle": {
+                "scale": 3,
+                "level": "high",
+                "label": "Élevé (Rouge)",
+                "color": "#ef4444",
+                "strokeColor": "#ef4444",
+                "textColor": "#ffffff",
+                "scoreTextColor": "#ef4444",
+                "bgBadge": "rgba(239, 68, 68, 0.2)",
+                "borderBadge": "#ef4444"
+              },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
+              "latestEvaluation": {
+                "id": 3438,
+                "ref": "RA79",
+                "cotation": 51,
+                "method": "standard",
+                "gravite": 1,
+                "exposition": 1,
+                "occurrence": 1,
+                "formation": 1,
+                "protection": 1,
+                "comment": "Câbles au sol",
+                "photo": null,
+                "dateCreation": 1727792457,
+                "status": 1
+              },
+              "initialEvaluation": {
+                "id": 3438,
+                "ref": "RA79",
+                "cotation": 51,
+                "method": "standard",
+                "gravite": 1,
+                "exposition": 1,
+                "occurrence": 1,
+                "formation": 1,
+                "protection": 1,
+                "comment": "Câbles au sol",
+                "photo": null,
+                "dateCreation": 1727792457,
+                "status": 1
+              },
+              "evaluationsCount": 1,
+              "evaluations": [
+                {
+                  "id": 3438,
+                  "ref": "RA79",
+                  "cotation": 51,
+                  "method": "standard",
+                  "gravite": 1,
+                  "exposition": 1,
+                  "occurrence": 1,
+                  "formation": 1,
+                  "protection": 1,
+                  "comment": "Câbles au sol",
+                  "photo": null,
+                  "dateCreation": 1727792457,
+                  "status": 1
+                }
+              ],
+              "tasks": [
+                {
+                  "id": 1131,
+                  "ref": "TK2410-1122",
+                  "label": "Passer les câbles en aérien afin de ne pas avoir de différence de niveau au niveau du sol",
+                  "description": "",
+                  "progress": 25,
+                  "budget": 900,
+                  "color": "#16a085"
+                },
+                {
+                  "id": 1132,
+                  "ref": "TK2410-1123",
+                  "label": "Réaliser une formation afin de mettre en place les méthodes des 5S dans l'atelier",
+                  "description": "",
+                  "progress": 100,
+                  "budget": 500,
+                  "color": "#16a085"
+                }
+              ]
+            },
+            {
               "id": 3211,
               "ref": "RK17",
               "fkElement": 36,
@@ -28094,111 +28199,6 @@
                 }
               ],
               "tasks": []
-            },
-            {
-              "id": 3366,
-              "ref": "RK29",
-              "fkElement": 36,
-              "categoryPosition": 0,
-              "categoryName": "Risques de chute de plain-pied",
-              "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
-              "description": "Déplacement entre les postes Percage, découpe, soudage",
-              "cotationBrute": 51,
-              "cotationResiduelle": 37,
-              "scaleBrute": {
-                "scale": 3,
-                "level": "high",
-                "label": "Élevé (Rouge)",
-                "color": "#ef4444",
-                "strokeColor": "#ef4444",
-                "textColor": "#ffffff",
-                "scoreTextColor": "#ef4444",
-                "bgBadge": "rgba(239, 68, 68, 0.2)",
-                "borderBadge": "#ef4444"
-              },
-              "scaleResiduelle": {
-                "scale": 1,
-                "level": "low",
-                "label": "Faible (Gris)",
-                "color": "#94a3b8",
-                "strokeColor": "#94a3b8",
-                "textColor": "#0f172a",
-                "scoreTextColor": "#cbd5e1",
-                "bgBadge": "rgba(148, 163, 184, 0.18)",
-                "borderBadge": "#94a3b8"
-              },
-              "photoUrl": null,
-              "photoFallbackPath": null,
-              "photoRaRef": null,
-              "photoRawName": null,
-              "latestEvaluation": {
-                "id": 3438,
-                "ref": "RA79",
-                "cotation": 51,
-                "method": "standard",
-                "gravite": 1,
-                "exposition": 1,
-                "occurrence": 1,
-                "formation": 1,
-                "protection": 1,
-                "comment": "Câbles au sol",
-                "photo": null,
-                "dateCreation": 1727792457,
-                "status": 1
-              },
-              "initialEvaluation": {
-                "id": 3438,
-                "ref": "RA79",
-                "cotation": 51,
-                "method": "standard",
-                "gravite": 1,
-                "exposition": 1,
-                "occurrence": 1,
-                "formation": 1,
-                "protection": 1,
-                "comment": "Câbles au sol",
-                "photo": null,
-                "dateCreation": 1727792457,
-                "status": 1
-              },
-              "evaluationsCount": 1,
-              "evaluations": [
-                {
-                  "id": 3438,
-                  "ref": "RA79",
-                  "cotation": 51,
-                  "method": "standard",
-                  "gravite": 1,
-                  "exposition": 1,
-                  "occurrence": 1,
-                  "formation": 1,
-                  "protection": 1,
-                  "comment": "Câbles au sol",
-                  "photo": null,
-                  "dateCreation": 1727792457,
-                  "status": 1
-                }
-              ],
-              "tasks": [
-                {
-                  "id": 1131,
-                  "ref": "TK2410-1122",
-                  "label": "Passer les câbles en aérien afin de ne pas avoir de différence de niveau au niveau du sol",
-                  "description": "",
-                  "progress": 25,
-                  "budget": 900,
-                  "color": "#16a085"
-                },
-                {
-                  "id": 1132,
-                  "ref": "TK2410-1123",
-                  "label": "Réaliser une formation afin de mettre en place les méthodes des 5S dans l'atelier",
-                  "description": "",
-                  "progress": 100,
-                  "budget": 500,
-                  "color": "#16a085"
-                }
-              ]
             },
             {
               "id": 3212,
@@ -28446,7 +28446,7 @@
               "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/electricite_PictoCategorie_v2.png",
               "description": "Perceuse à colonne",
               "cotationBrute": 100,
-              "cotationResiduelle": 58,
+              "cotationResiduelle": 100,
               "scaleBrute": {
                 "scale": 4,
                 "level": "critical",
@@ -28459,15 +28459,15 @@
                 "borderBadge": "#cbd5e1"
               },
               "scaleResiduelle": {
-                "scale": 3,
-                "level": "high",
-                "label": "Élevé (Rouge)",
-                "color": "#ef4444",
-                "strokeColor": "#ef4444",
+                "scale": 4,
+                "level": "critical",
+                "label": "Critique (Noir)",
+                "color": "#111827",
+                "strokeColor": "#e2e8f0",
                 "textColor": "#ffffff",
-                "scoreTextColor": "#ef4444",
-                "bgBadge": "rgba(239, 68, 68, 0.2)",
-                "borderBadge": "#ef4444"
+                "scoreTextColor": "#f8fafc",
+                "bgBadge": "#09090b",
+                "borderBadge": "#cbd5e1"
               },
               "photoUrl": "./risk-photos/RA59_20220127_094415.jpg",
               "photoFallbackPath": "riskassessment/RA59/20220127_094415.jpg",
@@ -28749,6 +28749,111 @@
               ]
             },
             {
+              "id": 3366,
+              "ref": "RK29",
+              "fkElement": 36,
+              "categoryPosition": 0,
+              "categoryName": "Risques de chute de plain-pied",
+              "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
+              "description": "Déplacement entre les postes Percage, découpe, soudage",
+              "cotationBrute": 51,
+              "cotationResiduelle": 51,
+              "scaleBrute": {
+                "scale": 3,
+                "level": "high",
+                "label": "Élevé (Rouge)",
+                "color": "#ef4444",
+                "strokeColor": "#ef4444",
+                "textColor": "#ffffff",
+                "scoreTextColor": "#ef4444",
+                "bgBadge": "rgba(239, 68, 68, 0.2)",
+                "borderBadge": "#ef4444"
+              },
+              "scaleResiduelle": {
+                "scale": 3,
+                "level": "high",
+                "label": "Élevé (Rouge)",
+                "color": "#ef4444",
+                "strokeColor": "#ef4444",
+                "textColor": "#ffffff",
+                "scoreTextColor": "#ef4444",
+                "bgBadge": "rgba(239, 68, 68, 0.2)",
+                "borderBadge": "#ef4444"
+              },
+              "photoUrl": null,
+              "photoFallbackPath": null,
+              "photoRaRef": null,
+              "photoRawName": null,
+              "latestEvaluation": {
+                "id": 3438,
+                "ref": "RA79",
+                "cotation": 51,
+                "method": "standard",
+                "gravite": 1,
+                "exposition": 1,
+                "occurrence": 1,
+                "formation": 1,
+                "protection": 1,
+                "comment": "Câbles au sol",
+                "photo": null,
+                "dateCreation": 1727792457,
+                "status": 1
+              },
+              "initialEvaluation": {
+                "id": 3438,
+                "ref": "RA79",
+                "cotation": 51,
+                "method": "standard",
+                "gravite": 1,
+                "exposition": 1,
+                "occurrence": 1,
+                "formation": 1,
+                "protection": 1,
+                "comment": "Câbles au sol",
+                "photo": null,
+                "dateCreation": 1727792457,
+                "status": 1
+              },
+              "evaluationsCount": 1,
+              "evaluations": [
+                {
+                  "id": 3438,
+                  "ref": "RA79",
+                  "cotation": 51,
+                  "method": "standard",
+                  "gravite": 1,
+                  "exposition": 1,
+                  "occurrence": 1,
+                  "formation": 1,
+                  "protection": 1,
+                  "comment": "Câbles au sol",
+                  "photo": null,
+                  "dateCreation": 1727792457,
+                  "status": 1
+                }
+              ],
+              "tasks": [
+                {
+                  "id": 1131,
+                  "ref": "TK2410-1122",
+                  "label": "Passer les câbles en aérien afin de ne pas avoir de différence de niveau au niveau du sol",
+                  "description": "",
+                  "progress": 25,
+                  "budget": 900,
+                  "color": "#16a085"
+                },
+                {
+                  "id": 1132,
+                  "ref": "TK2410-1123",
+                  "label": "Réaliser une formation afin de mettre en place les méthodes des 5S dans l'atelier",
+                  "description": "",
+                  "progress": 100,
+                  "budget": 500,
+                  "color": "#16a085"
+                }
+              ]
+            },
+            {
               "id": 3211,
               "ref": "RK17",
               "fkElement": 36,
@@ -28833,111 +28938,6 @@
                 }
               ],
               "tasks": []
-            },
-            {
-              "id": 3366,
-              "ref": "RK29",
-              "fkElement": 36,
-              "categoryPosition": 0,
-              "categoryName": "Risques de chute de plain-pied",
-              "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
-              "description": "Déplacement entre les postes Percage, découpe, soudage",
-              "cotationBrute": 51,
-              "cotationResiduelle": 37,
-              "scaleBrute": {
-                "scale": 3,
-                "level": "high",
-                "label": "Élevé (Rouge)",
-                "color": "#ef4444",
-                "strokeColor": "#ef4444",
-                "textColor": "#ffffff",
-                "scoreTextColor": "#ef4444",
-                "bgBadge": "rgba(239, 68, 68, 0.2)",
-                "borderBadge": "#ef4444"
-              },
-              "scaleResiduelle": {
-                "scale": 1,
-                "level": "low",
-                "label": "Faible (Gris)",
-                "color": "#94a3b8",
-                "strokeColor": "#94a3b8",
-                "textColor": "#0f172a",
-                "scoreTextColor": "#cbd5e1",
-                "bgBadge": "rgba(148, 163, 184, 0.18)",
-                "borderBadge": "#94a3b8"
-              },
-              "photoUrl": null,
-              "photoFallbackPath": null,
-              "photoRaRef": null,
-              "photoRawName": null,
-              "latestEvaluation": {
-                "id": 3438,
-                "ref": "RA79",
-                "cotation": 51,
-                "method": "standard",
-                "gravite": 1,
-                "exposition": 1,
-                "occurrence": 1,
-                "formation": 1,
-                "protection": 1,
-                "comment": "Câbles au sol",
-                "photo": null,
-                "dateCreation": 1727792457,
-                "status": 1
-              },
-              "initialEvaluation": {
-                "id": 3438,
-                "ref": "RA79",
-                "cotation": 51,
-                "method": "standard",
-                "gravite": 1,
-                "exposition": 1,
-                "occurrence": 1,
-                "formation": 1,
-                "protection": 1,
-                "comment": "Câbles au sol",
-                "photo": null,
-                "dateCreation": 1727792457,
-                "status": 1
-              },
-              "evaluationsCount": 1,
-              "evaluations": [
-                {
-                  "id": 3438,
-                  "ref": "RA79",
-                  "cotation": 51,
-                  "method": "standard",
-                  "gravite": 1,
-                  "exposition": 1,
-                  "occurrence": 1,
-                  "formation": 1,
-                  "protection": 1,
-                  "comment": "Câbles au sol",
-                  "photo": null,
-                  "dateCreation": 1727792457,
-                  "status": 1
-                }
-              ],
-              "tasks": [
-                {
-                  "id": 1131,
-                  "ref": "TK2410-1122",
-                  "label": "Passer les câbles en aérien afin de ne pas avoir de différence de niveau au niveau du sol",
-                  "description": "",
-                  "progress": 25,
-                  "budget": 900,
-                  "color": "#16a085"
-                },
-                {
-                  "id": 1132,
-                  "ref": "TK2410-1123",
-                  "label": "Réaliser une formation afin de mettre en place les méthodes des 5S dans l'atelier",
-                  "description": "",
-                  "progress": 100,
-                  "budget": 500,
-                  "color": "#16a085"
-                }
-              ]
             },
             {
               "id": 3212,
@@ -29051,7 +29051,7 @@
             "maxBrute": 100,
             "maxResiduelle": 100,
             "avgBrute": 60,
-            "avgResiduelle": 52,
+            "avgResiduelle": 60,
             "scaleBrute": {
               "scale": 4,
               "level": "critical",
@@ -29074,10 +29074,10 @@
               "bgBadge": "#09090b",
               "borderBadge": "#cbd5e1"
             },
-            "criticalCount": 1,
+            "criticalCount": 2,
             "highCount": 3,
             "mediumCount": 0,
-            "lowCount": 3,
+            "lowCount": 2,
             "totalTasks": 11
           }
         },
@@ -30034,7 +30034,7 @@
           "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/electricite_PictoCategorie_v2.png",
           "description": "Perceuse à colonne",
           "cotationBrute": 100,
-          "cotationResiduelle": 58,
+          "cotationResiduelle": 100,
           "scaleBrute": {
             "scale": 4,
             "level": "critical",
@@ -30047,15 +30047,15 @@
             "borderBadge": "#cbd5e1"
           },
           "scaleResiduelle": {
-            "scale": 3,
-            "level": "high",
-            "label": "Élevé (Rouge)",
-            "color": "#ef4444",
-            "strokeColor": "#ef4444",
+            "scale": 4,
+            "level": "critical",
+            "label": "Critique (Noir)",
+            "color": "#111827",
+            "strokeColor": "#e2e8f0",
             "textColor": "#ffffff",
-            "scoreTextColor": "#ef4444",
-            "bgBadge": "rgba(239, 68, 68, 0.2)",
-            "borderBadge": "#ef4444"
+            "scoreTextColor": "#f8fafc",
+            "bgBadge": "#09090b",
+            "borderBadge": "#cbd5e1"
           },
           "photoUrl": "./risk-photos/RA59_20220127_094415.jpg",
           "photoFallbackPath": "riskassessment/RA59/20220127_094415.jpg",
@@ -30337,6 +30337,111 @@
           ]
         },
         {
+          "id": 3366,
+          "ref": "RK29",
+          "fkElement": 36,
+          "categoryPosition": 0,
+          "categoryName": "Risques de chute de plain-pied",
+          "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
+          "description": "Déplacement entre les postes Percage, découpe, soudage",
+          "cotationBrute": 51,
+          "cotationResiduelle": 51,
+          "scaleBrute": {
+            "scale": 3,
+            "level": "high",
+            "label": "Élevé (Rouge)",
+            "color": "#ef4444",
+            "strokeColor": "#ef4444",
+            "textColor": "#ffffff",
+            "scoreTextColor": "#ef4444",
+            "bgBadge": "rgba(239, 68, 68, 0.2)",
+            "borderBadge": "#ef4444"
+          },
+          "scaleResiduelle": {
+            "scale": 3,
+            "level": "high",
+            "label": "Élevé (Rouge)",
+            "color": "#ef4444",
+            "strokeColor": "#ef4444",
+            "textColor": "#ffffff",
+            "scoreTextColor": "#ef4444",
+            "bgBadge": "rgba(239, 68, 68, 0.2)",
+            "borderBadge": "#ef4444"
+          },
+          "photoUrl": null,
+          "photoFallbackPath": null,
+          "photoRaRef": null,
+          "photoRawName": null,
+          "latestEvaluation": {
+            "id": 3438,
+            "ref": "RA79",
+            "cotation": 51,
+            "method": "standard",
+            "gravite": 1,
+            "exposition": 1,
+            "occurrence": 1,
+            "formation": 1,
+            "protection": 1,
+            "comment": "Câbles au sol",
+            "photo": null,
+            "dateCreation": 1727792457,
+            "status": 1
+          },
+          "initialEvaluation": {
+            "id": 3438,
+            "ref": "RA79",
+            "cotation": 51,
+            "method": "standard",
+            "gravite": 1,
+            "exposition": 1,
+            "occurrence": 1,
+            "formation": 1,
+            "protection": 1,
+            "comment": "Câbles au sol",
+            "photo": null,
+            "dateCreation": 1727792457,
+            "status": 1
+          },
+          "evaluationsCount": 1,
+          "evaluations": [
+            {
+              "id": 3438,
+              "ref": "RA79",
+              "cotation": 51,
+              "method": "standard",
+              "gravite": 1,
+              "exposition": 1,
+              "occurrence": 1,
+              "formation": 1,
+              "protection": 1,
+              "comment": "Câbles au sol",
+              "photo": null,
+              "dateCreation": 1727792457,
+              "status": 1
+            }
+          ],
+          "tasks": [
+            {
+              "id": 1131,
+              "ref": "TK2410-1122",
+              "label": "Passer les câbles en aérien afin de ne pas avoir de différence de niveau au niveau du sol",
+              "description": "",
+              "progress": 25,
+              "budget": 900,
+              "color": "#16a085"
+            },
+            {
+              "id": 1132,
+              "ref": "TK2410-1123",
+              "label": "Réaliser une formation afin de mettre en place les méthodes des 5S dans l'atelier",
+              "description": "",
+              "progress": 100,
+              "budget": 500,
+              "color": "#16a085"
+            }
+          ]
+        },
+        {
           "id": 3211,
           "ref": "RK17",
           "fkElement": 36,
@@ -30421,111 +30526,6 @@
             }
           ],
           "tasks": []
-        },
-        {
-          "id": 3366,
-          "ref": "RK29",
-          "fkElement": 36,
-          "categoryPosition": 0,
-          "categoryName": "Risques de chute de plain-pied",
-          "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chutePP_PictoCategorie_v2.png",
-          "description": "Déplacement entre les postes Percage, découpe, soudage",
-          "cotationBrute": 51,
-          "cotationResiduelle": 37,
-          "scaleBrute": {
-            "scale": 3,
-            "level": "high",
-            "label": "Élevé (Rouge)",
-            "color": "#ef4444",
-            "strokeColor": "#ef4444",
-            "textColor": "#ffffff",
-            "scoreTextColor": "#ef4444",
-            "bgBadge": "rgba(239, 68, 68, 0.2)",
-            "borderBadge": "#ef4444"
-          },
-          "scaleResiduelle": {
-            "scale": 1,
-            "level": "low",
-            "label": "Faible (Gris)",
-            "color": "#94a3b8",
-            "strokeColor": "#94a3b8",
-            "textColor": "#0f172a",
-            "scoreTextColor": "#cbd5e1",
-            "bgBadge": "rgba(148, 163, 184, 0.18)",
-            "borderBadge": "#94a3b8"
-          },
-          "photoUrl": null,
-          "photoFallbackPath": null,
-          "photoRaRef": null,
-          "photoRawName": null,
-          "latestEvaluation": {
-            "id": 3438,
-            "ref": "RA79",
-            "cotation": 51,
-            "method": "standard",
-            "gravite": 1,
-            "exposition": 1,
-            "occurrence": 1,
-            "formation": 1,
-            "protection": 1,
-            "comment": "Câbles au sol",
-            "photo": null,
-            "dateCreation": 1727792457,
-            "status": 1
-          },
-          "initialEvaluation": {
-            "id": 3438,
-            "ref": "RA79",
-            "cotation": 51,
-            "method": "standard",
-            "gravite": 1,
-            "exposition": 1,
-            "occurrence": 1,
-            "formation": 1,
-            "protection": 1,
-            "comment": "Câbles au sol",
-            "photo": null,
-            "dateCreation": 1727792457,
-            "status": 1
-          },
-          "evaluationsCount": 1,
-          "evaluations": [
-            {
-              "id": 3438,
-              "ref": "RA79",
-              "cotation": 51,
-              "method": "standard",
-              "gravite": 1,
-              "exposition": 1,
-              "occurrence": 1,
-              "formation": 1,
-              "protection": 1,
-              "comment": "Câbles au sol",
-              "photo": null,
-              "dateCreation": 1727792457,
-              "status": 1
-            }
-          ],
-          "tasks": [
-            {
-              "id": 1131,
-              "ref": "TK2410-1122",
-              "label": "Passer les câbles en aérien afin de ne pas avoir de différence de niveau au niveau du sol",
-              "description": "",
-              "progress": 25,
-              "budget": 900,
-              "color": "#16a085"
-            },
-            {
-              "id": 1132,
-              "ref": "TK2410-1123",
-              "label": "Réaliser une formation afin de mettre en place les méthodes des 5S dans l'atelier",
-              "description": "",
-              "progress": 100,
-              "budget": 500,
-              "color": "#16a085"
-            }
-          ]
         },
         {
           "id": 3212,
@@ -30960,7 +30960,7 @@
         "maxBrute": 100,
         "maxResiduelle": 100,
         "avgBrute": 58,
-        "avgResiduelle": 53,
+        "avgResiduelle": 58,
         "scaleBrute": {
           "scale": 4,
           "level": "critical",
@@ -30983,10 +30983,10 @@
           "bgBadge": "#09090b",
           "borderBadge": "#cbd5e1"
         },
-        "criticalCount": 2,
+        "criticalCount": 3,
         "highCount": 5,
         "mediumCount": 0,
-        "lowCount": 4,
+        "lowCount": 3,
         "totalTasks": 18
       }
     },
@@ -31314,7 +31314,7 @@
               "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/incendies_PictoCategorie_v2.png",
               "description": "Risques d'incendie et d'explosion",
               "cotationBrute": 100,
-              "cotationResiduelle": 55,
+              "cotationResiduelle": 100,
               "scaleBrute": {
                 "scale": 4,
                 "level": "critical",
@@ -31327,15 +31327,15 @@
                 "borderBadge": "#cbd5e1"
               },
               "scaleResiduelle": {
-                "scale": 3,
-                "level": "high",
-                "label": "Élevé (Rouge)",
-                "color": "#ef4444",
-                "strokeColor": "#ef4444",
+                "scale": 4,
+                "level": "critical",
+                "label": "Critique (Noir)",
+                "color": "#111827",
+                "strokeColor": "#e2e8f0",
                 "textColor": "#ffffff",
-                "scoreTextColor": "#ef4444",
-                "bgBadge": "rgba(239, 68, 68, 0.2)",
-                "borderBadge": "#ef4444"
+                "scoreTextColor": "#f8fafc",
+                "bgBadge": "#09090b",
+                "borderBadge": "#cbd5e1"
               },
               "photoUrl": "./risk-photos/RA67_ATEX.jpg",
               "photoFallbackPath": "riskassessment/RA67/ATEX.jpg",
@@ -31499,7 +31499,7 @@
               "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/incendies_PictoCategorie_v2.png",
               "description": "Risques d'incendie et d'explosion",
               "cotationBrute": 100,
-              "cotationResiduelle": 55,
+              "cotationResiduelle": 100,
               "scaleBrute": {
                 "scale": 4,
                 "level": "critical",
@@ -31512,15 +31512,15 @@
                 "borderBadge": "#cbd5e1"
               },
               "scaleResiduelle": {
-                "scale": 3,
-                "level": "high",
-                "label": "Élevé (Rouge)",
-                "color": "#ef4444",
-                "strokeColor": "#ef4444",
+                "scale": 4,
+                "level": "critical",
+                "label": "Critique (Noir)",
+                "color": "#111827",
+                "strokeColor": "#e2e8f0",
                 "textColor": "#ffffff",
-                "scoreTextColor": "#ef4444",
-                "bgBadge": "rgba(239, 68, 68, 0.2)",
-                "borderBadge": "#ef4444"
+                "scoreTextColor": "#f8fafc",
+                "bgBadge": "#09090b",
+                "borderBadge": "#cbd5e1"
               },
               "photoUrl": "./risk-photos/RA67_ATEX.jpg",
               "photoFallbackPath": "riskassessment/RA67/ATEX.jpg",
@@ -31677,9 +31677,9 @@
             "totalRisks": 2,
             "directRisksCount": 2,
             "maxBrute": 100,
-            "maxResiduelle": 55,
+            "maxResiduelle": 100,
             "avgBrute": 55,
-            "avgResiduelle": 33,
+            "avgResiduelle": 55,
             "scaleBrute": {
               "scale": 4,
               "level": "critical",
@@ -31692,18 +31692,18 @@
               "borderBadge": "#cbd5e1"
             },
             "scaleResiduelle": {
-              "scale": 3,
-              "level": "high",
-              "label": "Élevé (Rouge)",
-              "color": "#ef4444",
-              "strokeColor": "#ef4444",
+              "scale": 4,
+              "level": "critical",
+              "label": "Critique (Noir)",
+              "color": "#111827",
+              "strokeColor": "#e2e8f0",
               "textColor": "#ffffff",
-              "scoreTextColor": "#ef4444",
-              "bgBadge": "rgba(239, 68, 68, 0.2)",
-              "borderBadge": "#ef4444"
+              "scoreTextColor": "#f8fafc",
+              "bgBadge": "#09090b",
+              "borderBadge": "#cbd5e1"
             },
-            "criticalCount": 0,
-            "highCount": 1,
+            "criticalCount": 1,
+            "highCount": 0,
             "mediumCount": 0,
             "lowCount": 1,
             "totalTasks": 1
@@ -32059,7 +32059,7 @@
           "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/incendies_PictoCategorie_v2.png",
           "description": "Risques d'incendie et d'explosion",
           "cotationBrute": 100,
-          "cotationResiduelle": 55,
+          "cotationResiduelle": 100,
           "scaleBrute": {
             "scale": 4,
             "level": "critical",
@@ -32072,15 +32072,15 @@
             "borderBadge": "#cbd5e1"
           },
           "scaleResiduelle": {
-            "scale": 3,
-            "level": "high",
-            "label": "Élevé (Rouge)",
-            "color": "#ef4444",
-            "strokeColor": "#ef4444",
+            "scale": 4,
+            "level": "critical",
+            "label": "Critique (Noir)",
+            "color": "#111827",
+            "strokeColor": "#e2e8f0",
             "textColor": "#ffffff",
-            "scoreTextColor": "#ef4444",
-            "bgBadge": "rgba(239, 68, 68, 0.2)",
-            "borderBadge": "#ef4444"
+            "scoreTextColor": "#f8fafc",
+            "bgBadge": "#09090b",
+            "borderBadge": "#cbd5e1"
           },
           "photoUrl": "./risk-photos/RA67_ATEX.jpg",
           "photoFallbackPath": "riskassessment/RA67/ATEX.jpg",
@@ -32333,9 +32333,9 @@
         "totalRisks": 4,
         "directRisksCount": 0,
         "maxBrute": 100,
-        "maxResiduelle": 55,
+        "maxResiduelle": 100,
         "avgBrute": 35,
-        "avgResiduelle": 24,
+        "avgResiduelle": 35,
         "scaleBrute": {
           "scale": 4,
           "level": "critical",
@@ -32348,18 +32348,18 @@
           "borderBadge": "#cbd5e1"
         },
         "scaleResiduelle": {
-          "scale": 3,
-          "level": "high",
-          "label": "Élevé (Rouge)",
-          "color": "#ef4444",
-          "strokeColor": "#ef4444",
+          "scale": 4,
+          "level": "critical",
+          "label": "Critique (Noir)",
+          "color": "#111827",
+          "strokeColor": "#e2e8f0",
           "textColor": "#ffffff",
-          "scoreTextColor": "#ef4444",
-          "bgBadge": "rgba(239, 68, 68, 0.2)",
-          "borderBadge": "#ef4444"
+          "scoreTextColor": "#f8fafc",
+          "bgBadge": "#09090b",
+          "borderBadge": "#cbd5e1"
         },
-        "criticalCount": 0,
-        "highCount": 1,
+        "criticalCount": 1,
+        "highCount": 0,
         "mediumCount": 0,
         "lowCount": 3,
         "totalTasks": 3
@@ -33363,7 +33363,7 @@
               "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/circulation_v2.png",
               "description": "Livraison et courses Rapide",
               "cotationBrute": 66,
-              "cotationResiduelle": 36,
+              "cotationResiduelle": 66,
               "scaleBrute": {
                 "scale": 3,
                 "level": "high",
@@ -33376,15 +33376,15 @@
                 "borderBadge": "#ef4444"
               },
               "scaleResiduelle": {
-                "scale": 1,
-                "level": "low",
-                "label": "Faible (Gris)",
-                "color": "#94a3b8",
-                "strokeColor": "#94a3b8",
-                "textColor": "#0f172a",
-                "scoreTextColor": "#cbd5e1",
-                "bgBadge": "rgba(148, 163, 184, 0.18)",
-                "borderBadge": "#94a3b8"
+                "scale": 3,
+                "level": "high",
+                "label": "Élevé (Rouge)",
+                "color": "#ef4444",
+                "strokeColor": "#ef4444",
+                "textColor": "#ffffff",
+                "scoreTextColor": "#ef4444",
+                "bgBadge": "rgba(239, 68, 68, 0.2)",
+                "borderBadge": "#ef4444"
               },
               "photoUrl": "./risk-photos/RA2_risque_routiers-en-mission_crash-voiture_600px.png",
               "photoFallbackPath": "riskassessment/RA2/risque_routiers-en-mission_crash-voiture_600px.png",
@@ -33462,7 +33462,7 @@
               "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/circulation_v2.png",
               "description": "Livraison et courses Rapide",
               "cotationBrute": 66,
-              "cotationResiduelle": 36,
+              "cotationResiduelle": 66,
               "scaleBrute": {
                 "scale": 3,
                 "level": "high",
@@ -33475,15 +33475,15 @@
                 "borderBadge": "#ef4444"
               },
               "scaleResiduelle": {
-                "scale": 1,
-                "level": "low",
-                "label": "Faible (Gris)",
-                "color": "#94a3b8",
-                "strokeColor": "#94a3b8",
-                "textColor": "#0f172a",
-                "scoreTextColor": "#cbd5e1",
-                "bgBadge": "rgba(148, 163, 184, 0.18)",
-                "borderBadge": "#94a3b8"
+                "scale": 3,
+                "level": "high",
+                "label": "Élevé (Rouge)",
+                "color": "#ef4444",
+                "strokeColor": "#ef4444",
+                "textColor": "#ffffff",
+                "scoreTextColor": "#ef4444",
+                "bgBadge": "rgba(239, 68, 68, 0.2)",
+                "borderBadge": "#ef4444"
               },
               "photoUrl": "./risk-photos/RA2_risque_routiers-en-mission_crash-voiture_600px.png",
               "photoFallbackPath": "riskassessment/RA2/risque_routiers-en-mission_crash-voiture_600px.png",
@@ -33554,9 +33554,9 @@
             "totalRisks": 1,
             "directRisksCount": 1,
             "maxBrute": 66,
-            "maxResiduelle": 36,
+            "maxResiduelle": 66,
             "avgBrute": 66,
-            "avgResiduelle": 36,
+            "avgResiduelle": 66,
             "scaleBrute": {
               "scale": 3,
               "level": "high",
@@ -33569,20 +33569,20 @@
               "borderBadge": "#ef4444"
             },
             "scaleResiduelle": {
-              "scale": 1,
-              "level": "low",
-              "label": "Faible (Gris)",
-              "color": "#94a3b8",
-              "strokeColor": "#94a3b8",
-              "textColor": "#0f172a",
-              "scoreTextColor": "#cbd5e1",
-              "bgBadge": "rgba(148, 163, 184, 0.18)",
-              "borderBadge": "#94a3b8"
+              "scale": 3,
+              "level": "high",
+              "label": "Élevé (Rouge)",
+              "color": "#ef4444",
+              "strokeColor": "#ef4444",
+              "textColor": "#ffffff",
+              "scoreTextColor": "#ef4444",
+              "bgBadge": "rgba(239, 68, 68, 0.2)",
+              "borderBadge": "#ef4444"
             },
             "criticalCount": 0,
-            "highCount": 0,
+            "highCount": 1,
             "mediumCount": 0,
-            "lowCount": 1,
+            "lowCount": 0,
             "totalTasks": 1
           }
         },
@@ -33797,18 +33797,18 @@
               "categoryName": "Risques de chute de hauteur",
               "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chuteH_PictoCategorie_v2.png",
               "description": "Chute de l'avion et des personnes à bord",
-              "cotationBrute": 66,
+              "cotationBrute": 25,
               "cotationResiduelle": 25,
               "scaleBrute": {
-                "scale": 3,
-                "level": "high",
-                "label": "Élevé (Rouge)",
-                "color": "#ef4444",
-                "strokeColor": "#ef4444",
-                "textColor": "#ffffff",
-                "scoreTextColor": "#ef4444",
-                "bgBadge": "rgba(239, 68, 68, 0.2)",
-                "borderBadge": "#ef4444"
+                "scale": 1,
+                "level": "low",
+                "label": "Faible (Gris)",
+                "color": "#94a3b8",
+                "strokeColor": "#94a3b8",
+                "textColor": "#0f172a",
+                "scoreTextColor": "#cbd5e1",
+                "bgBadge": "rgba(148, 163, 184, 0.18)",
+                "borderBadge": "#94a3b8"
               },
               "scaleResiduelle": {
                 "scale": 1,
@@ -34130,18 +34130,18 @@
               "categoryName": "Risques de chute de hauteur",
               "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chuteH_PictoCategorie_v2.png",
               "description": "Chute de l'avion et des personnes à bord",
-              "cotationBrute": 66,
+              "cotationBrute": 25,
               "cotationResiduelle": 25,
               "scaleBrute": {
-                "scale": 3,
-                "level": "high",
-                "label": "Élevé (Rouge)",
-                "color": "#ef4444",
-                "strokeColor": "#ef4444",
-                "textColor": "#ffffff",
-                "scoreTextColor": "#ef4444",
-                "bgBadge": "rgba(239, 68, 68, 0.2)",
-                "borderBadge": "#ef4444"
+                "scale": 1,
+                "level": "low",
+                "label": "Faible (Gris)",
+                "color": "#94a3b8",
+                "strokeColor": "#94a3b8",
+                "textColor": "#0f172a",
+                "scoreTextColor": "#cbd5e1",
+                "bgBadge": "rgba(148, 163, 184, 0.18)",
+                "borderBadge": "#94a3b8"
               },
               "scaleResiduelle": {
                 "scale": 1,
@@ -34266,7 +34266,7 @@
             "directRisksCount": 3,
             "maxBrute": 66,
             "maxResiduelle": 66,
-            "avgBrute": 58,
+            "avgBrute": 44,
             "avgResiduelle": 44,
             "scaleBrute": {
               "scale": 3,
@@ -35322,7 +35322,7 @@
           "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/circulation_v2.png",
           "description": "Livraison et courses Rapide",
           "cotationBrute": 66,
-          "cotationResiduelle": 36,
+          "cotationResiduelle": 66,
           "scaleBrute": {
             "scale": 3,
             "level": "high",
@@ -35335,15 +35335,15 @@
             "borderBadge": "#ef4444"
           },
           "scaleResiduelle": {
-            "scale": 1,
-            "level": "low",
-            "label": "Faible (Gris)",
-            "color": "#94a3b8",
-            "strokeColor": "#94a3b8",
-            "textColor": "#0f172a",
-            "scoreTextColor": "#cbd5e1",
-            "bgBadge": "rgba(148, 163, 184, 0.18)",
-            "borderBadge": "#94a3b8"
+            "scale": 3,
+            "level": "high",
+            "label": "Élevé (Rouge)",
+            "color": "#ef4444",
+            "strokeColor": "#ef4444",
+            "textColor": "#ffffff",
+            "scoreTextColor": "#ef4444",
+            "bgBadge": "rgba(239, 68, 68, 0.2)",
+            "borderBadge": "#ef4444"
           },
           "photoUrl": "./risk-photos/RA2_risque_routiers-en-mission_crash-voiture_600px.png",
           "photoFallbackPath": "riskassessment/RA2/risque_routiers-en-mission_crash-voiture_600px.png",
@@ -35609,18 +35609,18 @@
           "categoryName": "Risques de chute de hauteur",
           "categoryIcon": "https://demodoli.digirisk.com/htdocs/custom/digiriskdolibarr/img/categorieDangers/chuteH_PictoCategorie_v2.png",
           "description": "Chute de l'avion et des personnes à bord",
-          "cotationBrute": 66,
+          "cotationBrute": 25,
           "cotationResiduelle": 25,
           "scaleBrute": {
-            "scale": 3,
-            "level": "high",
-            "label": "Élevé (Rouge)",
-            "color": "#ef4444",
-            "strokeColor": "#ef4444",
-            "textColor": "#ffffff",
-            "scoreTextColor": "#ef4444",
-            "bgBadge": "rgba(239, 68, 68, 0.2)",
-            "borderBadge": "#ef4444"
+            "scale": 1,
+            "level": "low",
+            "label": "Faible (Gris)",
+            "color": "#94a3b8",
+            "strokeColor": "#94a3b8",
+            "textColor": "#0f172a",
+            "scoreTextColor": "#cbd5e1",
+            "bgBadge": "rgba(148, 163, 184, 0.18)",
+            "borderBadge": "#94a3b8"
           },
           "scaleResiduelle": {
             "scale": 1,
@@ -35745,8 +35745,8 @@
         "directRisksCount": 11,
         "maxBrute": 66,
         "maxResiduelle": 66,
-        "avgBrute": 39,
-        "avgResiduelle": 34,
+        "avgBrute": 36,
+        "avgResiduelle": 36,
         "scaleBrute": {
           "scale": 3,
           "level": "high",
@@ -35770,9 +35770,9 @@
           "borderBadge": "#ef4444"
         },
         "criticalCount": 0,
-        "highCount": 3,
+        "highCount": 4,
         "mediumCount": 5,
-        "lowCount": 7,
+        "lowCount": 6,
         "totalTasks": 9
       }
     }

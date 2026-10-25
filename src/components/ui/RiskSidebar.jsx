@@ -116,9 +116,7 @@ export default function RiskSidebar({
             className="kpi-card"
             style={{ borderColor: scaleObj?.borderBadge || scaleObj?.color || '#334155' }}
           >
-            <span className="kpi-label">
-              Cotation Max ({cotationMode === 'brute' ? 'Brute' : 'Résiduelle'})
-            </span>
+            <span className="kpi-label">Cotation Max</span>
             <span
               className="kpi-value"
               style={{ color: scaleObj?.scoreTextColor || scaleObj?.color || '#f8fafc' }}
@@ -353,18 +351,6 @@ function RiskDetailCard({ risk, cotationMode, isHighlighted, onHoverRisk }) {
           {risk.description && (
             <p className="risk-desc-text">{risk.description}</p>
           )}
-        </div>
-      )}
-
-      {/* Comparaison Brute -> Résiduelle si atténuation */}
-      {hasReduction && (
-        <div className="cotation-delta-banner">
-          <TrendingDown size={14} />
-          <span>
-            Cotation Brute <strong>{risk.cotationBrute}</strong> → Résiduelle{' '}
-            <strong>{risk.cotationResiduelle}</strong> grâce aux actions de
-            prévention
-          </span>
         </div>
       )}
 
