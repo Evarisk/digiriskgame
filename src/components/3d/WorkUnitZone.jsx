@@ -15,6 +15,7 @@ export default function WorkUnitZone({
   isSelected,
   activeRisk,
   onSelect,
+  showLabels = true,
 }) {
   const [hovered, setHovered] = useState(false);
   const [photoCycleIdx, setPhotoCycleIdx] = useState(0);
@@ -149,7 +150,7 @@ export default function WorkUnitZone({
           onClick={handleClick}
         >
           {/* Volume holographique semi-transparent englobant l'atelier */}
-          <mesh position={[0, sizeH / 2 + 0.12, 0]}>
+          <mesh position={[0, sizeH / 2 + 0.12, 0]} userData={{ noCollide: true }}>
             <boxGeometry args={[sizeW * 0.94, sizeH * 0.85, sizeD * 0.94]} />
             <meshStandardMaterial
               color={riskColor}
@@ -172,106 +173,108 @@ export default function WorkUnitZone({
       )}
 
       {/* Hologramme HTML flottant au-dessus de l'Unité de Travail + Projection Photo Risque */}
-      <Html
-        position={[0, sizeH + (activeUtRisk ? 1.35 : 0.55), 0]}
-        center
-        distanceFactor={25}
-        zIndexRange={[15, 0]}
-      >
-        <div className="ut-hologram-stack" onClick={handleClick}>
-          {/* Projection Holographique de la photo du risque sur l'UT */}
-          {activeUtRisk && (
-            <div
-              key={activeUtRisk.id}
-              className="ut-photo-hologram"
-              style={{
-                borderColor:
-                  activeUtRisk.scaleResiduelle?.borderBadge || edgeColor,
-              }}
-            >
-              <div className="ut-photo-hologram-media">
-                <img
-                  src={activeUtRisk.photoUrl}
-                  alt={activeUtRisk.description}
-                  className="ut-photo-hologram-img"
-                  onError={(e) => {
-                    const fallback = activeUtRisk.photoFallbackPath
-                      ? `./api-proxy.php?photo=${encodeURIComponent(
-                          activeUtRisk.photoFallbackPath
-                        )}`
-                      : null;
-                    if (fallback && !e.currentTarget.dataset.retried) {
-                      e.currentTarget.dataset.retried = '1';
-                      e.currentTarget.src = fallback;
-                    }
-                  }}
-                />
-                <div className="hologram-scanline" />
-                <span
-                  className="ut-photo-risk-tag"
-                  style={{
-                    background: activeUtRisk.scaleResiduelle?.color || riskColor,
-                    color: activeUtRisk.scaleResiduelle?.textColor || '#fff',
-                  }}
-                >
-                  {activeUtRisk.ref} • {activeUtRisk.cotationResiduelle}/100
-                </span>
-              </div>
-              <div className="ut-photo-caption">{activeUtRisk.description}</div>
-              <div className="hologram-beam" />
-            </div>
-          )}
-
-          {/* Badge principal de l'Unité de Travail */}
-          <div
-            className={`ut-floating-badge ${isSelected ? 'selected' : ''} ${
-              isCritical ? 'critical-pulse' : ''
-            }`}
-            style={{
-              borderColor: isSelected ? '#ffffff' : edgeColor,
-            }}
-          >
-            <div className="ut-badge-top">
-              <span
-                className="ut-ref"
+      {showLabels && (
+        <Html
+          position={[0, sizeH + (activeUtRisk ? 1.35 : 0.55), 0]}
+          center
+          distanceFactor={25}
+          zIndexRange={[15, 0]}
+        >
+          <div className="ut-hologram-stack" onClick={handleClick}>
+            {/* Projection Holographique de la photo du risque sur l'UT */}
+            {activeUtRisk && (
+              <div
+                key={activeUtRisk.id}
+                className="ut-photo-hologram"
                 style={{
-                  background: riskColor,
-                  color: scaleObj.textColor || '#ffffff',
-                  border: isCritical ? '1px solid #cbd5e1' : 'none',
+                  borderColor:
+                    activeUtRisk.scaleResiduelle?.borderBadge || edgeColor,
                 }}
               >
-                {ut.ref}
-              </span>
-              <span
-                className="ut-score"
-                style={{ color: scaleObj.scoreTextColor || edgeColor }}
-              >
-                {maxScore}/100
-              </span>
-            </div>
-            <div className="ut-label">{ut.label}</div>
-            <div className="ut-meta">
-              {ut.stats.totalRisks} risque{ut.stats.totalRisks > 1 ? 's' : ''}
-              {ut.stats.totalTasks > 0
-                ? ` • ${ut.stats.totalTasks} action(s)`
-                : ''}
-            </div>
-            {ut.directRiskSigns?.length > 0 && (
-              <div className="ut-signs-row">
-                {ut.directRiskSigns.map((sign) => (
+                <div className="ut-photo-hologram-media">
                   <img
-                    key={sign.id || sign.ref}
-                    src={sign.iconUrl}
-                    alt={sign.categoryName}
-                    title={`[${sign.ref}] ${sign.categoryName} — ${sign.description}`}
-                    className="sign-mini-picto ut-sign"
+                    src={activeUtRisk.photoUrl}
+                    alt={activeUtRisk.description}
+                    className="ut-photo-hologram-img"
+                    onError={(e) => {
+                      const fallback = activeUtRisk.photoFallbackPath
+                        ? `./api-proxy.php?photo=${encodeURIComponent(
+                            activeUtRisk.photoFallbackPath
+                          )}`
+                        : null;
+                      if (fallback && !e.currentTarget.dataset.retried) {
+                        e.currentTarget.dataset.retried = '1';
+                        e.currentTarget.src = fallback;
+                      }
+                    }}
                   />
-                ))}
+                  <div className="hologram-scanline" />
+                  <span
+                    className="ut-photo-risk-tag"
+                    style={{
+                      background: activeUtRisk.scaleResiduelle?.color || riskColor,
+                      color: activeUtRisk.scaleResiduelle?.textColor || '#fff',
+                    }}
+                  >
+                    {activeUtRisk.ref} • {activeUtRisk.cotationResiduelle}/100
+                  </span>
+                </div>
+                <div className="ut-photo-caption">{activeUtRisk.description}</div>
+                <div className="hologram-beam" />
               </div>
             )}
+
+            {/* Badge principal de l'Unité de Travail */}
+            <div
+              className={`ut-floating-badge ${isSelected ? 'selected' : ''} ${
+                isCritical ? 'critical-pulse' : ''
+              }`}
+              style={{
+                borderColor: isSelected ? '#ffffff' : edgeColor,
+              }}
+            >
+              <div className="ut-badge-top">
+                <span
+                  className="ut-ref"
+                  style={{
+                    background: riskColor,
+                    color: scaleObj.textColor || '#ffffff',
+                    border: isCritical ? '1px solid #cbd5e1' : 'none',
+                  }}
+                >
+                  {ut.ref}
+                </span>
+                <span
+                  className="ut-score"
+                  style={{ color: scaleObj.scoreTextColor || edgeColor }}
+                >
+                  {maxScore}/100
+                </span>
+              </div>
+              <div className="ut-label">{ut.label}</div>
+              <div className="ut-meta">
+                {ut.stats.totalRisks} risque{ut.stats.totalRisks > 1 ? 's' : ''}
+                {ut.stats.totalTasks > 0
+                  ? ` • ${ut.stats.totalTasks} action(s)`
+                  : ''}
+              </div>
+              {ut.directRiskSigns?.length > 0 && (
+                <div className="ut-signs-row">
+                  {ut.directRiskSigns.map((sign) => (
+                    <img
+                      key={sign.id || sign.ref}
+                      src={sign.iconUrl}
+                      alt={sign.categoryName}
+                      title={`[${sign.ref}] ${sign.categoryName} — ${sign.description}`}
+                      className="sign-mini-picto ut-sign"
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      </Html>
+        </Html>
+      )}
     </group>
   );
 }

@@ -6,6 +6,8 @@ import BuildingGroup from './BuildingGroup';
 import WorkerAgents from './WorkerAgents';
 import CampusScenery from './CampusScenery';
 import { getTexture } from './models/textures';
+import FirstPersonExplorer from './explorer/FirstPersonExplorer';
+import { explorerStore } from './explorer/explorerStore';
 
 export default function DigitalTwinCanvas({
   data,
@@ -19,13 +21,20 @@ export default function DigitalTwinCanvas({
   agentSpeed,
   showRoof,
   cameraTarget,
+  explorerMode = false,
+  inspectedIds,
+  onInspect,
 }) {
+  const showLabels = !explorerMode;
   return (
     <div className="canvas-wrapper">
       <Canvas
         shadows
         camera={{ position: [0, 34, 42], fov: 45, near: 0.5, far: 250 }}
-        onPointerMissed={() => onSelectElement(null)}
+        onCreated={({ gl }) => {
+          explorerStore.canvas = gl.domElement;
+        }}
+        onPointerMissed={() => !explorerMode && onSelectElement(null)}
       >
         <color
           attach="background"
@@ -58,7 +67,18 @@ export default function DigitalTwinCanvas({
         {visualMode !== 'whitebox' && <StudioEnvironment />}
 
         {/* Contrôleur de caméra fluide vers l'élément sélectionné */}
-        <CameraNavigator cameraTarget={cameraTarget} />
+        {explorerMode ? (
+          /* Visite en première personne (remplace la caméra orbitale) */
+          <FirstPersonExplorer
+            data={data}
+            cameraTarget={cameraTarget}
+            cotationMode={cotationMode}
+            inspectedIds={inspectedIds}
+            onInspect={onInspect}
+          />
+        ) : (
+          <CameraNavigator cameraTarget={cameraTarget} />
+        )}
 
         {/* Sol industriel, voirie & Totem central GP5 */}
         <CampusGround
@@ -69,6 +89,7 @@ export default function DigitalTwinCanvas({
           rootEntity={data?.rootEntity}
           isSelected={selectedElement?.id === data?.rootEntity?.id}
           onSelectRoot={() => data?.rootEntity && onSelectElement(data.rootEntity)}
+          showLabels={showLabels}
         />
 
         {/* Bâtiments (Groupements GP1..GP4) & Ateliers (Unités de Travail UT1..UT18) */}
@@ -82,6 +103,7 @@ export default function DigitalTwinCanvas({
             activeRisk={activeRisk}
             onSelectElement={onSelectElement}
             showRoof={showRoof}
+            showLabels={showLabels}
           />
         ))}
 
@@ -92,6 +114,7 @@ export default function DigitalTwinCanvas({
           agentsEnabled={agentsEnabled}
           speedMultiplier={agentSpeed}
           onSelectUt={onSelectElement}
+          showLabels={showLabels}
         />
       </Canvas>
     </div>
@@ -157,7 +180,7 @@ function CameraNavigator({ cameraTarget }) {
   );
 }
 
-function CampusGround({ visualMode, buildings, companyName, companyLogo, rootEntity, isSelected, onSelectRoot }) {
+function CampusGround({ visualMode, buildings, companyName, companyLogo, rootEntity, isSelected, onSelectRoot, showLabels }) {
   return (
     <group>
       {/* Terrain autour du site industriel (l'enceinte pavée est dessinée par CampusScenery) */}
@@ -219,18 +242,20 @@ function CampusGround({ visualMode, buildings, companyName, companyLogo, rootEnt
               wireframe={visualMode === 'whitebox'}
             />
           </mesh>
-          <Html position={[0, 2.65, 0]} center distanceFactor={30} zIndexRange={[15, 0]}>
-            <div
-              onClick={(e) => {
-                e.stopPropagation();
-                onSelectRoot();
-              }}
-              className={`hq-totem-badge ${isSelected ? 'selected' : ''}`}
-            >
-              <span className="hq-ref">{rootEntity.ref}</span>
-              <span className="hq-label">{rootEntity.label}</span>
-            </div>
-          </Html>
+          {showLabels && (
+            <Html position={[0, 2.65, 0]} center distanceFactor={30} zIndexRange={[15, 0]}>
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelectRoot();
+                }}
+                className={`hq-totem-badge ${isSelected ? 'selected' : ''}`}
+              >
+                <span className="hq-ref">{rootEntity.ref}</span>
+                <span className="hq-label">{rootEntity.label}</span>
+              </div>
+            </Html>
+          )}
         </group>
       )}
     </group>

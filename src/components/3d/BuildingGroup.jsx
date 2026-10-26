@@ -18,6 +18,7 @@ export default function BuildingGroup({
   activeRisk,
   onSelectElement,
   showRoof,
+  showLabels = true,
 }) {
   const [hoveredBuilding, setHoveredBuilding] = useState(false);
 
@@ -88,7 +89,7 @@ export default function BuildingGroup({
       {/* Enveloppe architecturale du bâtiment */}
       {visualMode === 'whitebox' ? (
         /* Mode Étape 2 : Boîte blanche englobante en fil de fer */
-        <mesh position={[0, height / 2 + 0.1, 0]}>
+        <mesh position={[0, height / 2 + 0.1, 0]} userData={{ noCollide: true }}>
           <boxGeometry args={[width, height, depth]} />
           <meshStandardMaterial
             color="#ffffff"
@@ -127,62 +128,64 @@ export default function BuildingGroup({
       )}
 
       {/* Enseigne Holographique du Groupement (Bâtiment) */}
-      <Html
-        position={[
-          0,
-          visualMode === 'whitebox'
-            ? height + 1.15
-            : SHELL_HEADER_HEIGHT[archetype] || height + 1.15,
-          -depth / 2,
-        ]}
-        center
-        distanceFactor={32}
-        zIndexRange={[20, 0]}
-      >
-        <div
-          onClick={handleBuildingClick}
-          className={`building-header-card ${isBuildingSelected ? 'selected' : ''}`}
-          style={{
-            borderColor: isBuildingSelected ? '#ffffff' : themeColor,
-          }}
+      {showLabels && (
+        <Html
+          position={[
+            0,
+            visualMode === 'whitebox'
+              ? height + 1.15
+              : SHELL_HEADER_HEIGHT[archetype] || height + 1.15,
+            -depth / 2,
+          ]}
+          center
+          distanceFactor={32}
+          zIndexRange={[20, 0]}
         >
-          <span className="building-ref" style={{ background: themeColor }}>
-            {building.ref}
-          </span>
-          <div className="building-title-block">
-            <div className="building-name">{building.label}</div>
-            <div className="building-sub">
-              {building.children.length} UT • {building.stats.totalRisks} risques
-              {building.directRisks.length > 0
-                ? ` (dont ${building.directRisks.length} globaux)`
-                : ''}
-            </div>
-            {building.directRiskSigns?.length > 0 && (
-              <div className="building-signs-row">
-                {building.directRiskSigns.map((sign) => (
-                  <img
-                    key={sign.id || sign.ref}
-                    src={sign.iconUrl}
-                    alt={sign.categoryName}
-                    title={`[${sign.ref}] ${sign.categoryName} — ${sign.description}`}
-                    className="sign-mini-picto"
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-          <span
-            className="building-max-pill"
+          <div
+            onClick={handleBuildingClick}
+            className={`building-header-card ${isBuildingSelected ? 'selected' : ''}`}
             style={{
-              background: scaleObj.bgBadge || scaleObj.color,
-              color: scaleObj.scoreTextColor || scaleObj.color,
-              borderColor: scaleObj.borderBadge || scaleObj.color,
+              borderColor: isBuildingSelected ? '#ffffff' : themeColor,
             }}
           >
-            Max {maxScore}
-          </span>
-        </div>
-      </Html>
+            <span className="building-ref" style={{ background: themeColor }}>
+              {building.ref}
+            </span>
+            <div className="building-title-block">
+              <div className="building-name">{building.label}</div>
+              <div className="building-sub">
+                {building.children.length} UT • {building.stats.totalRisks} risques
+                {building.directRisks.length > 0
+                  ? ` (dont ${building.directRisks.length} globaux)`
+                  : ''}
+              </div>
+              {building.directRiskSigns?.length > 0 && (
+                <div className="building-signs-row">
+                  {building.directRiskSigns.map((sign) => (
+                    <img
+                      key={sign.id || sign.ref}
+                      src={sign.iconUrl}
+                      alt={sign.categoryName}
+                      title={`[${sign.ref}] ${sign.categoryName} — ${sign.description}`}
+                      className="sign-mini-picto"
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+            <span
+              className="building-max-pill"
+              style={{
+                background: scaleObj.bgBadge || scaleObj.color,
+                color: scaleObj.scoreTextColor || scaleObj.color,
+                borderColor: scaleObj.borderBadge || scaleObj.color,
+              }}
+            >
+              Max {maxScore}
+            </span>
+          </div>
+        </Html>
+      )}
 
       {/* Unités de Travail (Ateliers / Postes) rattachées à ce Groupement */}
       {building.children.map((ut) => (
@@ -194,6 +197,7 @@ export default function BuildingGroup({
           isSelected={selectedElement?.id === ut.id}
           activeRisk={activeRisk}
           onSelect={onSelectElement}
+          showLabels={showLabels}
         />
       ))}
     </group>

@@ -12,9 +12,9 @@ import { noRaycast } from './kit';
 
 const KEPT_ATTRIBUTES = ['position', 'normal', 'uv'];
 
-function isDynamic(obj, root) {
+function hasFlag(obj, root, flag) {
   for (let node = obj; node && node !== root; node = node.parent) {
-    if (node.userData?.dynamic) return true;
+    if (node.userData?.[flag]) return true;
   }
   return false;
 }
@@ -62,16 +62,17 @@ export default function MergeStatic({ children, deps = [] }) {
 
     root.traverse((obj) => {
       if (!obj.isMesh || obj.isInstancedMesh || !obj.visible || !obj.geometry?.attributes?.position) return;
-      if (Array.isArray(obj.material) || isDynamic(obj, root)) return;
-      const key = `${obj.material.uuid}|${obj.castShadow}|${obj.receiveShadow}`;
-      if (!buckets.has(key)) buckets.set(key, { material: obj.material, cast: obj.castShadow, receive: obj.receiveShadow, geos: [] });
+      if (Array.isArray(obj.material) || hasFlag(obj, root, 'dynamic')) return;
+      const noCollide = hasFlag(obj, root, 'noCollide');
+      const key = `${obj.material.uuid}|${obj.castShadow}|${obj.receiveShadow}|${noCollide}`;
+      if (!buckets.has(key)) buckets.set(key, { material: obj.material, cast: obj.castShadow, receive: obj.receiveShadow, noCollide, geos: [] });
       const local = new THREE.Matrix4().multiplyMatrices(inverseRoot, obj.matrixWorld);
       buckets.get(key).geos.push(normalizedGeometry(obj.geometry, local));
       hidden.push(obj);
     });
 
     const merged = [];
-    buckets.forEach(({ material, cast, receive, geos }) => {
+    buckets.forEach(({ material, cast, receive, noCollide, geos }) => {
       const geometry = mergeGeometries(geos, false);
       geos.forEach((g) => g.dispose());
       if (!geometry) return;
@@ -79,6 +80,7 @@ export default function MergeStatic({ children, deps = [] }) {
       mesh.castShadow = cast;
       mesh.receiveShadow = receive;
       mesh.raycast = noRaycast;
+      mesh.userData.noCollide = noCollide; // volumes sans collision du mode visite (voir collisionWorld)
       mesh.userData.dynamic = true; // ne jamais re-fusionner le résultat
       merged.push(mesh);
       root.add(mesh);

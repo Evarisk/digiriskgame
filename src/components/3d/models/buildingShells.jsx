@@ -162,7 +162,7 @@ function SmokePlume({ position, color = '#cbd5e1', puffs = 5 }) {
     });
   });
   return (
-    <group position={position}>
+    <group position={position} userData={{ noCollide: true }}>
       {materials.map((m, i) => (
         <mesh key={i} ref={(el) => (refs.current[i] = el)} userData={DYNAMIC} material={m} raycast={noRaycast}>
           <icosahedronGeometry args={[0.5, 1]} />

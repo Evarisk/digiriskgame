@@ -16,7 +16,7 @@ const OUTWARD_MARGIN = { office: 6.6, factory: 2.6, paint: 4.4, logistics: 10.2 
 const ROAD_X_WIDTH = 5.5; // voie Est-Ouest (selon X)
 const ROAD_Z_WIDTH = 6.5; // voie Nord-Sud (selon Z)
 
-function computeSiteBounds(buildings) {
+export function computeSiteBounds(buildings) {
   const rects = buildings.map((b) => {
     const [x, , z] = b.layout3D.position;
     const [w, , d] = b.layout3D.size;

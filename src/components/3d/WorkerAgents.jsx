@@ -16,6 +16,7 @@ export default function WorkerAgents({
   agentsEnabled = true,
   speedMultiplier = 1,
   onSelectUt,
+  showLabels = true,
 }) {
   // Construction automatique des trajectoires entre UT à partir des coordonnées réelles de l'API
   const agentRoutes = useMemo(() => {
@@ -135,6 +136,7 @@ export default function WorkerAgents({
             route={route}
             speedMultiplier={speedMultiplier}
             onSelectUt={onSelectUt}
+            showLabels={showLabels}
           />
         </React.Fragment>
       ))}
@@ -142,7 +144,7 @@ export default function WorkerAgents({
   );
 }
 
-function AnimatedHumanoidAgent({ route, speedMultiplier, onSelectUt }) {
+function AnimatedHumanoidAgent({ route, speedMultiplier, onSelectUt, showLabels }) {
   const groupRef = useRef();
   const limbs = useRef({}).current;
   const bodyRef = useRef();
@@ -201,25 +203,27 @@ function AnimatedHumanoidAgent({ route, speedMultiplier, onSelectUt }) {
       </group>
 
       {/* Badge flottant de l'agent avec son trajet UT A <-> UT B */}
-      <Html position={[0, 1.65, 0]} center distanceFactor={28} zIndexRange={[5, 0]}>
-        <div
-          className="agent-floating-pill"
-          onClick={(e) => {
-            e.stopPropagation();
-            if (route.fromUt && onSelectUt) onSelectUt(route.fromUt);
-          }}
-          title="Cliquer pour inspecter l'Unité de Travail de départ"
-        >
-          <span
-            className="agent-dot"
-            style={{ backgroundColor: route.helmetColor }}
-          />
-          <span className="agent-name">{route.name}</span>
-          <span className="agent-route">
-            {route.fromUt?.ref} ↔ {route.toUt?.ref}
-          </span>
-        </div>
-      </Html>
+      {showLabels && (
+        <Html position={[0, 1.65, 0]} center distanceFactor={28} zIndexRange={[5, 0]}>
+          <div
+            className="agent-floating-pill"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (route.fromUt && onSelectUt) onSelectUt(route.fromUt);
+            }}
+            title="Cliquer pour inspecter l'Unité de Travail de départ"
+          >
+            <span
+              className="agent-dot"
+              style={{ backgroundColor: route.helmetColor }}
+            />
+            <span className="agent-name">{route.name}</span>
+            <span className="agent-route">
+              {route.fromUt?.ref} ↔ {route.toUt?.ref}
+            </span>
+          </div>
+        </Html>
+      )}
     </group>
   );
 }
