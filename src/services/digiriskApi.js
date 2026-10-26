@@ -3,9 +3,22 @@ import {
   DEFAULT_DEMO_RISKSIGNS,
   enrichRiskSign,
 } from '../data/signalisationCategories';
+import {
+  BUILDING_ARCHETYPES,
+  detectBuildingArchetype,
+  detectWorkUnitArchetype,
+} from './archetypes';
 
 const DEFAULT_API_KEY = '';
 const PUBLIC_HOST = import.meta.env.VITE_DIGIRISK_PUBLIC_URL || 'https://demodoli.digirisk.com/htdocs';
+
+// Instance Dolibarr ciblée (demodoli par défaut, ou Dolibarr local via .env)
+export const API_BASE_URL =
+  import.meta.env.VITE_DIGIRISK_BASE_URL || 'https://demodoli.digirisk.com/htdocs/api/index.php';
+export const API_HOST_LABEL = (() => {
+  const url = new URL(API_BASE_URL);
+  return `${url.host}${url.pathname.replace(/(\/htdocs)?\/api\/index\.php$/, '')}`;
+})();
 
 export function getCotationScale(score) {
   if (score >= 81) {
@@ -88,21 +101,21 @@ export function attachSpatialLayout(hierarchy) {
     signsByElement[enriched.fkElement].push(enriched);
   }
 
-  // Quadrants sur le campus industriel (X, Z)
-  const buildingPresets = [
-    { center: [-17, -12], themeColor: '#3b82f6', roofStyle: 'office', iconType: 'office' },     // GP1 Bureaux
-    { center: [17, -12], themeColor: '#f59e0b', roofStyle: 'factory', iconType: 'production' }, // GP2 Production
-    { center: [-17, 13], themeColor: '#8b5cf6', roofStyle: 'chemical', iconType: 'paint' },     // GP3 Peinture
-    { center: [17, 13], themeColor: '#06b6d4', roofStyle: 'logistics', iconType: 'logistics' }, // GP4 Logistique
+  // Quadrants sur le campus industriel (X, Z) ; le style du bâtiment dépend de son libellé
+  const buildingCenters = [
+    [-17, -12],
+    [17, -12],
+    [-17, 13],
+    [17, 13],
   ];
 
   const allWorkUnitsWorld = [];
 
   const positionedBuildings = buildings.map((b, idx) => {
-    const preset = buildingPresets[idx % buildingPresets.length] || {
-      center: [(idx % 2 === 0 ? -17 : 17), Math.floor(idx / 2) * 24 - 12],
-      themeColor: '#3b82f6',
-      roofStyle: 'factory',
+    const buildingArchetype = detectBuildingArchetype(b, idx);
+    const preset = {
+      center: buildingCenters[idx] || [idx % 2 === 0 ? -17 : 17, Math.floor(idx / 2) * 24 - 12],
+      themeColor: BUILDING_ARCHETYPES[buildingArchetype].themeColor,
     };
 
     const workUnits = b.children || [];
@@ -125,7 +138,7 @@ export function attachSpatialLayout(hierarchy) {
       const worldX = preset.center[0] + localX;
       const worldZ = preset.center[1] + localZ;
 
-      const utType = detectWorkUnitArchetype(ut.label, b.label);
+      const utType = detectWorkUnitArchetype(ut.label, buildingArchetype);
       const utDirectSigns = signsByElement[ut.id] || ut.directRiskSigns || [];
 
       const enrichedUt = {
@@ -161,7 +174,9 @@ export function attachSpatialLayout(hierarchy) {
         position: [preset.center[0], 0, preset.center[1]],
         size: [width, 4.8, depth],
         themeColor: preset.themeColor,
-        roofStyle: preset.roofStyle,
+        archetype: buildingArchetype,
+        // Côté extérieur du campus (parking, quais, cheminée... sont placés de ce côté)
+        outward: [Math.sign(preset.center[0]) || 1, Math.sign(preset.center[1]) || 1],
       },
     };
   });
@@ -186,19 +201,6 @@ export function attachSpatialLayout(hierarchy) {
     buildings: positionedBuildings,
     allWorkUnitsWorld,
   };
-}
-
-function detectWorkUnitArchetype(utLabel = '', buildingLabel = '') {
-  const txt = `${utLabel} ${buildingLabel}`.toLowerCase();
-  if (txt.includes('soudeur') || txt.includes('chaudronnerie')) return 'welding';
-  if (txt.includes('cariste')) return 'forklift';
-  if (txt.includes('peinture') || txt.includes('accrochage')) return 'paint_booth';
-  if (txt.includes('épuration') || txt.includes('epuration') || txt.includes('dépotage') || txt.includes('depotage'))
-    return 'chemical_tank';
-  if (txt.includes('fret') || txt.includes('bateau') || txt.includes('coursier') || txt.includes('logistique'))
-    return 'logistics_dock';
-  if (txt.includes('informatique') || txt.includes('étude') || txt.includes('etude')) return 'tech_office';
-  return 'office_desk';
 }
 
 /**
@@ -454,8 +456,10 @@ function transformRawToHierarchy({ tree, risks, assessments, creationOptions, ta
 
   return {
     fetchedAt: new Date().toISOString(),
-    sourceUrl: 'https://demodoli.digirisk.com/htdocs/api/index.php',
+    sourceUrl: API_BASE_URL,
     entityName: creationOptions?.entity_name || 'MetalOandCo-Industrie',
+    // Logo de la société (data URI fourni par l'API DigiRisk, vide si non configuré)
+    entityLogo: creationOptions?.entity_logo || null,
     rootEntity,
     buildings,
     totalElements: Object.keys(nodesById).length,

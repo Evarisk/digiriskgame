@@ -10,6 +10,13 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Charge le .env du projet (Dolibarr local ou distant) si Node le permet (>= 20.12)
+const envFile = path.join(__dirname, '..', '.env');
+if (fs.existsSync(envFile) && typeof process.loadEnvFile === 'function') {
+  process.loadEnvFile(envFile);
+}
+
 const BASE_URL = process.env.VITE_DIGIRISK_BASE_URL || 'https://demodoli.digirisk.com/htdocs/api/index.php';
 const PUBLIC_HOST = process.env.VITE_DIGIRISK_PUBLIC_URL || 'https://demodoli.digirisk.com/htdocs';
 const API_KEY = process.env.VITE_DOLAPIKEY || '';
@@ -295,6 +302,7 @@ export function buildDigiRiskHierarchy({ tree, risks, assessments, creationOptio
     fetchedAt: new Date().toISOString(),
     sourceUrl: BASE_URL,
     entityName: creationOptions?.entity_name || 'MetalOandCo-Industrie (DigiRisk Demo)',
+    entityLogo: creationOptions?.entity_logo || null,
     rootEntity,
     buildings,
     totalElements: Object.keys(nodesById).length,

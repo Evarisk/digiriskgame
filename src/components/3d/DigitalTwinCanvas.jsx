@@ -1,9 +1,11 @@
 import React, { useRef, useEffect } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Grid, Html, Environment } from '@react-three/drei';
+import { OrbitControls, Grid, Html, Environment, Lightformer } from '@react-three/drei';
 import BuildingGroup from './BuildingGroup';
 import WorkerAgents from './WorkerAgents';
+import CampusScenery from './CampusScenery';
+import { getTexture } from './models/textures';
 
 export default function DigitalTwinCanvas({
   data,
@@ -52,12 +54,18 @@ export default function DigitalTwinCanvas({
           intensity={0.35}
         />
 
+        {/* Reflets d'environnement (calculés une seule fois, sans ressource réseau) */}
+        {visualMode !== 'whitebox' && <StudioEnvironment />}
+
         {/* Contrôleur de caméra fluide vers l'élément sélectionné */}
         <CameraNavigator cameraTarget={cameraTarget} />
 
         {/* Sol industriel, voirie & Totem central GP5 */}
         <CampusGround
           visualMode={visualMode}
+          buildings={data?.buildings}
+          companyName={data?.entityName}
+          companyLogo={data?.entityLogo}
           rootEntity={data?.rootEntity}
           isSelected={selectedElement?.id === data?.rootEntity?.id}
           onSelectRoot={() => data?.rootEntity && onSelectElement(data.rootEntity)}
@@ -87,6 +95,16 @@ export default function DigitalTwinCanvas({
         />
       </Canvas>
     </div>
+  );
+}
+
+export function StudioEnvironment() {
+  return (
+    <Environment resolution={128} frames={1} environmentIntensity={0.55}>
+      <Lightformer intensity={1.4} position={[0, 12, 0]} rotation-x={Math.PI / 2} scale={[40, 40, 1]} color="#e2e8f0" />
+      <Lightformer intensity={0.8} position={[24, 6, 12]} rotation-y={-Math.PI / 2} scale={[24, 6, 1]} color="#93c5fd" />
+      <Lightformer intensity={0.6} position={[-24, 6, -12]} rotation-y={Math.PI / 2} scale={[24, 6, 1]} color="#fde68a" />
+    </Environment>
   );
 }
 
@@ -139,18 +157,19 @@ function CameraNavigator({ cameraTarget }) {
   );
 }
 
-function CampusGround({ visualMode, rootEntity, isSelected, onSelectRoot }) {
+function CampusGround({ visualMode, buildings, companyName, companyLogo, rootEntity, isSelected, onSelectRoot }) {
   return (
     <group>
-      {/* Dalle principale du site industriel */}
+      {/* Terrain autour du site industriel (l'enceinte pavée est dessinée par CampusScenery) */}
       <mesh
         rotation={[-Math.PI / 2, 0, 0]}
         position={[0, -0.02, 0]}
         receiveShadow
       >
-        <planeGeometry args={[120, 120]} />
+        <planeGeometry args={[160, 160]} />
         <meshStandardMaterial
-          color={visualMode === 'whitebox' ? '#e2e8f0' : '#0b1120'}
+          color={visualMode === 'whitebox' ? '#e2e8f0' : '#ffffff'}
+          map={visualMode === 'whitebox' ? null : getTexture('grass', 40, 40)}
           roughness={0.9}
         />
       </mesh>
@@ -169,18 +188,9 @@ function CampusGround({ visualMode, rootEntity, isSelected, onSelectRoot }) {
         fadeStrength={1}
       />
 
-      {/* Allées de circulation inter-bâtiments (Axes X et Z) */}
+      {/* Voirie, rond-point, éclairage, végétation et clôture d'enceinte */}
       {visualMode !== 'whitebox' && (
-        <group position={[0, 0.02, 0]}>
-          <mesh rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[6.5, 64]} />
-            <meshStandardMaterial color="#1e293b" roughness={0.85} />
-          </mesh>
-          <mesh rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[68, 5.5]} />
-            <meshStandardMaterial color="#1e293b" roughness={0.85} />
-          </mesh>
-        </group>
+        <CampusScenery buildings={buildings} companyName={companyName} companyLogo={companyLogo} />
       )}
 
       {/* Totem Central de l'Entité Mère (GP5 Industrie Standard) */}

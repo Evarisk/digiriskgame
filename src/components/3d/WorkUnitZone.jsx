@@ -155,7 +155,7 @@ export default function WorkUnitZone({
               color={riskColor}
               transparent
               opacity={
-                isCritical ? 0.42 : isSelected ? 0.18 : hovered ? 0.14 : 0.08
+                isSelected ? 0.12 : hovered ? 0.1 : isCritical ? 0.1 : 0.035
               }
               depthWrite={false}
             />

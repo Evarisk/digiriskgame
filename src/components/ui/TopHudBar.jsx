@@ -9,6 +9,7 @@ import {
   Database,
   FolderTree,
 } from 'lucide-react';
+import { API_BASE_URL, API_HOST_LABEL } from '../../services/digiriskApi';
 
 export default function TopHudBar({
   data,
@@ -55,7 +56,7 @@ export default function TopHudBar({
               {isLive ? (
                 <>
                   <CheckCircle2 size={12} />
-                  <span className="status-text-full">API Live (demodoli.digirisk.com)</span>
+                  <span className="status-text-full">API Live ({API_HOST_LABEL})</span>
                   <span className="status-text-short">Live</span>
                 </>
               ) : (
@@ -121,7 +122,7 @@ export default function TopHudBar({
             className="hud-btn primary-sync"
             onClick={() => onRefreshApi(false)}
             disabled={loading}
-            title="Rafraîchir depuis demodoli.digirisk.com"
+            title={`Rafraîchir depuis ${API_HOST_LABEL}`}
           >
             <RefreshCw size={14} className={loading ? 'spin' : ''} />
             <span>Sync API</span>
@@ -137,7 +138,7 @@ export default function TopHudBar({
             <input
               type="text"
               readOnly
-              value="https://demodoli.digirisk.com/htdocs/api/index.php"
+              value={API_BASE_URL}
             />
           </label>
           <label>
