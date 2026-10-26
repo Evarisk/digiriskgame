@@ -110,6 +110,7 @@ export default function DigitalTwinCanvas({
         {/* Flux cinématiques d'opérateurs entre les Unités de Travail */}
         <WorkerAgents
           allWorkUnits={data?.allWorkUnitsWorld || []}
+          buildings={data?.buildings || []}
           showPaths={showPaths}
           agentsEnabled={agentsEnabled}
           speedMultiplier={agentSpeed}

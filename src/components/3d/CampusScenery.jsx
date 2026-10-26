@@ -1,14 +1,28 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
-import { Box, Cylinder, Ball, Tree, StreetLamp, Bench, SafetySign, seeded, PALETTE, DYNAMIC } from './models/kit';
+import {
+  Box,
+  Cylinder,
+  Ball,
+  Tree,
+  StreetLamp,
+  Bench,
+  SafetySign,
+  SafetyGuardrail,
+  WalkwayStrip,
+  WalkwayNode,
+  seeded,
+  PALETTE,
+  DYNAMIC,
+} from './models/kit';
+import { getBuildingDoorZ } from './models/buildingShells';
 import { getTexture } from './models/textures';
 import MergeStatic from './models/MergeStatic';
 
 /**
- * Décor du site industriel : voirie marquée, rond-point central, éclairage public,
- * arbres, clôture d'enceinte et poste de garde. L'emprise est calculée à partir
- * des bâtiments (et de leurs annexes extérieures : parking, quais, cuves...).
+ * Décor du site industriel : voirie marquée, couloirs piétons balisés (norme INRS),
+ * rond-point central, éclairage public, arbres, clôture d'enceinte et poste de garde.
  */
 
 // Débord des annexes extérieures côté `outward` selon le type de bâtiment
@@ -76,23 +90,121 @@ function DashedLine({ from, to, axis, gapAround = 4.5 }) {
   ));
 }
 
-/** Passage piéton (bandes blanches) en travers d'une voie. */
+/** Passage piéton (bandes blanches sur fond vert sécurité) en travers d'une voie. */
 function Crosswalk({ position, across = 'z', width }) {
   const stripes = Math.floor(width / 0.6);
   return (
-    <group position={position}>
+    <group position={position} userData={{ noCollide: true }}>
+      {/* Bande de fond verte sécurité sous les bandes blanches du passage piéton */}
+      <Box
+        position={[0, 0.033, 0]}
+        size={across === 'z' ? [1.85, 0.005, width] : [width, 0.005, 1.85]}
+        color="#15803d"
+        rough={0.85}
+        shadow={false}
+      />
       {Array.from({ length: stripes }, (_, i) => {
         const o = -width / 2 + 0.3 + i * 0.6;
         return (
           <Box
             key={i}
-            position={across === 'z' ? [0, 0.036, o] : [o, 0.036, 0]}
+            position={across === 'z' ? [0, 0.037, o] : [o, 0.037, 0]}
             size={across === 'z' ? [1.6, 0.006, 0.32] : [0.32, 0.006, 1.6]}
             color="#f1f5f9"
             shadow={false}
           />
         );
       })}
+    </group>
+  );
+}
+
+/**
+ * Réseau extérieur de cheminements piétons industriels balisés (vert/jaune + chevrons + barrières)
+ * reliant les portes latérales et principales des 4 bâtiments ainsi que les passages piétons.
+ */
+function CampusPedestrianNetwork({ buildings = [] }) {
+  const y = 0.034;
+
+  return (
+    <group userData={{ noCollide: true }}>
+      {/* Boucle piétonne centrale autour du carrefour et des 4 passages piétons */}
+      {/* Axe Nord-Sud Est (X = +6.2) : de GP2 (Z = -8.0) à GP4 (Z = +13.4) */}
+      <WalkwayStrip from={[6.2, -8.0]} to={[6.2, -2.6]} y={y} />
+      <WalkwayStrip from={[6.2, 2.6]} to={[6.2, 13.4]} y={y} />
+      <WalkwayNode position={[6.2, -5.4]} y={y} />
+      <WalkwayNode position={[6.2, 5.4]} y={y} />
+      <WalkwayNode position={[6.2, -8.0]} y={y} />
+      <WalkwayNode position={[6.2, 13.4]} y={y} />
+
+      {/* Axe Nord-Sud Ouest : section Sud (X = -6.2) de GP3 (Z = +13.4) au passage piéton Ouest */}
+      <WalkwayStrip from={[-6.2, 2.6]} to={[-6.2, 13.4]} y={y} />
+      <WalkwayStrip from={[-6.2, -3.25]} to={[-6.2, -2.6]} y={y} arrows={false} />
+      <WalkwayNode position={[-6.2, 5.4]} y={y} />
+      <WalkwayNode position={[-6.2, 13.4]} y={y} />
+      <WalkwayNode position={[-6.2, -3.25]} y={y} />
+
+      {/* Axe Nord-Sud Nord-Ouest (X = -4.25, le long du pignon Est de GP1) */}
+      <WalkwayStrip from={[-4.25, -11.6]} to={[-4.25, -3.25]} y={y} />
+      <WalkwayNode position={[-4.25, -11.6]} y={y} />
+      <WalkwayNode position={[-4.25, -5.4]} y={y} />
+      <WalkwayNode position={[-4.25, -3.25]} y={y} />
+
+      {/* Liaisons Est-Ouest Nord (Z = -3.25 vers Porte Sud GP1 et Z = -5.4 vers Porte Sud GP2) */}
+      <WalkwayStrip from={[-17.0, -3.25]} to={[-4.25, -3.25]} y={y} />
+      <WalkwayNode position={[-17.0, -3.25]} y={y} />
+      <WalkwayStrip from={[-4.25, -5.4]} to={[-3.0, -5.4]} y={y} arrows={false} />
+      <WalkwayStrip from={[3.0, -5.4]} to={[17.0, -5.4]} y={y} />
+      <WalkwayNode position={[17.0, -5.4]} y={y} />
+
+      {/* Liaison Est-Ouest Sud (Z = +5.4 de part et d'autre du passage piéton Sud) */}
+      <WalkwayStrip from={[-6.2, 5.4]} to={[-3.0, 5.4]} y={y} arrows={false} />
+      <WalkwayStrip from={[3.0, 5.4]} to={[6.2, 5.4]} y={y} arrows={false} />
+
+      {/* Raccordements directs aux portes latérales et principales de chaque bâtiment */}
+      {buildings.map((b) => {
+        const [bx, , bz] = b.layout3D.position;
+        const [w, , d] = b.layout3D.size;
+        const [ox] = b.layout3D.outward || [Math.sign(bx) || 1, Math.sign(bz) || 1];
+        const doorZ = getBuildingDoorZ(d);
+        const sideDoorX = bx - ox * (w / 2 + 0.1);
+        const sideWorldZ = bz + doorZ;
+        const corrX = ox > 0 ? 6.2 : bz < 0 ? -4.25 : -6.2;
+        const southDoorZ = bz + d / 2 + 0.1;
+
+        return (
+          <React.Fragment key={`campus-wk-${b.id}`}>
+            {/* Branchement de la Porte Latérale au couloir piéton Nord-Sud */}
+            <WalkwayStrip from={[sideDoorX, sideWorldZ]} to={[corrX, sideWorldZ]} y={y} />
+            <WalkwayNode position={[corrX, sideWorldZ]} y={y} />
+
+            {/* Branchement de la Porte Principale Sud */}
+            {bz < 0 ? (
+              <WalkwayStrip
+                from={[bx, southDoorZ]}
+                to={[bx, bx < 0 ? -3.25 : -5.4]}
+                y={y}
+                arrows={false}
+              />
+            ) : (
+              <>
+                <WalkwayStrip from={[bx, southDoorZ]} to={[bx, southDoorZ + 1.1]} y={y} arrows={false} />
+                <WalkwayNode position={[bx, southDoorZ + 1.1]} y={y} />
+              </>
+            )}
+          </React.Fragment>
+        );
+      })}
+
+      {/* Barrières / arceaux de sécurité protégeant les débouchés des passages piétons */}
+      <SafetyGuardrail position={[-5.1, 0, -2.95]} length={1.3} height={0.68} axis="x" />
+      <SafetyGuardrail position={[-5.1, 0, 2.95]} length={1.3} height={0.68} axis="x" />
+      <SafetyGuardrail position={[5.1, 0, -2.95]} length={1.3} height={0.68} axis="x" />
+      <SafetyGuardrail position={[5.1, 0, 2.95]} length={1.3} height={0.68} axis="x" />
+      <SafetySign kind="mandatory" position={[-7.2, 0, -3.1]} height={1.25} size={0.28} />
+      <SafetySign kind="mandatory" position={[7.2, 0, -3.1]} height={1.25} size={0.28} />
+      <SafetySign kind="mandatory" position={[-7.2, 0, 3.1]} height={1.25} size={0.28} />
+      <SafetySign kind="mandatory" position={[7.2, 0, 3.1]} height={1.25} size={0.28} />
     </group>
   );
 }
@@ -336,6 +448,9 @@ export default function CampusScenery({ buildings = [], companyName, companyLogo
       <Crosswalk position={[6.2, 0, 0]} across="z" width={ROAD_X_WIDTH - 0.6} />
       <Crosswalk position={[0, 0, -5.4]} across="x" width={ROAD_Z_WIDTH - 0.6} />
       <Crosswalk position={[0, 0, 5.4]} across="x" width={ROAD_Z_WIDTH - 0.6} />
+
+      {/* Réseau de cheminements piétons balisés entre les portes des bâtiments et les passages piétons */}
+      <CampusPedestrianNetwork buildings={buildings} />
 
       {/* Rond-point engazonné et mâts de drapeaux autour du totem central */}
       <Cylinder position={[0, 0.04, 0]} radius={4.4} height={0.05} segments={40} color="#334155" rough={0.8} shadow={false} />

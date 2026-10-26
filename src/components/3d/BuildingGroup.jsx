@@ -1,10 +1,115 @@
 import React, { useState } from 'react';
 import { Html, Edges } from '@react-three/drei';
 import WorkUnitZone from './WorkUnitZone';
-import BuildingShell, { SHELL_HEADER_HEIGHT } from './models/buildingShells';
-import { FloorZone } from './models/kit';
+import BuildingShell, { SHELL_HEADER_HEIGHT, getBuildingDoorZ } from './models/buildingShells';
+import { FloorZone, WalkwayStrip, WalkwayNode } from './models/kit';
 import MergeStatic from './models/MergeStatic';
 import { getTexture } from './models/textures';
+
+/**
+ * Réseau de couloirs piétons balisés (norme INRS : bande verte + bordures jaunes + chevrons)
+ * à l'intérieur d'un bâtiment, reliant la Porte Latérale, la Porte Principale Sud et chaque UT.
+ */
+function BuildingWalkways({ width, depth, outward = [1, 1], children = [] }) {
+  const [ox] = outward;
+  const y = 0.172;
+  const doorZ = getBuildingDoorZ(depth);
+  const sideDoorEdgeX = -ox * (width / 2 + 0.15);
+  const southDoorEdgeZ = depth / 2 + 0.15;
+
+  const utXs = children.map((u) => u.layout3D.localPosition[0]);
+  const minUtX = utXs.length ? Math.min(...utXs, 0) : -3.1;
+  const maxUtX = utXs.length ? Math.max(...utXs, 0) : 3.1;
+  const corridorMinX = ox > 0 ? sideDoorEdgeX : minUtX;
+  const corridorMaxX = ox < 0 ? sideDoorEdgeX : maxUtX;
+
+  // Bâtiment à 1 rangée d'UT (ex. GP2 Atelier Production, depth = 11.4)
+  if (depth < 14) {
+    return (
+      <group>
+        {/* Couloir transversal principal depuis la porte latérale */}
+        <WalkwayStrip from={[corridorMinX, doorZ]} to={[corridorMaxX, doorZ]} y={y} />
+        {/* Seuil zébré de la porte latérale */}
+        <WalkwayStrip
+          from={[-ox * (width / 2 - 0.55), doorZ]}
+          to={[-ox * (width / 2 + 0.45), doorZ]}
+          y={y + 0.002}
+          zebra
+        />
+        {/* Allée centrale Nord-Sud depuis la porte principale Sud */}
+        <WalkwayStrip from={[0, southDoorEdgeZ]} to={[0, 0.4]} y={y} />
+        {/* Seuil zébré de la porte principale Sud */}
+        <WalkwayStrip from={[0, depth / 2 - 0.55]} to={[0, depth / 2 + 0.45]} y={y + 0.002} zebra />
+        <WalkwayNode position={[0, doorZ]} y={y} />
+
+        {/* Embranchements vers l'entrée de chaque Unité de Travail */}
+        {children.map((ut) => {
+          const [ux, , uz] = ut.layout3D.localPosition;
+          return (
+            <React.Fragment key={`wk-${ut.id}`}>
+              <WalkwayNode position={[ux, doorZ]} y={y} />
+              <WalkwayStrip from={[ux, doorZ]} to={[ux, uz + 2.35]} y={y} arrows={false} />
+            </React.Fragment>
+          );
+        })}
+      </group>
+    );
+  }
+
+  // Bâtiment à 2 rangées d'UT (ex. GP1 Bureaux, GP3 Peinture, GP4 Logistique, depth = 16.8)
+  const frontZ = depth / 2 - 1.6; // +6.8
+  const isThreeCols = children.length > 4;
+  const aisleXs = isThreeCols ? [-3.1, 3.1] : [0];
+
+  return (
+    <group>
+      {/* Couloir transversal central (z = +0.4) relié à la porte piétonne latérale */}
+      <WalkwayStrip from={[corridorMinX, doorZ]} to={[corridorMaxX, doorZ]} y={y} />
+      {/* Seuil zébré de la porte latérale */}
+      <WalkwayStrip
+        from={[-ox * (width / 2 - 0.55), doorZ]}
+        to={[-ox * (width / 2 + 0.45), doorZ]}
+        y={y + 0.002}
+        zebra
+      />
+
+      {/* Couloir transversal avant Sud (z = +6.8) */}
+      <WalkwayStrip from={[minUtX, frontZ]} to={[maxUtX, frontZ]} y={y} />
+
+      {/* Allées Nord-Sud reliant le couloir central et le couloir avant */}
+      {aisleXs.map((ax) => (
+        <React.Fragment key={`aisle-ns-${ax}`}>
+          <WalkwayStrip
+            from={[ax, isThreeCols ? doorZ : -2.3]}
+            to={[ax, frontZ]}
+            y={y}
+          />
+          <WalkwayNode position={[ax, doorZ]} y={y} />
+          <WalkwayNode position={[ax, frontZ]} y={y} />
+        </React.Fragment>
+      ))}
+
+      {/* Entrée principale Sud (x = 0, de la façade Sud jusqu'au couloir avant) */}
+      <WalkwayStrip from={[0, southDoorEdgeZ]} to={[0, frontZ]} y={y} />
+      <WalkwayStrip from={[0, depth / 2 - 0.55]} to={[0, depth / 2 + 0.45]} y={y + 0.002} zebra />
+      <WalkwayNode position={[0, frontZ]} y={y} />
+
+      {/* Embranchements vers chaque poste de travail */}
+      {children.map((ut) => {
+        const [ux, , uz] = ut.layout3D.localPosition;
+        if (uz > 0) {
+          return (
+            <React.Fragment key={`wk-${ut.id}`}>
+              <WalkwayNode position={[ux, frontZ]} y={y} />
+              <WalkwayStrip from={[ux, frontZ]} to={[ux, uz + 2.35]} y={y} arrows={false} />
+            </React.Fragment>
+          );
+        }
+        return <WalkwayNode key={`wk-${ut.id}`} position={[ux, doorZ]} y={y} />;
+      })}
+    </group>
+  );
+}
 
 /**
  * Représentation 3D d'un Groupement DigiRisk (Bâtiment / Site).
@@ -86,19 +191,27 @@ export default function BuildingGroup({
         />
       </mesh>
 
-      {/* Enveloppe architecturale du bâtiment */}
+      {/* Enveloppe architecturale du bâtiment & cheminements piétons internes balisés */}
       {visualMode === 'whitebox' ? (
-        /* Mode Étape 2 : Boîte blanche englobante en fil de fer */
-        <mesh position={[0, height / 2 + 0.1, 0]} userData={{ noCollide: true }}>
-          <boxGeometry args={[width, height, depth]} />
-          <meshStandardMaterial
-            color="#ffffff"
-            transparent
-            opacity={0.12}
-            depthWrite={false}
+        /* Mode Étape 2 : Boîte blanche englobante en fil de fer + couloirs piétons */
+        <group>
+          <mesh position={[0, height / 2 + 0.1, 0]} userData={{ noCollide: true }}>
+            <boxGeometry args={[width, height, depth]} />
+            <meshStandardMaterial
+              color="#ffffff"
+              transparent
+              opacity={0.12}
+              depthWrite={false}
+            />
+            <Edges scale={1} color={themeColor} />
+          </mesh>
+          <BuildingWalkways
+            width={width}
+            depth={depth}
+            outward={building.layout3D.outward}
+            children={building.children}
           />
-          <Edges scale={1} color={themeColor} />
-        </mesh>
+        </group>
       ) : (
         /* Mode Étape 3 : enveloppe métier (bureaux, usine, atelier peinture, entrepôt) */
         <MergeStatic deps={[archetype, building.layout3D.finish, width, height, depth, themeColor, showRoof, building.children.length]}>
@@ -113,7 +226,14 @@ export default function BuildingGroup({
             showRoof={showRoof}
             highlight={hoveredBuilding || isBuildingSelected}
           />
-          {/* Marquage au sol des allées de circulation autour des postes (bâtiments industriels) */}
+          {/* Couloirs piétons industriels balisés (vert/jaune + chevrons + seuils de portes) */}
+          <BuildingWalkways
+            width={width}
+            depth={depth}
+            outward={building.layout3D.outward}
+            children={building.children}
+          />
+          {/* Marquage au sol des zones de sécurité autour des postes (bâtiments industriels) */}
           {archetype !== 'office' &&
             building.children.map((ut) => (
               <FloorZone

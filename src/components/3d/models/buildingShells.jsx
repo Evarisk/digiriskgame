@@ -14,6 +14,7 @@ import {
   Tree,
   PalletRack,
   SafetySign,
+  SafetyGuardrail,
   Wheel,
   seeded,
   noRaycast,
@@ -43,6 +44,14 @@ export const SHELL_HEADER_HEIGHT = {
   logistics: 6.4,
 };
 
+/**
+ * Coordonnée Z locale de la porte piétonne latérale (côté allée centrale du campus) :
+ * alignée sur l'allée transversale principale du bâtiment.
+ */
+export function getBuildingDoorZ(depth) {
+  return depth < 14 ? depth / 2 - 1.7 : 0.4;
+}
+
 export default function BuildingShell({ archetype, ...props }) {
   if (archetype === 'office') return <OfficeShell {...props} />;
   if (archetype === 'paint') return <PaintShell {...props} />;
@@ -57,16 +66,37 @@ export default function BuildingShell({ archetype, ...props }) {
 /**
  * Poteaux périphériques + poutres de rive latérales. La façade avant reste sans poutre
  * haute : elle passerait devant les UT quand la caméra cible un poste du premier rang.
+ * Le poteau éventuel tombant dans l'ouverture de la porte latérale (`sideDoorZ`) est omis.
  */
-function StructuralFrame({ width, depth, height, step = 4.2, color = FRAME }) {
+function StructuralFrame({
+  width,
+  depth,
+  height,
+  step = 4.2,
+  color = FRAME,
+  sideDoorSide = 0,
+  sideDoorZ = null,
+}) {
   const nz = Math.max(1, Math.round((depth - 0.5) / step));
   const zs = Array.from({ length: nz + 1 }, (_, i) => -depth / 2 + 0.25 + (i * (depth - 0.5)) / nz);
   return (
     <group>
       {zs.map((z) =>
-        [-1, 1].map((sx) => (
-          <Box key={`${z}${sx}`} position={[sx * (width / 2 - 0.25), Y0 + height / 2, z]} size={[0.3, height, 0.3]} color={color} metal={0.5} rough={0.4} />
-        ))
+        [-1, 1].map((sx) => {
+          if (sx === sideDoorSide && sideDoorZ !== null && Math.abs(z - sideDoorZ) < 1.15) {
+            return null;
+          }
+          return (
+            <Box
+              key={`${z}${sx}`}
+              position={[sx * (width / 2 - 0.25), Y0 + height / 2, z]}
+              size={[0.3, height, 0.3]}
+              color={color}
+              metal={0.5}
+              rough={0.4}
+            />
+          );
+        })
       )}
       {[-1, 1].map((sx) => (
         <Box key={`r${sx}`} position={[sx * (width / 2 - 0.25), Y0 + height - 0.18, 0]} size={[0.26, 0.36, depth - 0.5]} color={color} metal={0.5} rough={0.4} />
@@ -84,6 +114,106 @@ function StructuralFrame({ width, depth, height, step = 4.2, color = FRAME }) {
       {[-1, 1].map((sx) => (
         <Cylinder key={`d${sx}`} position={[sx * (width / 2 + 0.06), Y0 + height / 2, -depth / 2 + 0.12]} radius={0.06} height={height} segments={8} color="#6b7280" metal={0.5} />
       ))}
+    </group>
+  );
+}
+
+/**
+ * Portique de porte piétonne industrielle (ouverture réelle dans le mur, vantail ouvert à 80°,
+ * hublot vitré, barre anti-panique, linteau zébré, bloc BAES lumineux « SORTIE », potelets
+ * et panneau d'obligation piéton).
+ */
+function IndustrialDoorway({
+  position = [0, 0, 0],
+  rotation = [0, 0, 0],
+  width = 2.0,
+  height = 2.35,
+  themeColor = '#f59e0b',
+  doubleLeaf = false,
+  withGuardrails = false,
+  guardrailSpan = 3.0,
+}) {
+  const halfW = width / 2;
+  const leafW = doubleLeaf ? (width - 0.26) / 2 : Math.min(0.95, width - 0.3);
+
+  return (
+    <group position={position} rotation={rotation}>
+      {/* Montants et linteau métalliques du portique */}
+      {[-1, 1].map((sx) => (
+        <Box
+          key={`post-${sx}`}
+          position={[sx * (halfW - 0.07), height / 2, 0]}
+          size={[0.14, height, 0.22]}
+          color="#1e293b"
+          metal={0.6}
+          rough={0.35}
+        />
+      ))}
+      <Box position={[0, height - 0.09, 0]} size={[width + 0.06, 0.18, 0.26]} color="#1e293b" metal={0.6} rough={0.35} />
+      <Box position={[0, height + 0.04, 0]} size={[width + 0.08, 0.08, 0.28]} color={themeColor} glow={0.35} shadow={false} />
+      <HazardBar position={[0, height + 0.13, 0]} length={width + 0.08} segments={8} height={0.09} thickness={0.24} />
+
+      {/* Bloc autonome d'éclairage de sécurité (BAES vert « SORTIE / PIÉTONS ») double face */}
+      {[-1, 1].map((sz) => (
+        <group key={`baes-${sz}`} position={[0, height - 0.26, sz * 0.14]}>
+          <Box size={[0.52, 0.18, 0.04]} color="#16a34a" glow={1.5} shadow={false} />
+          <Box position={[-0.1, 0, sz * 0.024]} size={[0.1, 0.11, 0.005]} color="#f8fafc" glow={0.9} shadow={false} />
+          <Box position={[0.1, 0, sz * 0.024]} size={[0.16, 0.035, 0.005]} color="#f8fafc" glow={0.9} shadow={false} />
+        </group>
+      ))}
+
+      {/* Vantail / Vantaux de porte ouverts vers l'intérieur (sans collision pour laisser le passage libre) */}
+      {(doubleLeaf ? [-1, 1] : [-1]).map((sx) => (
+        <group
+          key={`leaf-${sx}`}
+          position={[sx * (halfW - 0.12), 0, -0.05]}
+          rotation={[0, sx * 1.38, 0]}
+          userData={{ noCollide: true }}
+        >
+          <Box
+            position={[-sx * (leafW / 2), (height - 0.22) / 2, 0]}
+            size={[leafW, height - 0.22, 0.045]}
+            color="#475569"
+            metal={0.55}
+            rough={0.38}
+          />
+          {/* Hublot vitré vertical */}
+          <Box
+            position={[-sx * (leafW * 0.55), height * 0.58, 0]}
+            size={[0.22, 0.62, 0.055]}
+            color="#bae6fd"
+            opacity={0.5}
+            metal={0.8}
+            rough={0.1}
+            shadow={false}
+          />
+          {/* Barre anti-panique */}
+          <Box
+            position={[-sx * (leafW * 0.5), 0.98, 0.035]}
+            size={[leafW * 0.72, 0.04, 0.04]}
+            color="#ef4444"
+            metal={0.6}
+            shadow={false}
+          />
+        </group>
+      ))}
+
+      {/* Potelets de protection et panneau d'obligation piétons de part et d'autre du seuil */}
+      <Bollard position={[-(halfW + 0.24), 0, 0.36]} height={0.72} />
+      <Bollard position={[halfW + 0.24, 0, 0.36]} height={0.72} />
+      <SafetySign kind="mandatory" position={[halfW + 0.26, 0, -0.25]} height={1.25} size={0.26} />
+
+      {/* Garde-corps latéraux en façade avant pour canaliser le flux vers la porte */}
+      {withGuardrails &&
+        [-1, 1].map((sx) => (
+          <SafetyGuardrail
+            key={`gr-${sx}`}
+            position={[sx * (halfW + 0.35 + guardrailSpan / 2), 0, 0]}
+            length={guardrailSpan}
+            height={0.78}
+            axis="x"
+          />
+        ))}
     </group>
   );
 }
@@ -131,16 +261,52 @@ function SignBand({ width, y, z, themeColor, highlight }) {
   );
 }
 
-/** Mur bas en bardage ondulé sur un côté (x = side * width/2). */
-function LowSideWall({ side, width, depth, height = 1.3, color = '#64748b' }) {
+/**
+ * Mur bas en bardage ondulé sur un côté (x = side * width/2).
+ * Si `doorZ` est fourni, découpe une ouverture franche pour la porte piétonne.
+ */
+function LowSideWall({ side, width, depth, height = 1.3, color = '#64748b', doorZ = null, doorWidth = 2.0 }) {
+  const zMin = -depth / 2 + 0.15;
+  const zMax = depth / 2 - 0.15;
+
+  if (doorZ === null) {
+    return (
+      <Corrugated
+        position={[side * (width / 2 - 0.08), Y0 + height / 2, 0]}
+        rotation={[0, (side * Math.PI) / 2, 0]}
+        size={[depth - 0.3, height, 0.06]}
+        waves={Math.round(depth * 3)}
+        color={color}
+      />
+    );
+  }
+
+  const seg1End = doorZ - doorWidth / 2;
+  const seg2Start = doorZ + doorWidth / 2;
+  const len1 = Math.max(0, seg1End - zMin);
+  const len2 = Math.max(0, zMax - seg2Start);
+
   return (
-    <Corrugated
-      position={[side * (width / 2 - 0.08), Y0 + height / 2, 0]}
-      rotation={[0, (side * Math.PI) / 2, 0]}
-      size={[depth - 0.3, height, 0.06]}
-      waves={Math.round(depth * 3)}
-      color={color}
-    />
+    <group>
+      {len1 > 0.2 && (
+        <Corrugated
+          position={[side * (width / 2 - 0.08), Y0 + height / 2, (zMin + seg1End) / 2]}
+          rotation={[0, (side * Math.PI) / 2, 0]}
+          size={[len1, height, 0.06]}
+          waves={Math.max(4, Math.round(len1 * 3))}
+          color={color}
+        />
+      )}
+      {len2 > 0.2 && (
+        <Corrugated
+          position={[side * (width / 2 - 0.08), Y0 + height / 2, (seg2Start + zMax) / 2]}
+          rotation={[0, (side * Math.PI) / 2, 0]}
+          size={[len2, height, 0.06]}
+          waves={Math.max(4, Math.round(len2 * 3))}
+          color={color}
+        />
+      )}
+    </group>
   );
 }
 
@@ -244,18 +410,18 @@ function OfficeTower({ width, depth, themeColor, highlight, finish }) {
       {/* Volume vitré principal */}
       <Box position={[0, Y0 + towerH / 2, 0]} size={[towerW, towerH, towerD]} {...glass} receive />
       {/* Nez de dalle blancs ceinturant chaque niveau (corniche plus épaisse en tête) */}
-      {Array.from({ length: floors + 1 }, (_, f) => (
+      {Array.from({ length: floors + 1 }, (_, fIdx) => (
         <Box
-          key={`s${f}`}
-          position={[0, Y0 + f * floorH + (f === floors ? 0.05 : 0), 0]}
-          size={[towerW + 0.14, f === floors ? 0.42 : 0.24, towerD + 0.14]}
+          key={`s${fIdx}`}
+          position={[0, Y0 + fIdx * floorH + (fIdx === floors ? 0.05 : 0), 0]}
+          size={[towerW + 0.14, fIdx === floors ? 0.42 : 0.24, towerD + 0.14]}
           color={slab}
           rough={0.45}
         />
       ))}
       {/* Lignes d'éclairage des plafonds, visibles à travers le vitrage */}
-      {Array.from({ length: floors }, (_, f) => (
-        <Box key={`l${f}`} position={[0, Y0 + (f + 1) * floorH - 0.32, front + 0.006]} size={[towerW - 0.3, 0.035, 0.01]} color="#e0f2fe" glow={0.9} shadow={false} />
+      {Array.from({ length: floors }, (_, fIdx) => (
+        <Box key={`l${fIdx}`} position={[0, Y0 + (fIdx + 1) * floorH - 0.32, front + 0.006]} size={[towerW - 0.3, 0.035, 0.01]} color="#e0f2fe" glow={0.9} shadow={false} />
       ))}
       {/* Meneaux de la façade rideau et des pignons */}
       {mullions.map((x) => (
@@ -299,6 +465,8 @@ function OfficeTower({ width, depth, themeColor, highlight, finish }) {
 function OfficeShell({ width, height, depth, themeColor, outward = [1, 1], showRoof, highlight, finish }) {
   const facadeZ = -depth / 2 + 3.5;
   const [ox] = outward;
+  const doorZ = getBuildingDoorZ(depth);
+  const doorWidth = 2.0;
 
   const parkingX = ox * (width / 2 + 3.4);
   const carSlots = Math.max(3, Math.floor((depth - 1) / 1.75));
@@ -310,22 +478,76 @@ function OfficeShell({ width, height, depth, themeColor, outward = [1, 1], showR
       <OfficeTower width={width} depth={depth} themeColor={themeColor} highlight={highlight} finish={finish} />
 
       {/* Plateau ouvert : poteaux blancs, rives et parois vitrées latérales */}
-      <StructuralFrame width={width} depth={depth} height={height} color="#e2e8f0" />
-      {[-1, 1].map((sx) => (
-        <group key={sx}>
-          <Box position={[sx * (width / 2 - 0.12), Y0 + height / 2, (facadeZ + depth / 2) / 2]} size={[0.04, height - 0.4, depth / 2 - facadeZ - 0.3]} color="#bae6fd" opacity={0.12} metal={0.6} rough={0.1} shadow={false} />
-          <Box position={[sx * (width / 2 - 0.12), Y0 + 1.0, (facadeZ + depth / 2) / 2]} size={[0.06, 0.06, depth / 2 - facadeZ - 0.3]} color="#e2e8f0" shadow={false} />
-        </group>
-      ))}
-      {/* Entrée : auvent, portes vitrées, jardinières (peu profonds : la voie Est-Ouest longe la façade) */}
+      <StructuralFrame
+        width={width}
+        depth={depth}
+        height={height}
+        color="#e2e8f0"
+        sideDoorSide={-ox}
+        sideDoorZ={doorZ}
+      />
+      {[-1, 1].map((sx) => {
+        const zStart = facadeZ + 0.15;
+        const zEnd = depth / 2 - 0.15;
+        if (sx === -ox) {
+          // Découpe de la paroi vitrée côté voirie centrale pour la porte piétonne latérale
+          const seg1End = doorZ - doorWidth / 2;
+          const seg2Start = doorZ + doorWidth / 2;
+          const len1 = Math.max(0, seg1End - zStart);
+          const len2 = Math.max(0, zEnd - seg2Start);
+          return (
+            <group key={sx}>
+              {len1 > 0.2 && (
+                <>
+                  <Box position={[sx * (width / 2 - 0.12), Y0 + height / 2, (zStart + seg1End) / 2]} size={[0.04, height - 0.4, len1]} color="#bae6fd" opacity={0.12} metal={0.6} rough={0.1} shadow={false} />
+                  <Box position={[sx * (width / 2 - 0.12), Y0 + 1.0, (zStart + seg1End) / 2]} size={[0.06, 0.06, len1]} color="#e2e8f0" shadow={false} />
+                </>
+              )}
+              {len2 > 0.2 && (
+                <>
+                  <Box position={[sx * (width / 2 - 0.12), Y0 + height / 2, (seg2Start + zEnd) / 2]} size={[0.04, height - 0.4, len2]} color="#bae6fd" opacity={0.12} metal={0.6} rough={0.1} shadow={false} />
+                  <Box position={[sx * (width / 2 - 0.12), Y0 + 1.0, (seg2Start + zEnd) / 2]} size={[0.06, 0.06, len2]} color="#e2e8f0" shadow={false} />
+                </>
+              )}
+            </group>
+          );
+        }
+        return (
+          <group key={sx}>
+            <Box position={[sx * (width / 2 - 0.12), Y0 + height / 2, (facadeZ + depth / 2) / 2]} size={[0.04, height - 0.4, depth / 2 - facadeZ - 0.3]} color="#bae6fd" opacity={0.12} metal={0.6} rough={0.1} shadow={false} />
+            <Box position={[sx * (width / 2 - 0.12), Y0 + 1.0, (facadeZ + depth / 2) / 2]} size={[0.06, 0.06, depth / 2 - facadeZ - 0.3]} color="#e2e8f0" shadow={false} />
+          </group>
+        );
+      })}
+
+      {/* Porte piétonne latérale côté allée centrale */}
+      <IndustrialDoorway
+        position={[-ox * (width / 2 - 0.12), Y0, doorZ]}
+        rotation={[0, (-ox * Math.PI) / 2, 0]}
+        width={doorWidth}
+        themeColor={themeColor}
+      />
+
+      {/* Entrée principale Sud : auvent, portes vitrées coulissantes ouvertes, bloc BAES et jardinières */}
       <group position={[0, 0, depth / 2]}>
         <Box position={[0, Y0 + 2.4, 0.3]} size={[4.2, 0.14, 1.0]} color="#e2e8f0" rough={0.5} />
         <Box position={[0, Y0 + 2.48, 0.3]} size={[4.0, 0.02, 0.85]} color={themeColor} glow={0.35} shadow={false} />
         {[-1.9, 1.9].map((x) => (
           <Box key={x} position={[x, Y0 + 1.2, 0.7]} size={[0.1, 2.4, 0.1]} color="#e2e8f0" metal={0.5} />
         ))}
-        <Box position={[0, Y0 + 1.05, -0.25]} size={[2.2, 2.1, 0.05]} color="#bae6fd" opacity={0.3} metal={0.6} rough={0.1} shadow={false} />
-        <Box position={[0, Y0 + 1.05, -0.24]} size={[0.06, 2.1, 0.07]} color="#e2e8f0" shadow={false} />
+        {/* Dormant de la porte automatique et vantaux vitrés coulissés (ouverture centrale libre de 1,8 u) */}
+        {[-0.95, 0.95].map((x) => (
+          <Box key={`frame-${x}`} position={[x, Y0 + 1.1, -0.22]} size={[0.1, 2.2, 0.14]} color="#334155" metal={0.6} />
+        ))}
+        <Box position={[0, Y0 + 2.22, -0.22]} size={[3.4, 0.16, 0.18]} color="#334155" metal={0.6} />
+        {/* Bloc lumineux BAES « SORTIE / ACCUEIL » au-dessus des portes coulissantes */}
+        <Box position={[0, Y0 + 2.08, -0.11]} size={[0.52, 0.16, 0.04]} color="#16a34a" glow={1.5} shadow={false} />
+        {[-1.35, 1.35].map((x) => (
+          <group key={`glass-leaf-${x}`} position={[x, Y0 + 1.05, -0.25]} userData={{ noCollide: true }}>
+            <Box size={[0.85, 2.1, 0.04]} color="#bae6fd" opacity={0.38} metal={0.6} rough={0.1} shadow={false} />
+            <Box position={[0, 0, 0]} size={[0.87, 0.06, 0.05]} color="#e2e8f0" shadow={false} />
+          </group>
+        ))}
         {[-2.8, 2.8].map((x) => (
           <group key={x} position={[x, Y0, 0.42]}>
             <Box position={[0, 0.25, 0]} size={[1.2, 0.5, 0.5]} color="#9ca3af" rough={0.8} />
@@ -412,6 +634,8 @@ function FactoryShell({ width, height, depth, themeColor, outward = [1, 1], show
   const toothW = width / teeth;
   const toothH = 1.4;
   const [ox] = outward;
+  const doorZ = getBuildingDoorZ(depth);
+  const doorWidth = 2.0;
 
   const wallProfile = useMemo(() => {
     const pts = [[-width / 2, 0], [width / 2, 0], [width / 2, height]];
@@ -448,7 +672,14 @@ function FactoryShell({ width, height, depth, themeColor, outward = [1, 1], show
       <WallFixtures width={width} depth={depth} side={-ox} />
 
       {/* Charpente : poteaux et rives ; toiture en sheds uniquement si le toit est affiché */}
-      <StructuralFrame width={width} depth={depth} height={height} color="#475569" />
+      <StructuralFrame
+        width={width}
+        depth={depth}
+        height={height}
+        color="#475569"
+        sideDoorSide={-ox}
+        sideDoorZ={doorZ}
+      />
       {showRoof &&
         toothXs.map((x0) => {
           const len = Math.hypot(toothW, toothH);
@@ -460,8 +691,25 @@ function FactoryShell({ width, height, depth, themeColor, outward = [1, 1], show
             </group>
           );
         })}
-      <LowSideWall side={-1} width={width} depth={depth} height={1.4} color={f.lowWall} />
-      <LowSideWall side={1} width={width} depth={depth} height={1.4} color={f.lowWall} />
+      <LowSideWall side={-ox} width={width} depth={depth} height={1.4} color={f.lowWall} doorZ={doorZ} doorWidth={doorWidth} />
+      <LowSideWall side={ox} width={width} depth={depth} height={1.4} color={f.lowWall} />
+
+      {/* Porte piétonne latérale (côté allée centrale) & Porte piétonne principale Sud */}
+      <IndustrialDoorway
+        position={[-ox * (width / 2 - 0.08), Y0, doorZ]}
+        rotation={[0, (-ox * Math.PI) / 2, 0]}
+        width={doorWidth}
+        themeColor={themeColor}
+      />
+      <IndustrialDoorway
+        position={[0, Y0, depth / 2 - 0.12]}
+        width={2.1}
+        themeColor={themeColor}
+        doubleLeaf
+        withGuardrails
+        guardrailSpan={3.2}
+      />
+
       <OverheadCrane width={width} depth={depth} height={height} />
 
       {/* Cheminée en brique et silo côté extérieur */}
@@ -495,6 +743,15 @@ function PaintShell({ width, height, depth, themeColor, outward = [1, 1], showRo
   const roofD = 2.4;
   const roofZ = -depth / 2 + roofD / 2 + 0.1;
   const stacks = Math.max(2, Math.round(width / 6));
+  const doorZ = getBuildingDoorZ(depth);
+  const doorWidth = 2.0;
+  const zMin = -depth / 2 + 0.2;
+  const zMax = depth / 2 - 0.2;
+  const seg1End = doorZ - doorWidth / 2;
+  const seg2Start = doorZ + doorWidth / 2;
+  const len1 = Math.max(0, seg1End - zMin);
+  const len2 = Math.max(0, zMax - seg2Start);
+
   return (
     <group>
       {/* Mur du fond en panneaux sandwich */}
@@ -521,14 +778,52 @@ function PaintShell({ width, height, depth, themeColor, outward = [1, 1], showRo
       })}
       <RoofFan position={[-width / 2 + 2.2, Y0 + height + 0.12, roofZ + 0.4]} />
       <RoofFan position={[width / 2 - 2.2, Y0 + height + 0.12, roofZ + 0.4]} speed={5} />
-      {/* Ossature, murets latéraux avec couvertine zébrée */}
-      <StructuralFrame width={width} depth={depth} height={height} color="#64748b" />
-      {[-1, 1].map((sx) => (
-        <group key={sx}>
-          <Box position={[sx * (width / 2 - 0.1), Y0 + 0.6, 0]} size={[0.2, 1.2, depth - 0.4]} color={f.muret} rough={0.5} />
-          <HazardBar position={[sx * (width / 2 - 0.1), Y0 + 1.25, 0]} axis="z" length={depth - 0.4} segments={Math.round(depth * 1.5)} thickness={0.22} height={0.1} />
-        </group>
-      ))}
+      {/* Ossature, murets latéraux avec couvertine zébrée (découpé côté porte latérale) */}
+      <StructuralFrame
+        width={width}
+        depth={depth}
+        height={height}
+        color="#64748b"
+        sideDoorSide={-ox}
+        sideDoorZ={doorZ}
+      />
+      {/* Côté extérieur plein */}
+      <group>
+        <Box position={[ox * (width / 2 - 0.1), Y0 + 0.6, 0]} size={[0.2, 1.2, depth - 0.4]} color={f.muret} rough={0.5} />
+        <HazardBar position={[ox * (width / 2 - 0.1), Y0 + 1.25, 0]} axis="z" length={depth - 0.4} segments={Math.round(depth * 1.5)} thickness={0.22} height={0.1} />
+      </group>
+      {/* Côté intérieur découpé autour de la porte piétonne */}
+      <group>
+        {len1 > 0.2 && (
+          <>
+            <Box position={[-ox * (width / 2 - 0.1), Y0 + 0.6, (zMin + seg1End) / 2]} size={[0.2, 1.2, len1]} color={f.muret} rough={0.5} />
+            <HazardBar position={[-ox * (width / 2 - 0.1), Y0 + 1.25, (zMin + seg1End) / 2]} axis="z" length={len1} segments={Math.max(4, Math.round(len1 * 1.5))} thickness={0.22} height={0.1} />
+          </>
+        )}
+        {len2 > 0.2 && (
+          <>
+            <Box position={[-ox * (width / 2 - 0.1), Y0 + 0.6, (seg2Start + zMax) / 2]} size={[0.2, 1.2, len2]} color={f.muret} rough={0.5} />
+            <HazardBar position={[-ox * (width / 2 - 0.1), Y0 + 1.25, (seg2Start + zMax) / 2]} axis="z" length={len2} segments={Math.max(4, Math.round(len2 * 1.5))} thickness={0.22} height={0.1} />
+          </>
+        )}
+      </group>
+
+      {/* Porte piétonne latérale (côté allée centrale) & Porte piétonne principale Sud */}
+      <IndustrialDoorway
+        position={[-ox * (width / 2 - 0.1), Y0, doorZ]}
+        rotation={[0, (-ox * Math.PI) / 2, 0]}
+        width={doorWidth}
+        themeColor={themeColor}
+      />
+      <IndustrialDoorway
+        position={[0, Y0, depth / 2 - 0.12]}
+        width={2.1}
+        themeColor={themeColor}
+        doubleLeaf
+        withGuardrails
+        guardrailSpan={3.2}
+      />
+
       {showRoof && <Box position={[0, Y0 + height + 0.1, 0]} size={[width + 0.3, 0.2, depth + 0.3]} color="#e5e7eb" opacity={0.5} shadow={false} />}
 
       {/* Cuves extérieures sur rétention + poteau incendie */}
@@ -625,6 +920,9 @@ function WarehouseShell({ width, height, depth, themeColor, outward = [1, 1], sh
   const docks = Math.max(2, Math.min(4, Math.floor((depth - 2) / 3)));
   const dockZs = Array.from({ length: docks }, (_, i) => -depth / 2 + 2.2 + (i * (depth - 4.4)) / Math.max(1, docks - 1));
   const truckDock = Math.floor(docks / 2);
+  const doorZ = getBuildingDoorZ(depth);
+  const doorWidth = 2.0;
+
   return (
     <group>
       {/* Mur du fond en bardage ondulé */}
@@ -644,8 +942,32 @@ function WarehouseShell({ width, height, depth, themeColor, outward = [1, 1], sh
         <Box position={[0, Y0 + 0.3, 0.6]} size={[depth - 0.3, 0.6, 1.2]} color="#9ca3af" rough={0.9} />
         <HazardBar position={[0, Y0 + 0.62, 1.2]} length={depth - 0.3} segments={Math.round(depth * 1.5)} height={0.04} thickness={0.08} />
       </group>
-      <LowSideWall side={-ox} width={width} depth={depth} height={1.2} color={cladding} />
-      <StructuralFrame width={width} depth={depth} height={height} color="#475569" />
+      <LowSideWall side={-ox} width={width} depth={depth} height={1.2} color={cladding} doorZ={doorZ} doorWidth={doorWidth} />
+      <StructuralFrame
+        width={width}
+        depth={depth}
+        height={height}
+        color="#475569"
+        sideDoorSide={-ox}
+        sideDoorZ={doorZ}
+      />
+
+      {/* Porte piétonne latérale (côté allée centrale) & Porte piétonne principale Sud */}
+      <IndustrialDoorway
+        position={[-ox * (width / 2 - 0.08), Y0, doorZ]}
+        rotation={[0, (-ox * Math.PI) / 2, 0]}
+        width={doorWidth}
+        themeColor={themeColor}
+      />
+      <IndustrialDoorway
+        position={[0, Y0, depth / 2 - 0.12]}
+        width={2.1}
+        themeColor={themeColor}
+        doubleLeaf
+        withGuardrails
+        guardrailSpan={3.2}
+      />
+
       {showRoof && (
         <Box position={[0, Y0 + height + 0.1, 0]} size={[width + 0.3, 0.2, depth + 0.3]} color="#94a3b8" opacity={0.5} shadow={false} />
       )}
