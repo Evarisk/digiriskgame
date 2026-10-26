@@ -94,7 +94,7 @@ export function PaintBooth({ accent }) {
         <Box position={[0, 1.8, 0.42]} size={[2.45, 0.05, 0.66]} color={PANEL} rough={0.4} />
         <Box position={[0, 1.65, 0.74]} size={[2.45, 0.3, 0.04]} color={PALETTE.safetyYellow} />
         {/* Nuage de poudre animé */}
-        <mesh position={[0, 0.9, -0.1]} scale={[1.7, 1.0, 0.9]} material={cloudMaterial} raycast={noRaycast}>
+        <mesh position={[0, 0.9, -0.1]} scale={[1.7, 1.0, 0.9]} material={cloudMaterial} raycast={noRaycast} userData={{ noCollide: true }}>
           <sphereGeometry args={[0.5, 16, 12]} />
         </mesh>
       </group>

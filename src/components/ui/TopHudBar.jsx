@@ -8,6 +8,8 @@ import {
   CheckCircle2,
   Database,
   FolderTree,
+  Footprints,
+  Settings,
 } from 'lucide-react';
 import { API_BASE_URL, API_HOST_LABEL } from '../../services/digiriskApi';
 
@@ -24,6 +26,11 @@ export default function TopHudBar({
   setApiKey,
   treeCollapsed,
   setTreeCollapsed,
+  explorerMode,
+  explorerSupported,
+  onToggleExplorer,
+  settingsOpen,
+  onToggleSettings,
 }) {
   const [showApiPopover, setShowApiPopover] = useState(false);
 
@@ -97,14 +104,36 @@ export default function TopHudBar({
           <span>Flux</span>
         </button>
 
+        {explorerSupported && (
+          <button
+            type="button"
+            className={`hud-btn icon-toggle ${explorerMode ? 'active' : ''}`}
+            onClick={onToggleExplorer}
+            title="Parcourir le site en première personne (ZQSD / WASD + souris)"
+          >
+            <Footprints size={14} />
+            <span>{explorerMode ? 'Quitter la visite' : 'Visite 1re pers.'}</span>
+          </button>
+        )}
+
         <button
           type="button"
           className="hud-btn icon-toggle"
           onClick={onResetCamera}
-          title="Recentrer la caméra sur l'ensemble du site"
+          title={explorerMode ? "Revenir à l'entrée du site" : "Recentrer la caméra sur l'ensemble du site"}
         >
           <Compass size={14} />
-          <span>Vue Campus</span>
+          <span>{explorerMode ? 'Entrée du site' : 'Vue Campus'}</span>
+        </button>
+
+        <button
+          type="button"
+          className={`hud-btn icon-toggle ${settingsOpen ? 'active' : ''}`}
+          onClick={onToggleSettings}
+          title="Paramètres : skins 3D des groupements et unités de travail"
+        >
+          <Settings size={14} />
+          <span>Paramètres</span>
         </button>
 
         {/* Configuration Clé API & Synchronisation */}

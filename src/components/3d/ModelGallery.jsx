@@ -4,6 +4,7 @@ import { OrbitControls, Html } from '@react-three/drei';
 import WorkstationProps from './WorkstationProps';
 import BuildingShell from './models/buildingShells';
 import { StudioEnvironment } from './DigitalTwinCanvas';
+import { BUILDING_SKINS } from '../../services/skins';
 
 /**
  * Galerie de revue des modèles 3D (outil de développement) : http://localhost:5173/?galerie
@@ -17,17 +18,16 @@ const FAMILIES = {
   logistique: ['courier', 'air_freight', 'sea_freight', 'warehouse_storage'],
 };
 
-const BUILDINGS = ['office', 'factory', 'paint', 'logistics'];
 const THEME = { office: '#3b82f6', factory: '#f59e0b', paint: '#8b5cf6', logistics: '#06b6d4' };
 
 export default function ModelGallery({ filter = '' }) {
   const showBuildings = filter === 'batiments';
   const all = Object.values(FAMILIES).flat();
   const archetypes = FAMILIES[filter] || (all.includes(filter) ? [filter] : all);
-  const cols = showBuildings ? 2 : Math.min(4, archetypes.length);
+  const cols = showBuildings ? 4 : Math.min(4, archetypes.length);
   const cellW = showBuildings ? 34 : 6;
   const cellD = showBuildings ? 30 : 5.5;
-  const items = showBuildings ? BUILDINGS : archetypes;
+  const items = showBuildings ? BUILDING_SKINS : archetypes;
   const rows = Math.ceil(items.length / cols);
   const span = Math.max(cols * cellW, rows * cellD);
 
@@ -48,13 +48,13 @@ export default function ModelGallery({ filter = '' }) {
           const x = ((i % cols) - (cols - 1) / 2) * cellW;
           const z = (Math.floor(i / cols) - (rows - 1) / 2) * cellD;
           return showBuildings ? (
-            <group key={item} position={[x, 0, z]}>
+            <group key={item.id} position={[x, 0, z]}>
               <mesh position={[0, 0.08, 0]} receiveShadow>
                 <boxGeometry args={[18, 0.16, 16.8]} />
                 <meshStandardMaterial color="#0f172a" />
               </mesh>
-              <BuildingShell archetype={item} width={18} height={4.8} depth={16.8} themeColor={THEME[item]} outward={[1, -1]} />
-              <GalleryLabel position={[0, 12, -8.4]} text={item} />
+              <BuildingShell archetype={item.archetype} finish={item.finish} width={18} height={4.8} depth={16.8} themeColor={THEME[item.archetype]} outward={[1, -1]} />
+              <GalleryLabel position={[0, 12, -8.4]} text={item.label} />
             </group>
           ) : (
             <group key={item} position={[x, 0.15, z]}>
