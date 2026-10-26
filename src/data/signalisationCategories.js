@@ -2,7 +2,7 @@ const PUBLIC_HOST =
   (typeof import.meta !== 'undefined' && import.meta.env?.VITE_DIGIRISK_PUBLIC_URL) ||
   'https://demodoli.digirisk.com/htdocs';
 
-const SIG_BASE_URL = `${PUBLIC_HOST}/custom/digiriskdolibarr/img/categorieSignalisations`;
+const SIG_BASE_URL = `${PUBLIC_HOST}/custom/digiriskdolibarr/img`;
 
 /**
  * Catalogue officiel des catégories de signalisations DigiRisk (signalisationCategories.json)
