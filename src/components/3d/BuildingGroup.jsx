@@ -168,6 +168,19 @@ export default function BuildingGroup({
                 ? ` (dont ${building.directRisks.length} globaux)`
                 : ''}
             </div>
+            {building.directRiskSigns?.length > 0 && (
+              <div className="building-signs-row">
+                {building.directRiskSigns.map((sign) => (
+                  <img
+                    key={sign.id || sign.ref}
+                    src={sign.iconUrl}
+                    alt={sign.categoryName}
+                    title={`[${sign.ref}] ${sign.categoryName} — ${sign.description}`}
+                    className="sign-mini-picto"
+                  />
+                ))}
+              </div>
+            )}
           </div>
           <span
             className="building-max-pill"
