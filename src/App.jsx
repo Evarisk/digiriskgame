@@ -1,5 +1,7 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { loadDigiRiskData } from './services/digiriskApi';
+import { applySkins, loadSkins, saveSkins } from './services/skins';
+import SkinSettings from './components/ui/SkinSettings';
 import DigitalTwinCanvas from './components/3d/DigitalTwinCanvas';
 import TopHudBar from './components/ui/TopHudBar';
 import HierarchyNavigator from './components/ui/HierarchyNavigator';
@@ -8,8 +10,24 @@ import ExplorerHud from './components/ui/ExplorerHud';
 import { explorerStore, useExplorer, EXPLORER_SUPPORTED } from './components/3d/explorer/explorerStore';
 
 export default function App() {
-  const [data, setData] = useState(null);
+  const [rawData, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Skins 3D choisis par élément (Paramètres), appliqués aux données positionnées
+  const [skins, setSkins] = useState(loadSkins);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const data = useMemo(() => applySkins(rawData, skins), [rawData, skins]);
+  useEffect(() => saveSkins(skins), [skins]);
+
+  const handleSkinChange = (elementId, skinId) => {
+    setSkins((prev) => {
+      const next = { ...prev };
+      if (skinId) next[elementId] = skinId;
+      else delete next[elementId];
+      return next;
+    });
+  };
+
   const [apiKey, setApiKey] = useState('');
 
   // Modes d'affichage 3D et métier
@@ -140,6 +158,8 @@ export default function App() {
         explorerMode={explorerMode}
         explorerSupported={EXPLORER_SUPPORTED}
         onToggleExplorer={handleToggleExplorer}
+        settingsOpen={settingsOpen}
+        onToggleSettings={() => setSettingsOpen((open) => !open)}
       />
 
       {/* Zone principale 3D + Panneaux latéraux positionnés sous le bandeau */}
@@ -169,6 +189,19 @@ export default function App() {
             inspectedIds={inspectedIds}
             hasSelection={Boolean(selectedElement)}
             onExit={handleToggleExplorer}
+          />
+        )}
+
+        {/* Paramètres : skins 3D des groupements et unités de travail */}
+        {settingsOpen && !playing && (
+          <SkinSettings
+            data={data}
+            skins={skins}
+            cotationMode={cotationMode}
+            onChange={handleSkinChange}
+            onReset={() => setSkins({})}
+            onFocus={handleSelectElement}
+            onClose={() => setSettingsOpen(false)}
           />
         )}
 

@@ -20,6 +20,7 @@ import {
   DYNAMIC,
 } from './kit';
 import { getTexture } from './textures';
+import { shellFinish } from '../../../services/skins';
 
 /**
  * Enveloppes architecturales des Groupements DigiRisk (vue « maison de poupée ») :
@@ -214,7 +215,7 @@ function SolarRow({ count, ...rest }) {
  * nez de dalle blancs, brise-soleil bois, noyau en pierre claire portant l'enseigne,
  * toiture végétalisée et panneaux solaires.
  */
-function OfficeTower({ width, depth, themeColor, highlight }) {
+function OfficeTower({ width, depth, themeColor, highlight, finish }) {
   const floors = 3;
   const floorH = 2.7;
   const towerH = floors * floorH;
@@ -225,9 +226,10 @@ function OfficeTower({ width, depth, themeColor, highlight }) {
   const coreX = -towerW / 2 + towerW * 0.62;
   const coreLeft = coreX - coreW / 2;
   const coreRight = coreX + coreW / 2;
-  const glass = { color: '#36648b', metal: 0.9, rough: 0.07 };
-  const slab = '#f1f5f9';
-  const wood = '#b07a4f';
+  const f = shellFinish('office', finish);
+  const glass = { color: f.glass, metal: 0.9, rough: 0.07 };
+  const slab = f.slab;
+  const wood = f.fins;
 
   const mullions = [];
   for (let x = -towerW / 2 + 1.2; x < towerW / 2 - 0.1; x += 1.2) {
@@ -270,7 +272,7 @@ function OfficeTower({ width, depth, themeColor, highlight }) {
       ))}
       {/* Noyau de circulation en pierre claire, plus haut, avec enseigne */}
       <group position={[coreX, 0, 0.35]}>
-        <Box position={[0, Y0 + (towerH + 1.4) / 2, 0]} size={[coreW, towerH + 1.4, towerD + 0.7]} map={getTexture('concrete', coreW / 2.5, (towerH + 1.4) / 2.5)} color="#f5f0e8" rough={0.75} />
+        <Box position={[0, Y0 + (towerH + 1.4) / 2, 0]} size={[coreW, towerH + 1.4, towerD + 0.7]} map={getTexture('concrete', coreW / 2.5, (towerH + 1.4) / 2.5)} color={f.core} rough={0.75} />
         <Box position={[-0.7, Y0 + towerH / 2, towerD / 2 + 0.36]} size={[0.45, towerH - 0.8, 0.02]} {...glass} />
         <Box position={[0.75, Y0 + 1.1, towerD / 2 + 0.36]} size={[1.0, 2.0, 0.02]} {...glass} />
         <SignBand width={coreW - 0.5} y={Y0 + towerH + 0.75} z={towerD / 2 + 0.42} themeColor={themeColor} highlight={highlight} />
@@ -294,7 +296,7 @@ function OfficeTower({ width, depth, themeColor, highlight }) {
   );
 }
 
-function OfficeShell({ width, height, depth, themeColor, outward = [1, 1], showRoof, highlight }) {
+function OfficeShell({ width, height, depth, themeColor, outward = [1, 1], showRoof, highlight, finish }) {
   const facadeZ = -depth / 2 + 3.5;
   const [ox] = outward;
 
@@ -305,7 +307,7 @@ function OfficeShell({ width, height, depth, themeColor, outward = [1, 1], showR
   return (
     <group>
       {/* Immeuble de bureaux (R+2) au fond du plateau */}
-      <OfficeTower width={width} depth={depth} themeColor={themeColor} highlight={highlight} />
+      <OfficeTower width={width} depth={depth} themeColor={themeColor} highlight={highlight} finish={finish} />
 
       {/* Plateau ouvert : poteaux blancs, rives et parois vitrées latérales */}
       <StructuralFrame width={width} depth={depth} height={height} color="#e2e8f0" />
@@ -403,7 +405,9 @@ function OverheadCrane({ width, depth, height }) {
   );
 }
 
-function FactoryShell({ width, height, depth, themeColor, outward = [1, 1], showRoof, highlight }) {
+function FactoryShell({ width, height, depth, themeColor, outward = [1, 1], showRoof, highlight, finish }) {
+  const f = shellFinish('factory', finish);
+  const wallMat = { map: getTexture(f.wall.map, 0.75, 0.75), color: f.wall.color };
   const teeth = Math.max(3, Math.round(width / 3.4));
   const toothW = width / teeth;
   const toothH = 1.4;
@@ -423,7 +427,7 @@ function FactoryShell({ width, height, depth, themeColor, outward = [1, 1], show
   return (
     <group>
       {/* Mur pignon du fond en brique, profil en sheds */}
-      <Profile points={wallProfile} depth={0.3} position={[0, Y0, -depth / 2 + 0.15]} map={getTexture('brick', 0.75, 0.75)} rough={0.9} />
+      <Profile points={wallProfile} depth={0.3} position={[0, Y0, -depth / 2 + 0.15]} {...wallMat} rough={0.9} />
       {/* Verrières des sheds (faces verticales) */}
       {toothXs.map((x0) => (
         <Box key={`v${x0}`} position={[x0 + 0.08, Y0 + height + toothH / 2, -depth / 2 + 0.33]} size={[0.06, toothH - 0.15, 0.04]} color="#93c5fd" glow={0.25} metal={0.6} rough={0.2} shadow={false} />
@@ -456,13 +460,13 @@ function FactoryShell({ width, height, depth, themeColor, outward = [1, 1], show
             </group>
           );
         })}
-      <LowSideWall side={-1} width={width} depth={depth} height={1.4} color="#7c2d12" />
-      <LowSideWall side={1} width={width} depth={depth} height={1.4} color="#7c2d12" />
+      <LowSideWall side={-1} width={width} depth={depth} height={1.4} color={f.lowWall} />
+      <LowSideWall side={1} width={width} depth={depth} height={1.4} color={f.lowWall} />
       <OverheadCrane width={width} depth={depth} height={height} />
 
       {/* Cheminée en brique et silo côté extérieur */}
       <group position={[ox * (width / 2 + 1.0), 0, -depth / 2 + 1.3]}>
-        <Cylinder position={[0, 5.5, 0]} radius={0.6} height={11} top={0.7} segments={20} map={getTexture('brick', 3, 9)} rough={0.9} />
+        <Cylinder position={[0, 5.5, 0]} radius={0.6} height={11} top={0.7} segments={20} map={f.chimney.map ? getTexture(f.chimney.map, 3, 9) : null} color={f.chimney.color} metal={f.chimney.metal} rough={0.9} />
         <Cylinder position={[0, 9.5, 0]} radius={0.46} height={0.35} segments={20} color="#1f2937" />
         <Cylinder position={[0, 10.9, 0]} radius={0.45} height={0.25} segments={20} color="#1f2937" />
         <Cylinder position={[0, 0.25, 0]} radius={0.8} height={0.5} segments={20} color="#6b7280" rough={0.9} />
@@ -485,7 +489,8 @@ function FactoryShell({ width, height, depth, themeColor, outward = [1, 1], show
 /* Atelier peinture / chimie : panneaux sandwich, extraction, cuves     */
 /* ------------------------------------------------------------------ */
 
-function PaintShell({ width, height, depth, themeColor, outward = [1, 1], showRoof, highlight }) {
+function PaintShell({ width, height, depth, themeColor, outward = [1, 1], showRoof, highlight, finish }) {
+  const f = shellFinish('paint', finish);
   const [ox] = outward;
   const roofD = 2.4;
   const roofZ = -depth / 2 + roofD / 2 + 0.1;
@@ -493,7 +498,7 @@ function PaintShell({ width, height, depth, themeColor, outward = [1, 1], showRo
   return (
     <group>
       {/* Mur du fond en panneaux sandwich */}
-      <Box position={[0, Y0 + height / 2, -depth / 2 + 0.15]} size={[width, height, 0.3]} map={getTexture('panel', width / 1.2, 1)} rough={0.5} receive />
+      <Box position={[0, Y0 + height / 2, -depth / 2 + 0.15]} size={[width, height, 0.3]} map={getTexture('panel', width / 1.2, 1)} color={f.wall} rough={0.5} receive />
       <SignBand width={Math.min(8, width * 0.45)} y={Y0 + height - 0.4} z={-depth / 2 + 0.45} themeColor={themeColor} highlight={highlight} />
       <WallFixtures width={width} depth={depth} side={ox} />
       {/* Panneau ATEX sur le mur du fond */}
@@ -520,7 +525,7 @@ function PaintShell({ width, height, depth, themeColor, outward = [1, 1], showRo
       <StructuralFrame width={width} depth={depth} height={height} color="#64748b" />
       {[-1, 1].map((sx) => (
         <group key={sx}>
-          <Box position={[sx * (width / 2 - 0.1), Y0 + 0.6, 0]} size={[0.2, 1.2, depth - 0.4]} color="#d1d5db" rough={0.5} />
+          <Box position={[sx * (width / 2 - 0.1), Y0 + 0.6, 0]} size={[0.2, 1.2, depth - 0.4]} color={f.muret} rough={0.5} />
           <HazardBar position={[sx * (width / 2 - 0.1), Y0 + 1.25, 0]} axis="z" length={depth - 0.4} segments={Math.round(depth * 1.5)} thickness={0.22} height={0.1} />
         </group>
       ))}
@@ -613,9 +618,9 @@ function SemiTrailerTruck({ color = '#f8fafc', stripe = '#0891b2', ...rest }) {
   );
 }
 
-function WarehouseShell({ width, height, depth, themeColor, outward = [1, 1], showRoof, highlight }) {
+function WarehouseShell({ width, height, depth, themeColor, outward = [1, 1], showRoof, highlight, finish }) {
   const [ox] = outward;
-  const cladding = '#5b6b7d';
+  const cladding = shellFinish('logistics', finish).cladding;
   const rackBays = Math.max(4, Math.floor((width - 1.4) / 1.15));
   const docks = Math.max(2, Math.min(4, Math.floor((depth - 2) / 3)));
   const dockZs = Array.from({ length: docks }, (_, i) => -depth / 2 + 2.2 + (i * (depth - 4.4)) / Math.max(1, docks - 1));

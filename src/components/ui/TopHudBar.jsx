@@ -9,6 +9,7 @@ import {
   Database,
   FolderTree,
   Footprints,
+  Settings,
 } from 'lucide-react';
 import { API_BASE_URL, API_HOST_LABEL } from '../../services/digiriskApi';
 
@@ -28,6 +29,8 @@ export default function TopHudBar({
   explorerMode,
   explorerSupported,
   onToggleExplorer,
+  settingsOpen,
+  onToggleSettings,
 }) {
   const [showApiPopover, setShowApiPopover] = useState(false);
 
@@ -121,6 +124,16 @@ export default function TopHudBar({
         >
           <Compass size={14} />
           <span>{explorerMode ? 'Entrée du site' : 'Vue Campus'}</span>
+        </button>
+
+        <button
+          type="button"
+          className={`hud-btn icon-toggle ${settingsOpen ? 'active' : ''}`}
+          onClick={onToggleSettings}
+          title="Paramètres : skins 3D des groupements et unités de travail"
+        >
+          <Settings size={14} />
+          <span>Paramètres</span>
         </button>
 
         {/* Configuration Clé API & Synchronisation */}

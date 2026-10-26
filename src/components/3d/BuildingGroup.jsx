@@ -101,7 +101,7 @@ export default function BuildingGroup({
         </mesh>
       ) : (
         /* Mode Étape 3 : enveloppe métier (bureaux, usine, atelier peinture, entrepôt) */
-        <MergeStatic deps={[archetype, width, height, depth, themeColor, showRoof, building.children.length]}>
+        <MergeStatic deps={[archetype, building.layout3D.finish, width, height, depth, themeColor, showRoof, building.children.length]}>
           <BuildingShell
             archetype={archetype}
             width={width}
@@ -109,6 +109,7 @@ export default function BuildingGroup({
             depth={depth}
             themeColor={themeColor}
             outward={building.layout3D.outward}
+            finish={building.layout3D.finish}
             showRoof={showRoof}
             highlight={hoveredBuilding || isBuildingSelected}
           />
