@@ -28,6 +28,28 @@ cp .env.example .env
 # Renseignez VITE_DOLAPIKEY dans le fichier .env (ou directement via le bouton clé dans l'interface)
 ```
 
+## Connexion à un Dolibarr local
+
+Renseignez l'instance locale dans `.env` (le proxy Vite et le script de synchronisation la lisent) :
+
+```bash
+VITE_DIGIRISK_BASE_URL=http://localhost/dolibarr/htdocs/api/index.php
+VITE_DIGIRISK_PUBLIC_URL=http://localhost/dolibarr/htdocs
+VITE_DOLAPIKEY=<clé API de l'utilisateur>
+```
+
+Côté Dolibarr : module API REST activé, et pour l'utilisateur de la clé les droits en lecture
+`digiriskdolibarr` (API, éléments, risques, signalisations) et `projet` (lecture des tâches, voir tous les projets),
+plus `societe > client > voir` pour lister les tâches du plan d'actions.
+En développement, le serveur Vite émule aussi le mode photo de `api-proxy.php` (photos des cotations).
+
+## Modèles 3D
+
+- Le type de chaque bâtiment (bureaux, usine, atelier peinture, entrepôt) et de chaque poste (soudure, cisaille, cabine poudre, cariste, VRP, salon...) est déduit des libellés DigiRisk (`src/services/archetypes.js`).
+- Les modèles sont procéduraux (`src/components/3d/models/`) et leur géométrie statique est fusionnée (`MergeStatic`) pour limiter les draw calls ; tout élément animé porte `userData={DYNAMIC}`.
+- Galerie de revue : `http://localhost:5173/?galerie` (filtres : `bureaux`, `production`, `peinture`, `logistique`, `batiments` ou un archétype, ex. `?galerie=welding`).
+- Les drapeaux du rond-point affichent le logo de la société configuré dans Dolibarr (`entity_logo` de `risks/creation-options`), à défaut un monogramme.
+
 ## Commandes de développement local (Node.js)
 
 ```bash
