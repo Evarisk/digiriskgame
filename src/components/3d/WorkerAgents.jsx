@@ -2,6 +2,7 @@ import React, { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { Html, Line } from '@react-three/drei';
+import { Person } from './models/people';
 
 /**
  * Étape 4 — Cinématique des flux & Déplacements d'agents humanoïdes animés
@@ -90,7 +91,7 @@ export default function WorkerAgents({
       },
     ];
 
-    return pairs.map((p) => {
+    return pairs.map((p, i) => {
       const start = p.fromUt?.layout3D?.worldPosition || [-10, 0.2, -10];
       const end = p.toUt?.layout3D?.worldPosition || [10, 0.2, 10];
       const mid = p.viaPoint || [(start[0] + end[0]) / 2, 0.2, (start[2] + end[2]) / 2];
@@ -104,6 +105,8 @@ export default function WorkerAgents({
       const points = curve.getPoints(48);
       return {
         ...p,
+        variant: i,
+        vestColor: i === 2 ? '#f97316' : '#facc15',
         curve,
         points,
       };
@@ -141,10 +144,7 @@ export default function WorkerAgents({
 
 function AnimatedHumanoidAgent({ route, speedMultiplier, onSelectUt }) {
   const groupRef = useRef();
-  const leftArmRef = useRef();
-  const rightArmRef = useRef();
-  const leftLegRef = useRef();
-  const rightLegRef = useRef();
+  const limbs = useRef({}).current;
   const bodyRef = useRef();
 
   useFrame(({ clock }) => {
@@ -171,80 +171,33 @@ function AnimatedHumanoidAgent({ route, speedMultiplier, onSelectUt }) {
 
     // Animation procédurale : Walk cycle vs Idle breathing
     const animTime = clock.getElapsedTime() * 9 * speedMultiplier;
+    const { leftArm, rightArm, leftLeg, rightLeg } = limbs;
     if (isIdle) {
-      if (leftArmRef.current) leftArmRef.current.rotation.x = THREE.MathUtils.lerp(leftArmRef.current.rotation.x, 0, 0.15);
-      if (rightArmRef.current) rightArmRef.current.rotation.x = THREE.MathUtils.lerp(rightArmRef.current.rotation.x, 0, 0.15);
-      if (leftLegRef.current) leftLegRef.current.rotation.x = THREE.MathUtils.lerp(leftLegRef.current.rotation.x, 0, 0.15);
-      if (rightLegRef.current) rightLegRef.current.rotation.x = THREE.MathUtils.lerp(rightLegRef.current.rotation.x, 0, 0.15);
-      if (bodyRef.current) bodyRef.current.position.y = Math.sin(clock.getElapsedTime() * 3) * 0.02;
+      if (leftArm) leftArm.rotation.x = THREE.MathUtils.lerp(leftArm.rotation.x, 0, 0.15);
+      if (rightArm) rightArm.rotation.x = THREE.MathUtils.lerp(rightArm.rotation.x, 0, 0.15);
+      if (leftLeg) leftLeg.rotation.x = THREE.MathUtils.lerp(leftLeg.rotation.x, 0, 0.15);
+      if (rightLeg) rightLeg.rotation.x = THREE.MathUtils.lerp(rightLeg.rotation.x, 0, 0.15);
+      if (bodyRef.current) bodyRef.current.position.y = Math.sin(clock.getElapsedTime() * 3) * 0.015;
     } else {
-      const swing = Math.sin(animTime) * 0.65;
-      if (leftArmRef.current) leftArmRef.current.rotation.x = swing;
-      if (rightArmRef.current) rightArmRef.current.rotation.x = -swing;
-      if (leftLegRef.current) leftLegRef.current.rotation.x = -swing * 0.85;
-      if (rightLegRef.current) rightLegRef.current.rotation.x = swing * 0.85;
-      if (bodyRef.current) bodyRef.current.position.y = Math.abs(Math.cos(animTime)) * 0.06;
+      const swing = Math.sin(animTime) * 0.6;
+      if (leftArm) leftArm.rotation.x = swing;
+      if (rightArm) rightArm.rotation.x = -swing;
+      if (leftLeg) leftLeg.rotation.x = -swing * 0.8;
+      if (rightLeg) rightLeg.rotation.x = swing * 0.8;
+      if (bodyRef.current) bodyRef.current.position.y = Math.abs(Math.cos(animTime)) * 0.04;
     }
   });
 
   return (
     <group ref={groupRef}>
-      <group ref={bodyRef} scale={[0.85, 0.85, 0.85]}>
-        {/* Torse / Gilet haute visibilité */}
-        <mesh position={[0, 0.78, 0]} castShadow>
-          <boxGeometry args={[0.38, 0.48, 0.22]} />
-          <meshStandardMaterial color={route.suitColor} roughness={0.4} />
-        </mesh>
-        {/* Bandes réfléchissantes EPI */}
-        <mesh position={[0, 0.74, 0]}>
-          <boxGeometry args={[0.4, 0.07, 0.24]} />
-          <meshStandardMaterial color="#fde047" emissive="#fde047" emissiveIntensity={0.45} />
-        </mesh>
-
-        {/* Tête */}
-        <mesh position={[0, 1.18, 0]} castShadow>
-          <sphereGeometry args={[0.16, 16, 16]} />
-          <meshStandardMaterial color="#fed7aa" roughness={0.5} />
-        </mesh>
-
-        {/* Casque de sécurité EPI */}
-        <mesh position={[0, 1.28, 0]} castShadow>
-          <sphereGeometry args={[0.18, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.6]} />
-          <meshStandardMaterial
-            color={route.helmetColor}
-            emissive={route.helmetColor}
-            emissiveIntensity={0.25}
-            roughness={0.25}
-          />
-        </mesh>
-
-        {/* Bras Gauche & Droit */}
-        <group position={[-0.26, 0.96, 0]} ref={leftArmRef}>
-          <mesh position={[0, -0.18, 0]} castShadow>
-            <boxGeometry args={[0.11, 0.38, 0.11]} />
-            <meshStandardMaterial color={route.suitColor} />
-          </mesh>
-        </group>
-        <group position={[0.26, 0.96, 0]} ref={rightArmRef}>
-          <mesh position={[0, -0.18, 0]} castShadow>
-            <boxGeometry args={[0.11, 0.38, 0.11]} />
-            <meshStandardMaterial color={route.suitColor} />
-          </mesh>
-        </group>
-
-        {/* Jambe Gauche & Droite */}
-        <group position={[-0.1, 0.52, 0]} ref={leftLegRef}>
-          <mesh position={[0, -0.22, 0]} castShadow>
-            <boxGeometry args={[0.13, 0.44, 0.13]} />
-            <meshStandardMaterial color="#1e293b" />
-          </mesh>
-        </group>
-        <group position={[0.1, 0.52, 0]} ref={rightLegRef}>
-          <mesh position={[0, -0.22, 0]} castShadow>
-            <boxGeometry args={[0.13, 0.44, 0.13]} />
-            <meshStandardMaterial color="#1e293b" />
-          </mesh>
-        </group>
+      <group ref={bodyRef}>
+        {/* Opérateur articulé avec EPI (casque et gilet aux couleurs de l'agent) */}
+        <Person
+          outfit="worker"
+          variant={route.variant}
+          colors={{ top: route.suitColor, helmet: route.helmetColor, vest: route.vestColor }}
+          limbs={limbs}
+        />
       </group>
 
       {/* Badge flottant de l'agent avec son trajet UT A <-> UT B */}

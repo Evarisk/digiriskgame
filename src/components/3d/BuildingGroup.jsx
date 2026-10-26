@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { Html, Edges } from '@react-three/drei';
 import WorkUnitZone from './WorkUnitZone';
+import BuildingShell, { SHELL_HEADER_HEIGHT } from './models/buildingShells';
+import { FloorZone } from './models/kit';
+import MergeStatic from './models/MergeStatic';
+import { getTexture } from './models/textures';
 
 /**
  * Représentation 3D d'un Groupement DigiRisk (Bâtiment / Site).
@@ -20,6 +24,7 @@ export default function BuildingGroup({
   const [bx, by, bz] = building.layout3D.position;
   const [width, height, depth] = building.layout3D.size;
   const themeColor = building.layout3D.themeColor || '#3b82f6';
+  const archetype = building.layout3D.archetype || 'factory';
 
   const scaleObj =
     cotationMode === 'brute'
@@ -66,11 +71,17 @@ export default function BuildingGroup({
       </mesh>
 
       {/* Bordure de sécurité périmétrique du bâtiment */}
-      <mesh position={[0, 0.17, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh position={[0, 0.17, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[width - 0.35, depth - 0.35]} />
         <meshStandardMaterial
-          color={visualMode === 'whitebox' ? '#f1f5f9' : '#111827'}
-          roughness={0.85}
+          color={visualMode === 'whitebox' ? '#f1f5f9' : archetype === 'office' ? '#a8b2bf' : '#ffffff'}
+          map={
+            visualMode === 'whitebox'
+              ? null
+              : getTexture(archetype === 'office' ? 'concrete' : 'epoxy', (width - 0.35) / 3, (depth - 0.35) / 3)
+          }
+          roughness={0.6}
+          metalness={0.1}
         />
       </mesh>
 
@@ -88,64 +99,42 @@ export default function BuildingGroup({
           <Edges scale={1} color={themeColor} />
         </mesh>
       ) : (
-        /* Mode Étape 3 : Piliers industriels, parois vitrées et charpente */
-        <group>
-          {/* 4 Piliers d'angle */}
-          {[
-            [-width / 2 + 0.25, -depth / 2 + 0.25],
-            [width / 2 - 0.25, -depth / 2 + 0.25],
-            [-width / 2 + 0.25, depth / 2 - 0.25],
-            [width / 2 - 0.25, depth / 2 - 0.25],
-          ].map(([px, pz], idx) => (
-            <mesh key={idx} position={[px, height / 2, pz]} castShadow>
-              <boxGeometry args={[0.38, height, 0.38]} />
-              <meshStandardMaterial color="#334155" metalness={0.6} roughness={0.3} />
-            </mesh>
-          ))}
-
-          {/* Mur arrière semi-vitré avec bandeau couleur Groupement */}
-          <mesh position={[0, height / 2, -depth / 2 + 0.08]}>
-            <boxGeometry args={[width - 0.4, height * 0.85, 0.12]} />
-            <meshStandardMaterial
-              color={themeColor}
-              transparent
-              opacity={0.14}
-              depthWrite={false}
-            />
-            <Edges color={themeColor} />
-          </mesh>
-
-          {/* Bandeau supérieur d'enseigne */}
-          <mesh
-            position={[0, height - 0.25, -depth / 2 + 0.15]}
-            onClick={handleBuildingClick}
-          >
-            <boxGeometry args={[width, 0.45, 0.35]} />
-            <meshStandardMaterial
-              color={themeColor}
-              emissive={themeColor}
-              emissiveIntensity={hoveredBuilding || isBuildingSelected ? 0.65 : 0.25}
-            />
-          </mesh>
-
-          {/* Toiture optionnelle (masquée par défaut en vue éclatée pour inspecter les UT) */}
-          {showRoof && (
-            <mesh position={[0, height + 0.15, 0]} castShadow>
-              <boxGeometry args={[width + 0.4, 0.25, depth + 0.4]} />
-              <meshStandardMaterial
-                color="#1e293b"
-                transparent
-                opacity={0.55}
+        /* Mode Étape 3 : enveloppe métier (bureaux, usine, atelier peinture, entrepôt) */
+        <MergeStatic deps={[archetype, width, height, depth, themeColor, showRoof, building.children.length]}>
+          <BuildingShell
+            archetype={archetype}
+            width={width}
+            height={height}
+            depth={depth}
+            themeColor={themeColor}
+            outward={building.layout3D.outward}
+            showRoof={showRoof}
+            highlight={hoveredBuilding || isBuildingSelected}
+          />
+          {/* Marquage au sol des allées de circulation autour des postes (bâtiments industriels) */}
+          {archetype !== 'office' &&
+            building.children.map((ut) => (
+              <FloorZone
+                key={`aisle-${ut.id}`}
+                position={[ut.layout3D.localPosition[0], 0.17, ut.layout3D.localPosition[2]]}
+                width={ut.layout3D.size[0] + 0.7}
+                depth={ut.layout3D.size[2] + 0.7}
+                line={0.08}
+                color="#eab308"
               />
-              <Edges color={themeColor} />
-            </mesh>
-          )}
-        </group>
+            ))}
+        </MergeStatic>
       )}
 
       {/* Enseigne Holographique du Groupement (Bâtiment) */}
       <Html
-        position={[0, height + 1.15, -depth / 2]}
+        position={[
+          0,
+          visualMode === 'whitebox'
+            ? height + 1.15
+            : SHELL_HEADER_HEIGHT[archetype] || height + 1.15,
+          -depth / 2,
+        ]}
         center
         distanceFactor={32}
         zIndexRange={[20, 0]}
