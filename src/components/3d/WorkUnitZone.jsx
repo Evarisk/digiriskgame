@@ -256,6 +256,19 @@ export default function WorkUnitZone({
                 ? ` • ${ut.stats.totalTasks} action(s)`
                 : ''}
             </div>
+            {ut.directRiskSigns?.length > 0 && (
+              <div className="ut-signs-row">
+                {ut.directRiskSigns.map((sign) => (
+                  <img
+                    key={sign.id || sign.ref}
+                    src={sign.iconUrl}
+                    alt={sign.categoryName}
+                    title={`[${sign.ref}] ${sign.categoryName} — ${sign.description}`}
+                    className="sign-mini-picto ut-sign"
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </Html>

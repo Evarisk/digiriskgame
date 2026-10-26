@@ -1,4 +1,8 @@
 import snapshotData from '../data/digiriskSnapshot.json';
+import {
+  DEFAULT_DEMO_RISKSIGNS,
+  enrichRiskSign,
+} from '../data/signalisationCategories';
 
 const DEFAULT_API_KEY = '';
 const PUBLIC_HOST = import.meta.env.VITE_DIGIRISK_PUBLIC_URL || 'https://demodoli.digirisk.com/htdocs';
@@ -70,6 +74,19 @@ export function getCotationScale(score) {
  */
 export function attachSpatialLayout(hierarchy) {
   const buildings = hierarchy.buildings || [];
+  const rawSigns =
+    hierarchy.rawRiskSigns && hierarchy.rawRiskSigns.length > 0
+      ? hierarchy.rawRiskSigns
+      : DEFAULT_DEMO_RISKSIGNS;
+
+  const signsByElement = {};
+  for (const s of rawSigns) {
+    const enriched = enrichRiskSign(s);
+    if (!signsByElement[enriched.fkElement]) {
+      signsByElement[enriched.fkElement] = [];
+    }
+    signsByElement[enriched.fkElement].push(enriched);
+  }
 
   // Quadrants sur le campus industriel (X, Z)
   const buildingPresets = [
@@ -109,12 +126,15 @@ export function attachSpatialLayout(hierarchy) {
       const worldZ = preset.center[1] + localZ;
 
       const utType = detectWorkUnitArchetype(ut.label, b.label);
+      const utDirectSigns = signsByElement[ut.id] || ut.directRiskSigns || [];
 
       const enrichedUt = {
         ...ut,
         parentBuildingRef: b.ref,
         parentBuildingLabel: b.label,
         archetype: utType,
+        directRiskSigns: utDirectSigns,
+        allRiskSigns: utDirectSigns,
         layout3D: {
           localPosition: [localX, 0.15, localZ],
           worldPosition: [worldX, 0.15, worldZ],
@@ -126,8 +146,16 @@ export function attachSpatialLayout(hierarchy) {
       return enrichedUt;
     });
 
+    const bDirectSigns = signsByElement[b.id] || b.directRiskSigns || [];
+    const bAllSigns = [
+      ...bDirectSigns,
+      ...positionedWorkUnits.flatMap((u) => u.directRiskSigns || []),
+    ];
+
     return {
       ...b,
+      directRiskSigns: bDirectSigns,
+      allRiskSigns: bAllSigns,
       children: positionedWorkUnits,
       layout3D: {
         position: [preset.center[0], 0, preset.center[1]],
@@ -138,8 +166,23 @@ export function attachSpatialLayout(hierarchy) {
     };
   });
 
+  const rootDirectSigns =
+    hierarchy.rootEntity && signsByElement[hierarchy.rootEntity.id]
+      ? signsByElement[hierarchy.rootEntity.id]
+      : [];
+
   return {
     ...hierarchy,
+    rootEntity: hierarchy.rootEntity
+      ? {
+          ...hierarchy.rootEntity,
+          directRiskSigns: rootDirectSigns,
+          allRiskSigns: [
+            ...rootDirectSigns,
+            ...positionedBuildings.flatMap((b) => b.allRiskSigns || []),
+          ],
+        }
+      : null,
     buildings: positionedBuildings,
     allWorkUnitsWorld,
   };
@@ -185,12 +228,13 @@ export async function loadDigiRiskData({ apiKey = DEFAULT_API_KEY, forceSnapshot
       return res.json();
     };
 
-    const [tree, risks, assessments, creationOptions, tasks] = await Promise.all([
+    const [tree, risks, assessments, creationOptions, tasks, riskSigns] = await Promise.all([
       fetchJson('/digiriskdolibarr/digiriskelements/tree'),
       fetchJson('/digiriskdolibarr/risks?limit=500'),
       fetchJson('/digiriskdolibarr/riskassessments?limit=500'),
       fetchJson('/digiriskdolibarr/risks/creation-options'),
       fetchJson('/tasks?limit=500').catch(() => []),
+      fetchJson('/digiriskdolibarr/risksigns?limit=500').catch(() => DEFAULT_DEMO_RISKSIGNS),
     ]);
 
     const hierarchy = transformRawToHierarchy({
@@ -199,6 +243,7 @@ export async function loadDigiRiskData({ apiKey = DEFAULT_API_KEY, forceSnapshot
       assessments,
       creationOptions,
       tasks,
+      riskSigns,
     });
 
     return {
@@ -215,7 +260,7 @@ export async function loadDigiRiskData({ apiKey = DEFAULT_API_KEY, forceSnapshot
   }
 }
 
-function transformRawToHierarchy({ tree, risks, assessments, creationOptions, tasks }) {
+function transformRawToHierarchy({ tree, risks, assessments, creationOptions, tasks, riskSigns }) {
   const categoriesByPos = {};
   for (const cat of creationOptions?.categories || []) {
     categoriesByPos[Number(cat.position)] = {
@@ -417,5 +462,6 @@ function transformRawToHierarchy({ tree, risks, assessments, creationOptions, ta
     totalRisks: enrichedRisks.length,
     totalAssessments: (assessments || []).length,
     totalTasks: (tasks || []).length,
+    rawRiskSigns: riskSigns || DEFAULT_DEMO_RISKSIGNS,
   };
 }

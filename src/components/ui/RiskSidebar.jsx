@@ -35,6 +35,12 @@ export default function RiskSidebar({
     ? selectedElement.allRisks || []
     : selectedElement.directRisks || [];
 
+  const riskSigns = isGroupment
+    ? selectedElement.directRiskSigns?.length > 0
+      ? selectedElement.directRiskSigns
+      : selectedElement.allRiskSigns || []
+    : selectedElement.directRiskSigns || [];
+
   const allTasks = risks.flatMap((r) =>
     (r.tasks || []).map((t) => ({
       ...t,
@@ -144,6 +150,33 @@ export default function RiskSidebar({
           </div>
         </div>
 
+        {/* Bandeau rapide des panneaux de signalisation de l'élément */}
+        {riskSigns.length > 0 && (
+          <div className="sidebar-signs-strip">
+            <span className="strip-label">
+              Signalisations ({riskSigns.length}) :
+            </span>
+            <div className="sidebar-signs-icons">
+              {riskSigns.map((sign) => (
+                <button
+                  key={sign.id || sign.ref}
+                  type="button"
+                  className="sidebar-sign-pill"
+                  onClick={() => setActiveTab('signs')}
+                  title={`[${sign.ref}] ${sign.categoryName} — ${sign.description}`}
+                >
+                  <img
+                    src={sign.iconUrl}
+                    alt={sign.categoryName}
+                    className="sidebar-sign-img"
+                  />
+                  <span>{sign.ref}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Sous-unités rapides si un bâtiment (Groupement) est sélectionné */}
         {isGroupment && selectedElement.children?.length > 0 && (
           <div className="sub-units-strip">
@@ -166,23 +199,31 @@ export default function RiskSidebar({
           </div>
         )}
 
-        {/* Onglets Risques INRS / Plan d'Actions */}
+        {/* Onglets Risques INRS / Signalisations / Plan d'Actions */}
         <div className="sidebar-tabs">
           <button
             type="button"
             className={`tab-btn ${activeTab === 'risks' ? 'active' : ''}`}
             onClick={() => setActiveTab('risks')}
           >
-            <AlertTriangle size={15} />
-            <span>Risques INRS ({risks.length})</span>
+            <AlertTriangle size={14} />
+            <span>Risques ({risks.length})</span>
+          </button>
+          <button
+            type="button"
+            className={`tab-btn ${activeTab === 'signs' ? 'active' : ''}`}
+            onClick={() => setActiveTab('signs')}
+          >
+            <Shield size={14} />
+            <span>Signalisations ({riskSigns.length})</span>
           </button>
           <button
             type="button"
             className={`tab-btn ${activeTab === 'actions' ? 'active' : ''}`}
             onClick={() => setActiveTab('actions')}
           >
-            <CheckSquare size={15} />
-            <span>Plan d’Actions ({allTasks.length})</span>
+            <CheckSquare size={14} />
+            <span>Actions ({allTasks.length})</span>
           </button>
         </div>
       </div>
@@ -209,6 +250,37 @@ export default function RiskSidebar({
                   isHighlighted={activeRisk?.id === risk.id}
                   onHoverRisk={onHoverRisk}
                 />
+              ))}
+            </div>
+          )
+        ) : activeTab === 'signs' ? (
+          riskSigns.length === 0 ? (
+            <div className="empty-state">
+              <Shield size={36} className="empty-icon" />
+              <h4>Aucune signalisation rattachée</h4>
+              <p>
+                Aucun panneau de signalisation n’est configuré sur cet élément.
+              </p>
+            </div>
+          ) : (
+            <div className="signs-list">
+              {riskSigns.map((sign) => (
+                <div key={sign.id || sign.ref} className="sign-detail-card">
+                  <img
+                    src={sign.iconUrl}
+                    alt={sign.categoryName}
+                    className="sign-detail-picto"
+                  />
+                  <div className="sign-detail-content">
+                    <div className="sign-detail-top">
+                      <span className="risk-ref-tag">{sign.ref}</span>
+                      <strong className="sign-detail-cat">
+                        {sign.categoryName}
+                      </strong>
+                    </div>
+                    <p className="sign-detail-desc">{sign.description}</p>
+                  </div>
+                </div>
               ))}
             </div>
           )
