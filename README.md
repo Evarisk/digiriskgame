@@ -47,8 +47,18 @@ En développement, le serveur Vite émule aussi le mode photo de `api-proxy.php`
 
 - Le type de chaque bâtiment (bureaux, usine, atelier peinture, entrepôt) et de chaque poste (soudure, cisaille, cabine poudre, cariste, VRP, salon...) est déduit des libellés DigiRisk (`src/services/archetypes.js`).
 - Les modèles sont procéduraux (`src/components/3d/models/`) et leur géométrie statique est fusionnée (`MergeStatic`) pour limiter les draw calls ; tout élément animé porte `userData={DYNAMIC}`.
-- Galerie de revue : `http://localhost:5173/?galerie` (filtres : `bureaux`, `production`, `peinture`, `logistique`, `batiments` ou un archétype, ex. `?galerie=welding`).
+- Galerie de revue : `http://localhost:5173/?galerie` (filtres : `bureaux`, `production`, `peinture`, `logistique`, `batiments` (tous les skins de bâtiment) ou un archétype, ex. `?galerie=welding`).
 - Les drapeaux du rond-point affichent le logo de la société configuré dans Dolibarr (`entity_logo` de `risks/creation-options`), à défaut un monogramme.
+- **Skins** (bouton *Paramètres*) : chaque groupement peut prendre une autre enveloppe et finition (bureaux verre bleu / bronze / vert, usine brique / acier / béton, peinture blanc / anthracite / sable, entrepôt gris / bleu / vert) et chaque unité de travail n'importe lequel des 24 modèles de poste. « Auto » suit le libellé ; les choix sont mémorisés dans le navigateur (`src/services/skins.js`).
+
+## Visite en première personne
+
+Bouton *Visite 1re pers.* (souris + clavier requis) : on parcourt le site à hauteur d'homme avec une tablette DigiRisk en main.
+
+- ZQSD / WASD ou flèches pour se déplacer, souris pour regarder, Maj pour courir, Espace pour sauter, Échap pour la pause.
+- E ou clic : inspecte l'élément visé (UT, groupement, entité) et ouvre sa fiche risques ; la mission compte les UT inspectées, la minicarte les marque en vert.
+- Une alerte s'affiche à l'entrée d'une UT à risque élevé ou critique. En pause, choisir un élément dans l'arborescence y téléporte le joueur.
+- Les collisions utilisent la géométrie réelle des modèles (BVH `three-mesh-bvh`, `src/components/3d/explorer/`) ; un objet sans collision (volume holographique, fumée...) porte `userData={{ noCollide: true }}`.
 
 ## Commandes de développement local (Node.js)
 
