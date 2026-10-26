@@ -259,12 +259,23 @@ export default function CampusScenery({ buildings = [], companyName, companyLogo
       trees.push({ x, z, variant: k % 3 ? 'conifer' : 'round', size: 1 + seeded(k) * 0.6 });
     }
 
-    // Lampadaires alternés le long des deux voies (bras orienté vers la chaussée)
+    // Lampadaires alternés le long des deux voies (bras orienté vers la chaussée), décalés hors des
+    // bâtiments et de l'auvent d'entrée des bureaux, qui bordent la voie Est-Ouest
     const lamps = [];
+    const blocked = (x, z) =>
+      buildings.some((b) => {
+        const [bx, , bz] = b.layout3D.position;
+        const [w, , d] = b.layout3D.size;
+        const front = bz + d / 2;
+        const entrance = b.layout3D.archetype === 'office' && Math.abs(x - bx) < 3.8 && z > front - 0.5 && z < front + 1.8;
+        return entrance || (Math.abs(x - bx) < w / 2 + 0.3 && Math.abs(z - bz) < d / 2 + 0.3);
+      });
     for (let x = fence.minX + 4; x <= fence.maxX - 4; x += 9) {
       if (Math.abs(x) < 6) continue;
       const side = Math.round(x / 9) % 2 ? 1 : -1;
-      lamps.push({ x, z: side * (ROAD_X_WIDTH / 2 + 0.45), rot: side > 0 ? Math.PI / 2 : -Math.PI / 2 });
+      const z = side * (ROAD_X_WIDTH / 2 + 0.45);
+      const spot = [x, x - 4.5, x + 4.5].find((c) => Math.abs(c) >= 6 && c > fence.minX + 1 && c < fence.maxX - 1 && !blocked(c, z));
+      if (spot !== undefined) lamps.push({ x: spot, z, rot: side > 0 ? Math.PI / 2 : -Math.PI / 2 });
     }
     for (let z = fence.minZ + 4; z <= fence.maxZ - 4; z += 9) {
       if (Math.abs(z) < 6) continue;

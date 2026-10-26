@@ -315,19 +315,19 @@ function OfficeShell({ width, height, depth, themeColor, outward = [1, 1], showR
           <Box position={[sx * (width / 2 - 0.12), Y0 + 1.0, (facadeZ + depth / 2) / 2]} size={[0.06, 0.06, depth / 2 - facadeZ - 0.3]} color="#e2e8f0" shadow={false} />
         </group>
       ))}
-      {/* Entrée : auvent, portes vitrées, jardinières */}
+      {/* Entrée : auvent, portes vitrées, jardinières (peu profonds : la voie Est-Ouest longe la façade) */}
       <group position={[0, 0, depth / 2]}>
-        <Box position={[0, Y0 + 2.4, 0.6]} size={[4.2, 0.14, 1.6]} color="#e2e8f0" rough={0.5} />
-        <Box position={[0, Y0 + 2.48, 0.6]} size={[4.0, 0.02, 1.4]} color={themeColor} glow={0.35} shadow={false} />
+        <Box position={[0, Y0 + 2.4, 0.3]} size={[4.2, 0.14, 1.0]} color="#e2e8f0" rough={0.5} />
+        <Box position={[0, Y0 + 2.48, 0.3]} size={[4.0, 0.02, 0.85]} color={themeColor} glow={0.35} shadow={false} />
         {[-1.9, 1.9].map((x) => (
-          <Box key={x} position={[x, Y0 + 1.2, 1.3]} size={[0.1, 2.4, 0.1]} color="#e2e8f0" metal={0.5} />
+          <Box key={x} position={[x, Y0 + 1.2, 0.7]} size={[0.1, 2.4, 0.1]} color="#e2e8f0" metal={0.5} />
         ))}
         <Box position={[0, Y0 + 1.05, -0.25]} size={[2.2, 2.1, 0.05]} color="#bae6fd" opacity={0.3} metal={0.6} rough={0.1} shadow={false} />
         <Box position={[0, Y0 + 1.05, -0.24]} size={[0.06, 2.1, 0.07]} color="#e2e8f0" shadow={false} />
         {[-2.8, 2.8].map((x) => (
-          <group key={x} position={[x, Y0, 0.9]}>
-            <Box position={[0, 0.25, 0]} size={[1.2, 0.5, 0.6]} color="#9ca3af" rough={0.8} />
-            <Ball position={[0, 0.65, 0]} scale={[1.1, 0.45, 0.5]} shape="dodeca" color="#16a34a" flat />
+          <group key={x} position={[x, Y0, 0.42]}>
+            <Box position={[0, 0.25, 0]} size={[1.2, 0.5, 0.5]} color="#9ca3af" rough={0.8} />
+            <Ball position={[0, 0.65, 0]} scale={[1.1, 0.45, 0.42]} shape="dodeca" color="#16a34a" flat />
           </group>
         ))}
       </group>
