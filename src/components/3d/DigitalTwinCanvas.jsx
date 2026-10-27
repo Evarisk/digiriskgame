@@ -111,6 +111,7 @@ export default function DigitalTwinCanvas({
         {/* Flux cinématiques d'opérateurs entre les Unités de Travail */}
         <WorkerAgents
           buildings={data?.buildings || []}
+          employees={data?.employees}
           site={site}
           showPaths={showPaths}
           agentsEnabled={agentsEnabled}

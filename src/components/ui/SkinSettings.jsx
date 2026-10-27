@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Palette, RotateCcw, X } from 'lucide-react';
+import { Building2, Palette, RotateCcw, X } from 'lucide-react';
 import {
   BUILDING_LABELS,
   BUILDING_SKINS,
@@ -9,10 +9,71 @@ import {
 } from '../../services/skins';
 
 /**
- * Paramètres · Skins 3D : choix du skin de chaque Groupement (enveloppe + finition) et de chaque
- * Unité de Travail (modèle de poste). « Auto » reprend l'archétype déduit du libellé DigiRisk.
+ * Entité Dolibarr affichée (module multisociété) : liste des entités si l'API la fournit, sinon saisie
+ * du numéro. « Entité de l'utilisateur API » : pas d'en-tête DOLAPIENTITY.
  */
-export default function SkinSettings({ data, skins, onChange, onReset, onFocus, onClose, cotationMode }) {
+function EntityPicker({ entity, entities, entityName, error, loading, onChange }) {
+  const [typed, setTyped] = useState(entity ? String(entity) : '');
+  const submitTyped = () => {
+    const id = Number(typed);
+    onChange(id > 0 ? id : null);
+  };
+  return (
+    <div className="skin-entity">
+      <label htmlFor="entity-picker">
+        <Building2 size={14} />
+        Entité Dolibarr
+      </label>
+      {entities.length ? (
+        <select
+          id="entity-picker"
+          value={entity ?? ''}
+          disabled={loading}
+          onChange={(e) => onChange(e.target.value ? Number(e.target.value) : null)}
+        >
+          <option value="">Entité de l’utilisateur API{entity ? '' : ` · ${entityName || ''}`}</option>
+          {entities.map((e) => (
+            <option key={e.id} value={e.id}>
+              {e.id} · {e.label}
+            </option>
+          ))}
+        </select>
+      ) : (
+        <input
+          id="entity-picker"
+          type="number"
+          min="1"
+          placeholder="N° d’entité (vide : entité de l’utilisateur API)"
+          value={typed}
+          disabled={loading}
+          onChange={(e) => setTyped(e.target.value)}
+          onBlur={submitTyped}
+          onKeyDown={(e) => e.key === 'Enter' && submitTyped()}
+        />
+      )}
+      {error && <p className="skin-entity-error">{error}</p>}
+    </div>
+  );
+}
+
+/**
+ * Paramètres : entité Dolibarr affichée, puis skin de chaque Groupement (enveloppe + finition) et de
+ * chaque Unité de Travail (modèle de poste). « Auto » reprend l'archétype déduit du libellé DigiRisk.
+ */
+export default function SkinSettings({
+  data,
+  skins,
+  onChange,
+  onReset,
+  onFocus,
+  onClose,
+  cotationMode,
+  entity,
+  entities = [],
+  entityError,
+  loading,
+  onEntityChange,
+}) {
   const [tab, setTab] = useState('gp');
   // Bâtiments (la zone extérieure n'a pas d'enveloppe) ; UT de chaque bâtiment, sous-groupements compris
   const blocks = data?.buildings || [];
@@ -25,14 +86,22 @@ export default function SkinSettings({ data, skins, onChange, onReset, onFocus, 
   const scaleOf = (el) => (cotationMode === 'brute' ? el.stats.scaleBrute : el.stats.scaleResiduelle);
 
   return (
-    <div className="skin-settings" role="dialog" aria-label="Paramètres des skins 3D">
+    <div className="skin-settings" role="dialog" aria-label="Paramètres">
       <div className="skin-settings-header">
         <Palette size={16} />
-        <h4>Paramètres · Skins 3D</h4>
+        <h4>Paramètres</h4>
         <button type="button" className="skin-close" onClick={onClose} title="Fermer">
           <X size={16} />
         </button>
       </div>
+      <EntityPicker
+        entity={entity}
+        entities={entities}
+        entityName={data?.entityName}
+        error={entityError}
+        loading={loading}
+        onChange={onEntityChange}
+      />
       <p className="skin-settings-help">
         Choisissez l’apparence de chaque groupement (bâtiment) et de chaque unité de travail (poste). « Auto » suit le
         libellé DigiRisk. Les choix sont mémorisés dans ce navigateur.

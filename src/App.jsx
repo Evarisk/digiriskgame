@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { loadDigiRiskData } from './services/digiriskApi';
+import { loadDigiRiskData, loadEntities } from './services/digiriskApi';
 import { layoutTwin } from './services/siteLayout';
 import { loadSkins, saveSkins } from './services/skins';
 import SkinSettings from './components/ui/SkinSettings';
@@ -9,6 +9,27 @@ import HierarchyNavigator from './components/ui/HierarchyNavigator';
 import RiskSidebar from './components/ui/RiskSidebar';
 import ExplorerHud from './components/ui/ExplorerHud';
 import { explorerStore, useExplorer, EXPLORER_SUPPORTED } from './components/3d/explorer/explorerStore';
+
+// Entité Dolibarr choisie dans les Paramètres (multisociété), mémorisée dans ce navigateur
+const ENTITY_STORAGE_KEY = 'digiriskgame.entity';
+
+function loadSavedEntity() {
+  try {
+    const id = Number(window.localStorage.getItem(ENTITY_STORAGE_KEY));
+    return id > 0 ? id : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveEntity(id) {
+  try {
+    if (id) window.localStorage.setItem(ENTITY_STORAGE_KEY, String(id));
+    else window.localStorage.removeItem(ENTITY_STORAGE_KEY);
+  } catch {
+    // Stockage indisponible (navigation privée) : le choix vaut pour la session
+  }
+}
 
 export default function App() {
   const [rawData, setData] = useState(null);
@@ -30,6 +51,18 @@ export default function App() {
   };
 
   const [apiKey, setApiKey] = useState('');
+
+  // Multisociété : entité affichée (null : entité de l'utilisateur API) et entités disponibles
+  const [entity, setEntity] = useState(loadSavedEntity);
+  const [entities, setEntities] = useState([]);
+  const [entityError, setEntityError] = useState(null);
+  useEffect(() => {
+    let cancelled = false;
+    loadEntities({ apiKey }).then((list) => !cancelled && setEntities(list));
+    return () => {
+      cancelled = true;
+    };
+  }, [apiKey]);
 
   // Modes d'affichage 3D et métier
   const [visualMode, setVisualMode] = useState('detailed'); // 'detailed' (Étape 3) | 'whitebox' (Étape 2)
@@ -57,7 +90,15 @@ export default function App() {
   const fetchTwinData = useCallback(
     async (forceSnapshot = false) => {
       setLoading(true);
-      const result = await loadDigiRiskData({ apiKey, forceSnapshot });
+      let result;
+      try {
+        // Entité choisie : pas de repli silencieux sur le DUER de démonstration si elle est inaccessible
+        result = await loadDigiRiskData({ apiKey, entity, forceSnapshot, fallback: !entity });
+        setEntityError(null);
+      } catch (error) {
+        setEntityError(`Entité ${entity} inaccessible avec cette clé API (${error.message}). Affichage de l’entité de l’utilisateur API.`);
+        result = await loadDigiRiskData({ apiKey, forceSnapshot });
+      }
       setData(result);
       setLoading(false);
 
@@ -77,8 +118,19 @@ export default function App() {
         return units.find((u) => u.ref === 'UT14') || units[0] || null;
       });
     },
-    [apiKey]
+    [apiKey, entity]
   );
+
+  // Changement d'entité : nouvelle arborescence (rechargée par fetchTwinData), sélection et visite remises à zéro
+  const handleEntityChange = (id) => {
+    if (id === entity) return;
+    saveEntity(id);
+    setEntity(id);
+    setSelectedElement(null);
+    setActiveRisk(null);
+    setInspectedIds(new Set());
+    setCameraTarget({ type: 'overview', ts: Date.now() });
+  };
 
   useEffect(() => {
     fetchTwinData(false);
@@ -189,12 +241,17 @@ export default function App() {
           />
         )}
 
-        {/* Paramètres : skins 3D des groupements et unités de travail */}
+        {/* Paramètres : entité Dolibarr, skins 3D des groupements et unités de travail */}
         {settingsOpen && !playing && (
           <SkinSettings
             data={data}
             skins={skins}
             cotationMode={cotationMode}
+            entity={entity}
+            entities={entities}
+            entityError={entityError}
+            loading={loading}
+            onEntityChange={handleEntityChange}
             onChange={handleSkinChange}
             onReset={() => setSkins({})}
             onFocus={handleSelectElement}

@@ -2293,6 +2293,45 @@ body,
   color: var(--text-muted);
 }
 
+/* Entité Dolibarr (multisociété) */
+.skin-entity {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 16px 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.skin-entity label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.skin-entity select,
+.skin-entity input {
+  width: 100%;
+  padding: 7px 8px;
+  font: 500 12px 'Inter', system-ui, sans-serif;
+  color: var(--text-main);
+  background: #1e293b;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 7px;
+}
+
+.skin-entity select:disabled {
+  opacity: 0.6;
+}
+
+.skin-entity-error {
+  font-size: 11px;
+  line-height: 1.45;
+  color: #fca5a5;
+}
+
 .skin-tabs {
   display: flex;
   gap: 6px;

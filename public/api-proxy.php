@@ -5,7 +5,7 @@
  */
 
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Headers: DOLAPIKEY, Accept, Content-Type');
+header('Access-Control-Allow-Headers: DOLAPIKEY, DOLAPIENTITY, Accept, Content-Type');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
@@ -47,6 +47,15 @@ if ($apiKey === '') {
     exit;
 }
 
+// En-têtes transmis à Dolibarr : clé API et, en multisociété, entité choisie dans l'interface
+$forwardHeaders = [
+    'DOLAPIKEY: ' . $apiKey,
+    'Accept: application/json',
+];
+if (!empty($_SERVER['HTTP_DOLAPIENTITY'])) {
+    $forwardHeaders[] = 'DOLAPIENTITY: ' . (int) $_SERVER['HTTP_DOLAPIENTITY'];
+}
+
 // Mode 1 : Téléchargement direct d'une photo de risque (?photo=riskassessment/RA105/...)
 if (!empty($_GET['photo'])) {
     $photoPath = trim($_GET['photo']);
@@ -61,10 +70,7 @@ if (!empty($_GET['photo'])) {
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_TIMEOUT => 15,
-        CURLOPT_HTTPHEADER => [
-            'DOLAPIKEY: ' . $apiKey,
-            'Accept: application/json',
-        ],
+        CURLOPT_HTTPHEADER => $forwardHeaders,
     ]);
     $res = curl_exec($ch);
     $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -91,11 +97,19 @@ $endpoint = isset($_GET['endpoint']) ? trim($_GET['endpoint']) : '';
 if (
     $endpoint === '' ||
     strpos($endpoint, '/') !== 0 ||
-    !preg_match('#^/(digiriskdolibarr/|tasks|status|documents)#', $endpoint)
+    !preg_match('#^/(digiriskdolibarr/|tasks|status|documents|multicompany(\?|$)|users(\?|$))#', $endpoint)
 ) {
     http_response_code(400);
     echo json_encode(['error' => 'Endpoint non autorisé']);
     exit;
+}
+
+// Liste des salariés : seuls le nom, le prénom et le poste sortent du relais (jamais e-mail, téléphone...)
+if (preg_match('#^/users(\?|$)#', $endpoint)) {
+    parse_str((string) parse_url($endpoint, PHP_URL_QUERY), $query);
+    $query = array_intersect_key($query, array_flip(['limit', 'page', 'sqlfilters']));
+    $query['properties'] = 'id,firstname,lastname,job,employee,statut,gender';
+    $endpoint = '/users?' . http_build_query($query);
 }
 
 $targetUrl = $baseUrl . $endpoint;
@@ -105,10 +119,7 @@ curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_FOLLOWLOCATION => true,
     CURLOPT_TIMEOUT => 15,
-    CURLOPT_HTTPHEADER => [
-        'DOLAPIKEY: ' . $apiKey,
-        'Accept: application/json',
-    ],
+    CURLOPT_HTTPHEADER => $forwardHeaders,
 ]);
 
 $response = curl_exec($ch);
