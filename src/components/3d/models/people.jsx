@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Cylinder, Ball, PALETTE } from './kit';
+import { Box, Cylinder, Ball, PALETTE, DYNAMIC } from './kit';
 
 /**
  * Personnages low-poly articulés (≈ 1,75 m => 1,17 unité), face à +Z.
@@ -34,9 +34,11 @@ export function Person({ outfit = 'worker', pose = 'stand', variant = 0, colors,
   const setLimb = (key) => (el) => {
     if (limbs && el) limbs[key] = el;
   };
+  // Membres animés : marqués pour que MergeStatic fusionne leurs pièces dans leur propre repère
+  const limbData = limbs ? DYNAMIC : undefined;
 
   const leg = (side, key) => (
-    <group ref={setLimb(key)} position={[side * 0.065, hipY, 0]} rotation={[seated ? -Math.PI / 2 : 0, 0, 0]}>
+    <group ref={setLimb(key)} userData={limbData} position={[side * 0.065, hipY, 0]} rotation={[seated ? -Math.PI / 2 : 0, 0, 0]}>
       <Box position={[0, -0.135, 0]} size={[0.1, 0.27, 0.11]} color={o.pants} rough={0.8} />
       <group position={[0, -0.27, 0]} rotation={[seated ? Math.PI / 2 : 0, 0, 0]}>
         <Box position={[0, -0.12, 0]} size={[0.088, 0.24, 0.095]} color={o.pants} rough={0.8} />
@@ -46,7 +48,7 @@ export function Person({ outfit = 'worker', pose = 'stand', variant = 0, colors,
   );
 
   const arm = (side, key) => (
-    <group ref={setLimb(key)} position={[side * 0.165, 0.95 + bodyY, 0]} rotation={[shoulder, 0, side * 0.06]}>
+    <group ref={setLimb(key)} userData={limbData} position={[side * 0.165, 0.95 + bodyY, 0]} rotation={[shoulder, 0, side * 0.06]}>
       <Box position={[0, -0.11, 0]} size={[0.072, 0.22, 0.08]} color={o.top} rough={0.75} />
       <group position={[0, -0.22, 0]} rotation={[elbow, 0, 0]}>
         <Box position={[0, -0.1, 0]} size={[0.064, 0.2, 0.072]} color={o.top} rough={0.75} />

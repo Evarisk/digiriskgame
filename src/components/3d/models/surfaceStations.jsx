@@ -105,10 +105,10 @@ export function PaintBooth({ accent }) {
       ))}
       {[0, 1, 2].map((i) => (
         <group key={i} ref={(el) => (hangersRef.current[i] = el)} userData={DYNAMIC} position={[0, 2.02, -0.5]}>
-          <group>
+          <group userData={DYNAMIC}>
             <HangingPart painted={false} />
           </group>
-          <group>
+          <group userData={DYNAMIC}>
             <HangingPart painted />
           </group>
         </group>
@@ -254,10 +254,10 @@ export function HangingLine({ accent }) {
         <mesh geometry={railGeometry} material={getMaterial({ color: PALETTE.safetyYellow, metalness: 0.4, roughness: 0.45 })} castShadow raycast={noRaycast} />
         {Array.from({ length: hangerCount }, (_, i) => (
           <group key={i} ref={(el) => (hangersRef.current[i] = el)} userData={DYNAMIC}>
-            <group>
+            <group userData={DYNAMIC}>
               <HangingPart painted={false} />
             </group>
-            <group>
+            <group userData={DYNAMIC}>
               <HangingPart painted />
             </group>
           </group>
