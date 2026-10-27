@@ -6,6 +6,7 @@ import BuildingGroup from './BuildingGroup';
 import WorkerAgents from './WorkerAgents';
 import DeliveryTrucks from './DeliveryTrucks';
 import CampusScenery from './CampusScenery';
+import SkyDome, { SKY_HORIZON } from './SkyDome';
 import { getTexture } from './models/textures';
 import FirstPersonExplorer from './explorer/FirstPersonExplorer';
 import { explorerStore } from './explorer/explorerStore';
@@ -42,22 +43,22 @@ export default function DigitalTwinCanvas({
         }}
         onPointerMissed={() => !explorerMode && onSelectElement(null)}
       >
+        {/* Ciel de jour ; brume de l'horizon (le terrain lointain s'y fond) */}
         <color
           attach="background"
-          args={[visualMode === 'whitebox' ? '#f1f5f9' : '#090d16']}
+          args={[visualMode === 'whitebox' ? '#f1f5f9' : SKY_HORIZON]}
         />
         <fog
           attach="fog"
-          args={[visualMode === 'whitebox' ? '#f1f5f9' : '#090d16', 55 * k, 135 * k]}
+          args={[visualMode === 'whitebox' ? '#f1f5f9' : SKY_HORIZON, 55 * k, 135 * k]}
         />
+        {visualMode !== 'whitebox' && <SkyDome site={site} scale={k} />}
 
-        {/* Éclairage directionnel & ambiant */}
-        <ambientLight intensity={visualMode === 'whitebox' ? 0.85 : 0.55} />
-        <SunLight site={site} intensity={visualMode === 'whitebox' ? 1.1 : 1.35} />
+        {/* Éclairage directionnel & ambiant (lumière de jour, rebond du ciel et de la pelouse) */}
+        <ambientLight intensity={visualMode === 'whitebox' ? 0.85 : 0.5} />
+        <SunLight site={site} intensity={visualMode === 'whitebox' ? 1.1 : 1.5} />
         <hemisphereLight
-          skyColor="#38bdf8"
-          groundColor="#0f172a"
-          intensity={0.35}
+          args={visualMode === 'whitebox' ? ['#38bdf8', '#0f172a', 0.35] : ['#dbeafe', '#3f5f2a', 0.55]}
         />
 
         {/* Reflets d'environnement (calculés une seule fois, sans ressource réseau) */}
