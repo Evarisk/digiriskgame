@@ -12,78 +12,86 @@ import {
   SafetyGuardrail,
   WalkwayStrip,
   WalkwayNode,
+  FirstAidKit,
   seeded,
   PALETTE,
   DYNAMIC,
 } from './models/kit';
-import { getBuildingDoorZ } from './models/buildingShells';
 import { getTexture } from './models/textures';
 import MergeStatic from './models/MergeStatic';
+import { EquipmentOwner } from './equipment/equipment';
+import { AVENUE_WIDTH } from '../../services/siteLayout';
+
+const GATE_OWNER = { id: 'site-gate', ref: 'Accès', label: 'Poste de garde' };
 
 /**
- * Décor du site industriel : voirie marquée, couloirs piétons balisés (norme INRS),
+ * Décor du site industriel, d'après le plan calculé pour l'arborescence (services/siteLayout.js) :
+ * voirie marquée et carrefours, couloirs piétons balisés (norme INRS) et passages piétons,
  * rond-point central, éclairage public, arbres, clôture d'enceinte et poste de garde.
  */
 
-// Débord des annexes extérieures côté `outward` selon le type de bâtiment
-const OUTWARD_MARGIN = { office: 6.6, factory: 2.6, paint: 4.4, logistics: 10.2 };
-const ROAD_X_WIDTH = 5.5; // voie Est-Ouest (selon X)
-const ROAD_Z_WIDTH = 6.5; // voie Nord-Sud (selon Z)
+const HUB_RADIUS = 4.4;
+const HUB_GAP = 4.8; // interruption des bordures autour du rond-point
+const CROSSWALK_GAP = 0.95; // bordure abaissée au droit des passages piétons
+const WALKWAY_Y = 0.0125; // couloirs extérieurs posés sur le pavé
 
-export function computeSiteBounds(buildings) {
-  const rects = buildings.map((b) => {
-    const [x, , z] = b.layout3D.position;
-    const [w, , d] = b.layout3D.size;
-    const [ox] = b.layout3D.outward || [1, 1];
-    const extra = OUTWARD_MARGIN[b.layout3D.archetype] || 2;
-    return {
-      minX: x - w / 2 - (ox < 0 ? extra : 0.6),
-      maxX: x + w / 2 + (ox > 0 ? extra : 0.6),
-      minZ: z - d / 2 - 0.6,
-      maxZ: z + d / 2 + 0.6,
-    };
-  });
-  const site = rects.reduce(
-    (acc, r) => ({
-      minX: Math.min(acc.minX, r.minX),
-      maxX: Math.max(acc.maxX, r.maxX),
-      minZ: Math.min(acc.minZ, r.minZ),
-      maxZ: Math.max(acc.maxZ, r.maxZ),
-    }),
-    { minX: -30, maxX: 30, minZ: -20, maxZ: 20 }
-  );
-  return { rects, fence: { minX: site.minX - 3.5, maxX: site.maxX + 3.5, minZ: site.minZ - 3.5, maxZ: site.maxZ + 3.5 } };
+const inRect = (r, x, z, pad = 0) => x > r.minX - pad && x < r.maxX + pad && z > r.minZ - pad && z < r.maxZ + pad;
+
+/** Distance d'un point à un segment [a, b] (plan XZ). */
+function distanceToSegment(x, z, [ax, az], [bx, bz]) {
+  const dx = bx - ax;
+  const dz = bz - az;
+  const t = Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / (dx * dx + dz * dz || 1)));
+  return Math.hypot(x - ax - t * dx, z - az - t * dz);
 }
 
-function lengthOf(fence, axis) {
-  return axis === 'x' ? fence.maxX - fence.minX : fence.maxZ - fence.minZ;
+/** Rectangle de chaussée d'une voie (`axis` : direction de la voie). */
+export function streetRect(s) {
+  return s.axis === 'x'
+    ? { minX: s.from, maxX: s.to, minZ: s.z - s.width / 2, maxZ: s.z + s.width / 2 }
+    : { minX: s.x - s.width / 2, maxX: s.x + s.width / 2, minZ: s.from, maxZ: s.to };
 }
 
-/** Deux tronçons de part et d'autre du rond-point central : [[début, fin], ...]. */
-function splitAroundCenter(min, max, gap = 4.8) {
-  return [
-    [min, -gap],
-    [gap, max],
-  ];
+/** Carrefours d'une voie : position le long de son axe et demi-largeur de la voie croisée. */
+function crossingsOf(street, site) {
+  return site.intersections
+    .filter((i) => (street.axis === 'x' ? i.ew === street : i.ns === street))
+    .map((i) => ({ at: street.axis === 'x' ? i.x : i.z, half: (street.axis === 'x' ? i.ns : i.ew).width / 2, hub: i.hub }));
 }
 
-function isFree(x, z, rects, pad = 1.2) {
-  if (Math.abs(x) < ROAD_Z_WIDTH / 2 + 1.2 || Math.abs(z) < ROAD_X_WIDTH / 2 + 1.2) return false;
-  return !rects.some((r) => x > r.minX - pad && x < r.maxX + pad && z > r.minZ - pad && z < r.maxZ + pad);
+/** Passages piétons d'une voie : position le long de son axe. */
+function crosswalksOf(street, site) {
+  return site.crosswalks.filter((c) => c.street === street).map((c) => (street.axis === 'x' ? c.x : c.z));
 }
 
-/** Pointillés axiaux d'une voie. */
-function DashedLine({ from, to, axis, gapAround = 4.5 }) {
+/** Tronçons de bordure d'une voie entre carrefours et passages piétons : [[début, fin], ...]. */
+function segmentsOf(from, to, crossings, crosswalks) {
+  const gaps = [
+    ...crossings.map((c) => (c.hub ? [c.at - HUB_GAP, c.at + HUB_GAP] : [c.at - c.half - 0.3, c.at + c.half + 0.3])),
+    ...crosswalks.map((t) => [t - CROSSWALK_GAP, t + CROSSWALK_GAP]),
+  ].sort((a, b) => a[0] - b[0]);
+  const segments = [];
+  let start = from;
+  for (const [a, b] of gaps) {
+    if (a > start) segments.push([start, a]);
+    start = Math.max(start, b);
+  }
+  if (to > start) segments.push([start, to]);
+  return segments;
+}
+
+/** Pointillés axiaux d'une voie, interrompus aux carrefours. */
+function DashedLine({ street, from, to, crossings }) {
   const dashes = [];
   for (let c = from; c <= to; c += 2) {
-    if (Math.abs(c) < gapAround) continue;
+    if (crossings.some((k) => Math.abs(c - k.at) < (k.hub ? 4.5 : k.half + 0.5))) continue;
     dashes.push(c);
   }
   return dashes.map((c) => (
     <Box
       key={c}
-      position={axis === 'x' ? [c, 0.035, 0] : [0, 0.035, c]}
-      size={axis === 'x' ? [1.0, 0.006, 0.12] : [0.12, 0.006, 1.0]}
+      position={street.axis === 'x' ? [c, 0.035, street.z] : [street.x, 0.035, c]}
+      size={street.axis === 'x' ? [1.0, 0.006, 0.12] : [0.12, 0.006, 1.0]}
       color="#e2e8f0"
       shadow={false}
     />
@@ -95,9 +103,9 @@ function Crosswalk({ position, across = 'z', width }) {
   const stripes = Math.floor(width / 0.6);
   return (
     <group position={position} userData={{ noCollide: true }}>
-      {/* Bande de fond verte sécurité sous les bandes blanches du passage piéton */}
+      {/* Bande de fond verte sécurité sous les bandes blanches du passage piéton (au-dessus de l'enrobé) */}
       <Box
-        position={[0, 0.033, 0]}
+        position={[0, 0.0372, 0]}
         size={across === 'z' ? [1.85, 0.005, width] : [width, 0.005, 1.85]}
         color="#15803d"
         rough={0.85}
@@ -108,7 +116,7 @@ function Crosswalk({ position, across = 'z', width }) {
         return (
           <Box
             key={i}
-            position={across === 'z' ? [0, 0.037, o] : [o, 0.037, 0]}
+            position={across === 'z' ? [0, 0.04, o] : [o, 0.04, 0]}
             size={across === 'z' ? [1.6, 0.006, 0.32] : [0.32, 0.006, 1.6]}
             color="#f1f5f9"
             shadow={false}
@@ -120,92 +128,75 @@ function Crosswalk({ position, across = 'z', width }) {
 }
 
 /**
- * Réseau extérieur de cheminements piétons industriels balisés (vert/jaune + chevrons + barrières)
- * reliant les portes latérales et principales des 4 bâtiments ainsi que les passages piétons.
+ * Réseau extérieur de cheminements piétons industriels balisés (vert/jaune + chevrons), calculé par le
+ * plan du site : couloirs de part et d'autre de chaque voie, accès aux passages piétons, raccordement
+ * des portes de chaque bâtiment ; barrières et panneaux aux débouchés des passages du rond-point.
  */
-function CampusPedestrianNetwork({ buildings = [] }) {
-  const y = 0.034;
-
+function CampusPedestrianNetwork({ site }) {
+  const [hx, hz] = site.hub;
   return (
     <group userData={{ noCollide: true }}>
-      {/* Boucle piétonne centrale autour du carrefour et des 4 passages piétons */}
-      {/* Axe Nord-Sud Est (X = +6.2) : de GP2 (Z = -8.0) à GP4 (Z = +13.4) */}
-      <WalkwayStrip from={[6.2, -8.0]} to={[6.2, -2.6]} y={y} />
-      <WalkwayStrip from={[6.2, 2.6]} to={[6.2, 13.4]} y={y} />
-      <WalkwayNode position={[6.2, -5.4]} y={y} />
-      <WalkwayNode position={[6.2, 5.4]} y={y} />
-      <WalkwayNode position={[6.2, -8.0]} y={y} />
-      <WalkwayNode position={[6.2, 13.4]} y={y} />
+      {site.walkways.strips.map((s) => (
+        <WalkwayStrip key={`${s.from}-${s.to}`} from={s.from} to={s.to} y={WALKWAY_Y} arrows={s.arrows} />
+      ))}
+      {site.walkways.nodes.map((n) => (
+        <WalkwayNode key={`${n}`} position={n} y={WALKWAY_Y} />
+      ))}
 
-      {/* Axe Nord-Sud Ouest : section Sud (X = -6.2) de GP3 (Z = +13.4) au passage piéton Ouest */}
-      <WalkwayStrip from={[-6.2, 2.6]} to={[-6.2, 13.4]} y={y} />
-      <WalkwayStrip from={[-6.2, -3.25]} to={[-6.2, -2.6]} y={y} arrows={false} />
-      <WalkwayNode position={[-6.2, 5.4]} y={y} />
-      <WalkwayNode position={[-6.2, 13.4]} y={y} />
-      <WalkwayNode position={[-6.2, -3.25]} y={y} />
-
-      {/* Axe Nord-Sud Nord-Ouest (X = -4.25, le long du pignon Est de GP1) */}
-      <WalkwayStrip from={[-4.25, -11.6]} to={[-4.25, -3.25]} y={y} />
-      <WalkwayNode position={[-4.25, -11.6]} y={y} />
-      <WalkwayNode position={[-4.25, -5.4]} y={y} />
-      <WalkwayNode position={[-4.25, -3.25]} y={y} />
-
-      {/* Liaisons Est-Ouest Nord (Z = -3.25 vers Porte Sud GP1 et Z = -5.4 vers Porte Sud GP2) */}
-      <WalkwayStrip from={[-17.0, -3.25]} to={[-4.25, -3.25]} y={y} />
-      <WalkwayNode position={[-17.0, -3.25]} y={y} />
-      <WalkwayStrip from={[-4.25, -5.4]} to={[-3.0, -5.4]} y={y} arrows={false} />
-      <WalkwayStrip from={[3.0, -5.4]} to={[17.0, -5.4]} y={y} />
-      <WalkwayNode position={[17.0, -5.4]} y={y} />
-
-      {/* Liaison Est-Ouest Sud (Z = +5.4 de part et d'autre du passage piéton Sud) */}
-      <WalkwayStrip from={[-6.2, 5.4]} to={[-3.0, 5.4]} y={y} arrows={false} />
-      <WalkwayStrip from={[3.0, 5.4]} to={[6.2, 5.4]} y={y} arrows={false} />
-
-      {/* Raccordements directs aux portes latérales et principales de chaque bâtiment */}
-      {buildings.map((b) => {
-        const [bx, , bz] = b.layout3D.position;
-        const [w, , d] = b.layout3D.size;
-        const [ox] = b.layout3D.outward || [Math.sign(bx) || 1, Math.sign(bz) || 1];
-        const doorZ = getBuildingDoorZ(d);
-        const sideDoorX = bx - ox * (w / 2 + 0.1);
-        const sideWorldZ = bz + doorZ;
-        const corrX = ox > 0 ? 6.2 : bz < 0 ? -4.25 : -6.2;
-        const southDoorZ = bz + d / 2 + 0.1;
-
-        return (
-          <React.Fragment key={`campus-wk-${b.id}`}>
-            {/* Branchement de la Porte Latérale au couloir piéton Nord-Sud */}
-            <WalkwayStrip from={[sideDoorX, sideWorldZ]} to={[corrX, sideWorldZ]} y={y} />
-            <WalkwayNode position={[corrX, sideWorldZ]} y={y} />
-
-            {/* Branchement de la Porte Principale Sud */}
-            {bz < 0 ? (
-              <WalkwayStrip
-                from={[bx, southDoorZ]}
-                to={[bx, bx < 0 ? -3.25 : -5.4]}
-                y={y}
-                arrows={false}
-              />
-            ) : (
-              <>
-                <WalkwayStrip from={[bx, southDoorZ]} to={[bx, southDoorZ + 1.1]} y={y} arrows={false} />
-                <WalkwayNode position={[bx, southDoorZ + 1.1]} y={y} />
-              </>
-            )}
+      {/* Barrières / arceaux de sécurité protégeant les débouchés des passages piétons du rond-point */}
+      <group position={[hx, 0, hz]}>
+        {[[-1, -1], [-1, 1], [1, -1], [1, 1]].map(([sx, sz]) => (
+          <React.Fragment key={`${sx}${sz}`}>
+            <SafetyGuardrail position={[sx * 5.1, 0, sz * 2.95]} length={1.3} height={0.68} axis="x" />
+            <SafetySign kind="mandatory" position={[sx * 7.2, 0, sz * 3.1]} height={1.25} size={0.28} />
           </React.Fragment>
-        );
-      })}
-
-      {/* Barrières / arceaux de sécurité protégeant les débouchés des passages piétons */}
-      <SafetyGuardrail position={[-5.1, 0, -2.95]} length={1.3} height={0.68} axis="x" />
-      <SafetyGuardrail position={[-5.1, 0, 2.95]} length={1.3} height={0.68} axis="x" />
-      <SafetyGuardrail position={[5.1, 0, -2.95]} length={1.3} height={0.68} axis="x" />
-      <SafetyGuardrail position={[5.1, 0, 2.95]} length={1.3} height={0.68} axis="x" />
-      <SafetySign kind="mandatory" position={[-7.2, 0, -3.1]} height={1.25} size={0.28} />
-      <SafetySign kind="mandatory" position={[7.2, 0, -3.1]} height={1.25} size={0.28} />
-      <SafetySign kind="mandatory" position={[-7.2, 0, 3.1]} height={1.25} size={0.28} />
-      <SafetySign kind="mandatory" position={[7.2, 0, 3.1]} height={1.25} size={0.28} />
+        ))}
+      </group>
     </group>
+  );
+}
+
+/** Chaussée, bordures, lignes de rive, pointillés et passages piétons d'une voie. */
+function Street({ street, site }) {
+  const along = street.axis === 'x';
+  const crossings = crossingsOf(street, site);
+  const crosswalks = crosswalksOf(street, site);
+  const length = street.to - street.from;
+  const mid = (street.from + street.to) / 2;
+  const half = street.width / 2;
+  // Marquages limités à l'enceinte (l'avenue se prolonge au-delà du portail)
+  const end = Math.min(street.to, along ? site.fence.maxX : site.fence.maxZ);
+  const segments = segmentsOf(street.from, end, crossings, crosswalks);
+  const at = (t, offset) => (along ? [t, street.z + offset] : [street.x + offset, t]);
+
+  return (
+    <>
+      <Box
+        position={along ? [mid, 0.02, street.z] : [street.x, 0.021, mid]}
+        size={along ? [length, 0.03, street.width] : [street.width, 0.03, length]}
+        map={getTexture('asphalt', (along ? length : street.width) / 4, (along ? street.width : length) / 4)}
+        rough={0.85}
+        shadow={false}
+        receive
+      />
+      {[-1, 1].map((s) =>
+        segments.map(([a, b]) => {
+          const [cx, cz] = at((a + b) / 2, s * (half + 0.15));
+          const [lx, lz] = at((a + b) / 2, s * (half - 0.25));
+          return (
+            <React.Fragment key={`${s}${a}`}>
+              <Box position={[cx, 0.06, cz]} size={along ? [b - a, 0.1, 0.3] : [0.3, 0.1, b - a]} color="#475569" rough={0.8} shadow={false} />
+              <Box position={[lx, 0.035, lz]} size={along ? [b - a, 0.006, 0.08] : [0.08, 0.006, b - a]} color="#94a3b8" shadow={false} />
+            </React.Fragment>
+          );
+        })
+      )}
+      <DashedLine street={street} from={street.from + 1} to={street.main && !along ? end + 3 : end - 1} crossings={crossings} />
+      {crosswalks.map((t) => {
+        const [x, z] = at(t, 0);
+        return <Crosswalk key={t} position={[x, 0, z]} across={along ? 'z' : 'x'} width={street.width - 0.6} />;
+      })}
+    </>
   );
 }
 
@@ -329,7 +320,7 @@ function GuardHouse({ side = 1, ...rest }) {
   );
 }
 
-export default function CampusScenery({ buildings = [], companyName, companyLogo }) {
+export default function CampusScenery({ site, companyName, companyLogo }) {
   const flagTexture = useCompanyFlagTexture(companyLogo, companyName);
   const flagMaterial = useMemo(
     () => new THREE.MeshStandardMaterial({ map: flagTexture, side: THREE.DoubleSide, roughness: 0.85 }),
@@ -338,15 +329,23 @@ export default function CampusScenery({ buildings = [], companyName, companyLogo
   useEffect(() => () => flagMaterial.dispose(), [flagMaterial]);
 
   const layout = useMemo(() => {
-    if (!buildings.length) return null;
-    const { rects, fence } = computeSiteBounds(buildings);
+    if (!site) return null;
+    const { fence, footprints, streets, lots, gate, hub } = site;
+    const streetRects = streets.map(streetRect);
+    const isFree = (x, z, pad = 1.2) =>
+      !streetRects.some((r) => inRect(r, x, z, 1.2)) &&
+      !footprints.some((r) => inRect(r, x, z, pad)) &&
+      !site.walkways.strips.some((s) => distanceToSegment(x, z, s.from, s.to) < 0.4 + pad) &&
+      Math.hypot(x - hub[0], z - hub[1]) > HUB_RADIUS + 1;
+    const lengthX = fence.maxX - fence.minX;
+    const lengthZ = fence.maxZ - fence.minZ;
 
     const trees = [];
     // Alignement d'arbres le long de la clôture (côté intérieur)
     const inset = 1.6;
     const step = 4.2;
     const addTree = (x, z, i) => {
-      if (!isFree(x, z, rects, 0.8)) return;
+      if (!isFree(x, z, 0.8)) return;
       trees.push({ x, z, variant: seeded(i) > 0.55 ? 'conifer' : 'round', size: 0.85 + seeded(i + 7) * 0.45 });
     };
     let i = 0;
@@ -358,64 +357,76 @@ export default function CampusScenery({ buildings = [], companyName, companyLogo
       addTree(fence.minX + inset, z, (i += 1));
       addTree(fence.maxX - inset, z, (i += 1));
     }
+    // Bosquets clairsemés sur les îlots sans bâtiment
+    lots
+      .filter((lot) => !lot.occupied)
+      .forEach((lot, l) => {
+        for (let x = lot.minX + 2; x <= lot.maxX - 2; x += 4.5) {
+          for (let z = lot.minZ + 2; z <= lot.maxZ - 2; z += 4.5) {
+            const k = l * 97 + x * 3.1 + z * 7.3;
+            if (seeded(k) > 0.6 && isFree(x, z, 0.8)) {
+              trees.push({ x, z, variant: seeded(k + 1) > 0.5 ? 'conifer' : 'round', size: 0.9 + seeded(k + 2) * 0.5 });
+            }
+          }
+        }
+      });
     // Bosquets hors enceinte pour habiller le terrain (bande de 2,5 à 9 unités autour de la clôture)
-    for (let k = 0; k < 32; k += 1) {
+    const groves = Math.max(32, Math.round((lengthX + lengthZ) / 4));
+    for (let k = 0; k < groves; k += 1) {
       const side = k % 4;
       const along = seeded(k * 3.1);
       const offset = 2.5 + seeded(k * 5.7) * 6.5;
-      const x =
-        side === 0 ? fence.minX - offset : side === 1 ? fence.maxX + offset : fence.minX + along * lengthOf(fence, 'x');
-      const z =
-        side === 2 ? fence.minZ - offset : side === 3 ? fence.maxZ + offset : fence.minZ + along * lengthOf(fence, 'z');
-      if (z > 0 && Math.abs(x) < ROAD_Z_WIDTH / 2 + 1.5) continue;
+      const x = side === 0 ? fence.minX - offset : side === 1 ? fence.maxX + offset : fence.minX + along * lengthX;
+      const z = side === 2 ? fence.minZ - offset : side === 3 ? fence.maxZ + offset : fence.minZ + along * lengthZ;
+      if (z > fence.maxZ - 1 && Math.abs(x - gate.x) < AVENUE_WIDTH / 2 + 1.5) continue;
       trees.push({ x, z, variant: k % 3 ? 'conifer' : 'round', size: 1 + seeded(k) * 0.6 });
     }
 
-    // Lampadaires alternés le long des deux voies (bras orienté vers la chaussée), décalés hors des
-    // bâtiments et de l'auvent d'entrée des bureaux, qui bordent la voie Est-Ouest
+    // Lampadaires alternés le long de chaque voie (bras orienté vers la chaussée), hors carrefours
+    // et hors accès aux passages piétons
     const lamps = [];
-    const blocked = (x, z) =>
-      buildings.some((b) => {
-        const [bx, , bz] = b.layout3D.position;
-        const [w, , d] = b.layout3D.size;
-        const front = bz + d / 2;
-        const entrance = b.layout3D.archetype === 'office' && Math.abs(x - bx) < 3.8 && z > front - 0.5 && z < front + 1.8;
-        return entrance || (Math.abs(x - bx) < w / 2 + 0.3 && Math.abs(z - bz) < d / 2 + 0.3);
-      });
-    for (let x = fence.minX + 4; x <= fence.maxX - 4; x += 9) {
-      if (Math.abs(x) < 6) continue;
-      const side = Math.round(x / 9) % 2 ? 1 : -1;
-      const z = side * (ROAD_X_WIDTH / 2 + 0.45);
-      const spot = [x, x - 4.5, x + 4.5].find((c) => Math.abs(c) >= 6 && c > fence.minX + 1 && c < fence.maxX - 1 && !blocked(c, z));
-      if (spot !== undefined) lamps.push({ x: spot, z, rot: side > 0 ? Math.PI / 2 : -Math.PI / 2 });
-    }
-    for (let z = fence.minZ + 4; z <= fence.maxZ - 4; z += 9) {
-      if (Math.abs(z) < 6) continue;
-      const side = Math.round(z / 9) % 2 ? 1 : -1;
-      lamps.push({ x: side * (ROAD_Z_WIDTH / 2 + 0.45), z, rot: side > 0 ? Math.PI : 0 });
+    for (const street of streets) {
+      const along = street.axis === 'x';
+      const crossings = crossingsOf(street, site);
+      const crosswalks = crosswalksOf(street, site);
+      const end = Math.min(street.to, along ? fence.maxX : fence.maxZ);
+      const nearCrossing = (t) =>
+        crossings.some((c) => Math.abs(t - c.at) < (c.hub ? 6 : c.half + 3)) || crosswalks.some((c) => Math.abs(t - c) < 1.4);
+      const offset = street.width / 2 + 0.45;
+      for (let t = street.from + 4; t <= end - 4; t += 9) {
+        if (nearCrossing(t)) continue;
+        const side = Math.round(t / 9) % 2 ? 1 : -1;
+        const at = (c) => (along ? [c, street.z + side * offset] : [street.x + side * offset, c]);
+        const spot = [t, t - 4.5, t + 4.5].find(
+          (c) => !nearCrossing(c) && c > street.from + 1 && c < end - 1 && !footprints.some((r) => inRect(r, ...at(c), 0.3))
+        );
+        if (spot === undefined) continue;
+        const [x, z] = at(spot);
+        lamps.push({ x, z, rot: along ? (side > 0 ? Math.PI / 2 : -Math.PI / 2) : side > 0 ? Math.PI : 0 });
+      }
     }
 
-    // Poteaux de clôture
+    // Poteaux de clôture (portail ouvert sur l'avenue)
+    const gateHalf = AVENUE_WIDTH / 2 + 2.2;
     const posts = [];
     const postStep = 4;
-    for (let x = fence.minX; x <= fence.maxX + 0.01; x += (fence.maxX - fence.minX) / Math.round((fence.maxX - fence.minX) / postStep)) {
+    for (let x = fence.minX; x <= fence.maxX + 0.01; x += lengthX / Math.round(lengthX / postStep)) {
       posts.push([x, fence.minZ]);
-      if (Math.abs(x) > ROAD_Z_WIDTH / 2 + 2.2) posts.push([x, fence.maxZ]);
+      if (Math.abs(x - gate.x) > gateHalf) posts.push([x, fence.maxZ]);
     }
-    for (let z = fence.minZ; z <= fence.maxZ + 0.01; z += (fence.maxZ - fence.minZ) / Math.round((fence.maxZ - fence.minZ) / postStep)) {
+    for (let z = fence.minZ; z <= fence.maxZ + 0.01; z += lengthZ / Math.round(lengthZ / postStep)) {
       posts.push([fence.minX, z], [fence.maxX, z]);
     }
 
-    return { fence, trees, lamps, posts };
-  }, [buildings]);
+    return { fence, gate, hub, gateHalf, trees, lamps, posts };
+  }, [site]);
 
   if (!layout) return null;
-  const { fence, trees, lamps, posts } = layout;
+  const { fence, gate, hub, gateHalf, trees, lamps, posts } = layout;
   const lengthX = fence.maxX - fence.minX;
   const lengthZ = fence.maxZ - fence.minZ;
   const centerX = (fence.minX + fence.maxX) / 2;
   const centerZ = (fence.minZ + fence.maxZ) / 2;
-  const gateHalf = ROAD_Z_WIDTH / 2 + 2.2;
   const fenceH = 1.6;
 
   return (
@@ -423,45 +434,26 @@ export default function CampusScenery({ buildings = [], companyName, companyLogo
       {/* Enceinte pavée */}
       <Box position={[centerX, 0.004, centerZ]} size={[lengthX, 0.008, lengthZ]} map={getTexture('pavers', lengthX / 3, lengthZ / 3)} rough={0.95} shadow={false} receive />
 
-      {/* Voirie : chaussées, bordures, marquages */}
-      <Box position={[centerX, 0.02, 0]} size={[lengthX, 0.03, ROAD_X_WIDTH]} map={getTexture('asphalt', lengthX / 4, ROAD_X_WIDTH / 4)} rough={0.85} shadow={false} receive />
-      <Box position={[0, 0.021, (fence.minZ + fence.maxZ + 8) / 2]} size={[ROAD_Z_WIDTH, 0.03, lengthZ + 8]} map={getTexture('asphalt', ROAD_Z_WIDTH / 4, (lengthZ + 8) / 4)} rough={0.85} shadow={false} receive />
-      {[-1, 1].map((s) => (
-        <React.Fragment key={s}>
-          {splitAroundCenter(fence.minX, fence.maxX).map(([a, b]) => (
-            <React.Fragment key={`x${a}`}>
-              <Box position={[(a + b) / 2, 0.06, s * (ROAD_X_WIDTH / 2 + 0.15)]} size={[b - a, 0.1, 0.3]} color="#475569" rough={0.8} shadow={false} />
-              <Box position={[(a + b) / 2, 0.035, s * (ROAD_X_WIDTH / 2 - 0.25)]} size={[b - a, 0.006, 0.08]} color="#94a3b8" shadow={false} />
-            </React.Fragment>
-          ))}
-          {splitAroundCenter(fence.minZ, fence.maxZ).map(([a, b]) => (
-            <React.Fragment key={`z${a}`}>
-              <Box position={[s * (ROAD_Z_WIDTH / 2 + 0.15), 0.06, (a + b) / 2]} size={[0.3, 0.1, b - a]} color="#475569" rough={0.8} shadow={false} />
-              <Box position={[s * (ROAD_Z_WIDTH / 2 - 0.25), 0.035, (a + b) / 2]} size={[0.08, 0.006, b - a]} color="#94a3b8" shadow={false} />
-            </React.Fragment>
-          ))}
-        </React.Fragment>
+      {/* Voirie : chaussées, bordures, marquages, passages piétons */}
+      {site.streets.map((street) => (
+        <Street key={`${street.axis}${street.x ?? street.z}`} street={street} site={site} />
       ))}
-      <DashedLine from={fence.minX + 1} to={fence.maxX - 1} axis="x" />
-      <DashedLine from={fence.minZ + 1} to={fence.maxZ + 3} axis="z" />
-      <Crosswalk position={[-6.2, 0, 0]} across="z" width={ROAD_X_WIDTH - 0.6} />
-      <Crosswalk position={[6.2, 0, 0]} across="z" width={ROAD_X_WIDTH - 0.6} />
-      <Crosswalk position={[0, 0, -5.4]} across="x" width={ROAD_Z_WIDTH - 0.6} />
-      <Crosswalk position={[0, 0, 5.4]} across="x" width={ROAD_Z_WIDTH - 0.6} />
 
       {/* Réseau de cheminements piétons balisés entre les portes des bâtiments et les passages piétons */}
-      <CampusPedestrianNetwork buildings={buildings} />
+      <CampusPedestrianNetwork site={site} />
 
       {/* Rond-point engazonné et mâts de drapeaux autour du totem central */}
-      <Cylinder position={[0, 0.04, 0]} radius={4.4} height={0.05} segments={40} color="#334155" rough={0.8} shadow={false} />
-      <Cylinder position={[0, 0.07, 0]} radius={4.1} height={0.06} segments={40} color="#14532d" rough={0.95} shadow={false} />
-      {/* Drapeaux aux couleurs de la société (logo Dolibarr) */}
-      <Flag position={[-2.2, 0.05, -3.0]} material={flagMaterial} phase={0} />
-      <Flag position={[-0.3, 0.05, -3.5]} material={flagMaterial} phase={1.3} />
-      <Flag position={[1.6, 0.05, -3.0]} material={flagMaterial} phase={2.1} />
-      {[[-3.2, 1.6], [3.2, 1.6]].map(([x, z]) => (
-        <Bench key={x} position={[x, 0.08, z]} rotation={[0, x < 0 ? Math.PI / 3 : -Math.PI / 3, 0]} />
-      ))}
+      <group position={[hub[0], 0, hub[1]]}>
+        <Cylinder position={[0, 0.04, 0]} radius={HUB_RADIUS} height={0.05} segments={40} color="#334155" rough={0.8} shadow={false} />
+        <Cylinder position={[0, 0.07, 0]} radius={HUB_RADIUS - 0.3} height={0.06} segments={40} color="#14532d" rough={0.95} shadow={false} />
+        {/* Drapeaux aux couleurs de la société (logo Dolibarr) */}
+        <Flag position={[-2.2, 0.05, -3.0]} material={flagMaterial} phase={0} />
+        <Flag position={[-0.3, 0.05, -3.5]} material={flagMaterial} phase={1.3} />
+        <Flag position={[1.6, 0.05, -3.0]} material={flagMaterial} phase={2.1} />
+        {[[-3.2, 1.6], [3.2, 1.6]].map(([x, z]) => (
+          <Bench key={x} position={[x, 0.08, z]} rotation={[0, x < 0 ? Math.PI / 3 : -Math.PI / 3, 0]} />
+        ))}
+      </group>
 
       {/* Éclairage public */}
       {lamps.map((l) => (
@@ -473,15 +465,15 @@ export default function CampusScenery({ buildings = [], companyName, companyLogo
         <Tree key={k} position={[t.x, 0, t.z]} variant={t.variant} size={t.size} />
       ))}
 
-      {/* Clôture d'enceinte (portail d'entrée au sud, sur la voie principale) */}
+      {/* Clôture d'enceinte (portail d'entrée au sud, sur l'avenue) */}
       {posts.map(([x, z], k) => (
         <Box key={k} position={[x, fenceH / 2, z]} size={[0.1, fenceH, 0.1]} color="#64748b" metal={0.6} rough={0.4} />
       ))}
       <Box position={[centerX, fenceH - 0.05, fence.minZ]} size={[lengthX, 0.05, 0.05]} color="#64748b" metal={0.6} shadow={false} />
       <Box position={[centerX, fenceH / 2, fence.minZ]} size={[lengthX, fenceH, 0.02]} color="#94a3b8" opacity={0.16} shadow={false} />
       {[-1, 1].map((s) => {
-        const from = s < 0 ? fence.minX : gateHalf;
-        const to = s < 0 ? -gateHalf : fence.maxX;
+        const from = s < 0 ? fence.minX : gate.x + gateHalf;
+        const to = s < 0 ? gate.x - gateHalf : fence.maxX;
         return (
           <React.Fragment key={s}>
             <Box position={[(from + to) / 2, fenceH - 0.05, fence.maxZ]} size={[to - from, 0.05, 0.05]} color="#64748b" metal={0.6} shadow={false} />
@@ -491,8 +483,11 @@ export default function CampusScenery({ buildings = [], companyName, companyLogo
           </React.Fragment>
         );
       })}
-      <GuardHouse position={[ROAD_Z_WIDTH / 2 + 2.6, 0, fence.maxZ - 1.6]} side={1} />
-      <SafetySign kind="firstaid" position={[-ROAD_Z_WIDTH / 2 - 1.5, 0, fence.maxZ - 1.2]} height={1.7} size={0.55} />
+      <GuardHouse position={[gate.x + AVENUE_WIDTH / 2 + 2.6, 0, fence.maxZ - 1.6]} side={1} />
+      <EquipmentOwner.Provider value={GATE_OWNER}>
+        <FirstAidKit position={[gate.x + AVENUE_WIDTH / 2 + 1.2, 0, fence.maxZ - 2.0]} rotation={[0, -Math.PI / 2, 0]} slot="gate" />
+      </EquipmentOwner.Provider>
+      <SafetySign kind="firstaid" position={[gate.x - AVENUE_WIDTH / 2 - 1.5, 0, fence.maxZ - 1.2]} height={1.7} size={0.55} />
     </MergeStatic>
   );
 }

@@ -109,37 +109,22 @@ export function buildingSkinLabel(archetype, finish) {
   return BUILDING_SKIN_BY_ID[`${archetype}:${finish}`]?.label || BUILDING_LABELS[archetype] || archetype;
 }
 
-/**
- * Applique les skins choisis aux données positionnées : archétype, finition et couleur des groupements,
- * archétype des UT (en « Auto », le repli dépend de l'archétype effectif du bâtiment parent).
- */
-export function applySkins(data, skins) {
-  if (!data?.buildings) return data;
-  const allWorkUnitsWorld = [];
-  const buildings = data.buildings.map((b) => {
-    const autoArchetype = b.layout3D.autoArchetype || b.layout3D.archetype;
-    const skin = BUILDING_SKIN_BY_ID[skins[b.id]];
-    const archetype = skin?.archetype || autoArchetype;
-    const finish = skin?.finish || Object.keys(SHELL_FINISHES[archetype] || {})[0];
-    const children = b.children.map((ut) => {
-      const autoUt = detectWorkUnitArchetype(ut.label, archetype);
-      const enriched = { ...ut, autoArchetype: autoUt, archetype: WORKUNIT_SKIN_LABELS[skins[ut.id]] ? skins[ut.id] : autoUt };
-      allWorkUnitsWorld.push(enriched);
-      return enriched;
-    });
-    return {
-      ...b,
-      children,
-      layout3D: {
-        ...b.layout3D,
-        autoArchetype,
-        archetype,
-        finish,
-        themeColor: BUILDING_ARCHETYPES[archetype]?.themeColor || b.layout3D.themeColor,
-      },
-    };
-  });
-  return { ...data, buildings, allWorkUnitsWorld };
+/** Skin effectif d'un groupement : archétype choisi (sinon automatique), finition et couleur. */
+export function resolveBuildingSkin(skins, id, autoArchetype) {
+  const skin = BUILDING_SKIN_BY_ID[skins?.[id]];
+  const archetype = skin?.archetype || autoArchetype;
+  return {
+    autoArchetype,
+    archetype,
+    finish: skin?.finish || Object.keys(SHELL_FINISHES[archetype] || {})[0],
+    themeColor: BUILDING_ARCHETYPES[archetype]?.themeColor || '#64748b',
+  };
+}
+
+/** Skin effectif d'une UT ; en « Auto », le repli dépend de l'archétype effectif du bâtiment parent. */
+export function resolveWorkUnitSkin(skins, ut, buildingArchetype) {
+  const autoArchetype = detectWorkUnitArchetype(ut.label, buildingArchetype);
+  return { autoArchetype, archetype: WORKUNIT_SKIN_LABELS[skins?.[ut.id]] ? skins[ut.id] : autoArchetype };
 }
 
 const STORAGE_KEY = 'digiriskgame.skins.v1';

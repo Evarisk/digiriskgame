@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { explorerStore } from '../3d/explorer/explorerStore';
-import { computeSiteBounds } from '../3d/CampusScenery';
+import { streetRect } from '../3d/CampusScenery';
 
 /**
- * Minicarte du mode visite (nord en haut) : voirie, groupements, UT teintées par leur cotation
- * (cerclées de vert une fois inspectées) et position / orientation du joueur.
+ * Minicarte du mode visite (nord en haut) : voirie, groupements et sous-groupements, UT teintées
+ * par leur cotation (cerclées de vert une fois inspectées) et position / orientation du joueur.
  */
 
 const CSS_W = 190;
@@ -13,7 +13,8 @@ const DPR = 2;
 
 export default function ExplorerMinimap({ data, cotationMode, inspectedIds }) {
   const canvasRef = useRef();
-  const fence = useMemo(() => (data?.buildings?.length ? computeSiteBounds(data.buildings).fence : null), [data]);
+  const site = data?.site;
+  const fence = useMemo(() => (site?.fence ? site.fence : null), [site]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -37,15 +38,19 @@ export default function ExplorerMinimap({ data, cotationMode, inspectedIds }) {
       ctx.lineWidth = 2;
       ctx.strokeRect(...rect(fence.minX, fence.minZ, fence.maxX, fence.maxZ));
 
-      // Voies Est-Ouest et Nord-Sud, rond-point
+      // Voirie et rond-point central
       ctx.fillStyle = 'rgba(71, 85, 105, 0.75)';
-      ctx.fillRect(...rect(fence.minX, -2.75, fence.maxX, 2.75));
-      ctx.fillRect(...rect(-3.25, fence.minZ, 3.25, fence.maxZ + 4));
+      for (const street of site.streets) {
+        const r = streetRect(street);
+        ctx.fillRect(...rect(r.minX, r.minZ, r.maxX, r.maxZ));
+      }
       ctx.beginPath();
-      ctx.arc(px(0), pz(0), 4.4 * k, 0, Math.PI * 2);
+      ctx.arc(px(site.hub[0]), pz(site.hub[1]), 4.4 * k, 0, Math.PI * 2);
       ctx.fillStyle = '#14532d';
       ctx.fill();
 
+      // Étiquettes lisibles uniquement si les bâtiments sont assez grands à l'écran
+      const labelled = data.buildings.every((b) => b.layout3D.size[0] * k > 22 * DPR);
       for (const b of data.buildings) {
         const [x, , z] = b.layout3D.position;
         const [w, , d] = b.layout3D.size;
@@ -54,10 +59,20 @@ export default function ExplorerMinimap({ data, cotationMode, inspectedIds }) {
         ctx.strokeStyle = b.layout3D.themeColor || '#3b82f6';
         ctx.lineWidth = 2;
         ctx.strokeRect(...rect(x - w / 2, z - d / 2, x + w / 2, z + d / 2));
-        ctx.fillStyle = '#e2e8f0';
-        ctx.font = `bold ${10 * DPR}px Inter, system-ui, sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.fillText(b.ref, px(x), pz(z - d / 2) + 12 * DPR);
+        for (const zone of b.zones || []) {
+          const [zx, , zz] = zone.layout3D.position;
+          const [zw, , zd] = zone.layout3D.size;
+          ctx.lineWidth = 1;
+          ctx.setLineDash([3 * DPR, 2 * DPR]);
+          ctx.strokeRect(...rect(zx - zw / 2, zz - zd / 2, zx + zw / 2, zz + zd / 2));
+          ctx.setLineDash([]);
+        }
+        if (labelled) {
+          ctx.fillStyle = '#e2e8f0';
+          ctx.font = `bold ${10 * DPR}px Inter, system-ui, sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.fillText(b.ref, px(x), pz(z - d / 2) + 12 * DPR);
+        }
       }
 
       for (const ut of data.allWorkUnitsWorld || []) {
@@ -109,7 +124,7 @@ export default function ExplorerMinimap({ data, cotationMode, inspectedIds }) {
       lastPlayer = player;
       draw();
     });
-  }, [fence, data, cotationMode, inspectedIds]);
+  }, [fence, site, data, cotationMode, inspectedIds]);
 
   if (!fence) return null;
   return (

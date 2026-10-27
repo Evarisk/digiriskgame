@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { Html, Line } from '@react-three/drei';
 import { Person } from './models/people';
-import { getBuildingDoorZ } from './models/buildingShells';
+import MergeStatic from './models/MergeStatic';
 
 /**
  * Construit une trajectoire industrielle lisse (segments rectilignes strictement centrés
@@ -61,112 +61,98 @@ function buildRoundedIndustrialCurve(rawWaypoints, cornerRadius = 0.42) {
   return curvePath;
 }
 
-/**
- * Calcule le cheminement interne d'une Unité de Travail jusqu'au seuil extérieur
- * de la porte choisie (`'side'` = porte piétonne latérale, `'south'` = porte principale Sud).
- */
-function getBuildingExitWaypoints(ut, building, doorType = 'side') {
-  if (!ut?.layout3D?.worldPosition || !building?.layout3D?.position) {
-    const [wx, , wz] = ut?.layout3D?.worldPosition || [0, 0.18, 0];
-    return [[wx, 0.18, wz + 1.8]];
-  }
+const Y_INDOOR = 0.18;
+const Y_OUTDOOR = 0.04;
+const WALK_SPEED = 3.2; // vitesse de marche apparente moyenne (unités / s) pour un facteur de 1
 
-  const [bx, , bz] = building.layout3D.position;
-  const [w, , d] = building.layout3D.size;
-  const [ox] = building.layout3D.outward || [Math.sign(bx) || 1, Math.sign(bz) || 1];
-  const [ux, , uz] = ut.layout3D.localPosition;
-  const worldUx = bx + ux;
-  const worldUz = bz + uz;
-
-  const doorZ = getBuildingDoorZ(d);
-  const sideWorldZ = bz + doorZ;
-  const sideDoorInnerX = bx - ox * (w / 2 - 0.55);
-  const sideDoorOuterX = bx - ox * (w / 2 + 0.55);
-  const outdoorCorrX = ox > 0 ? 6.2 : bz < 0 ? -4.25 : -6.2;
-
-  const southDoorInnerZ = bz + d / 2 - 0.55;
-  const southDoorOuterZ = bz + d / 2 + 0.55;
-  const outdoorSouthZ = bz < 0 ? (bx < 0 ? -3.25 : -5.4) : bz + d / 2 + 1.1;
-
-  const yIn = 0.18;
-  const yOut = 0.04;
-
-  // Bâtiment à 1 rangée (ex. GP2 Production, depth = 11.4)
-  if (d < 14) {
-    const startPt = [worldUx, yIn, worldUz + 2.1];
-    const onCorridor = [worldUx, yIn, sideWorldZ];
-    if (doorType === 'south') {
-      return [
-        startPt,
-        onCorridor,
-        [bx, yIn, sideWorldZ],
-        [bx, yIn, southDoorInnerZ],
-        [bx, yOut, southDoorOuterZ],
-        [bx, yOut, outdoorSouthZ],
-      ];
-    }
-    return [
-      startPt,
-      onCorridor,
-      [sideDoorInnerX, yIn, sideWorldZ],
-      [sideDoorOuterX, yOut, sideWorldZ],
-      [outdoorCorrX, yOut, sideWorldZ],
-    ];
-  }
-
-  // Bâtiment à 2 rangées (ex. GP1 Bureaux, GP3 Peinture, GP4 Logistique, depth = 16.8)
-  const frontWorldZ = bz + (d / 2 - 1.6); // bz + 6.8
-  const isThreeCols = (building.children?.length || 0) > 4;
-  const aisleX = isThreeCols ? (ux < 0 ? bx - 3.1 : bx + 3.1) : bx;
-
-  if (uz < 0) {
-    // Poste du 1er rang (arrière) : accès direct sur le couloir transversal central (sideWorldZ)
-    const startPt = [worldUx, yIn, worldUz + 2.05];
-    const onCentralCorridor = [worldUx, yIn, sideWorldZ];
-    if (doorType === 'side') {
-      return [
-        startPt,
-        onCentralCorridor,
-        [sideDoorInnerX, yIn, sideWorldZ],
-        [sideDoorOuterX, yOut, sideWorldZ],
-        [outdoorCorrX, yOut, sideWorldZ],
-      ];
-    }
-    return [
-      startPt,
-      onCentralCorridor,
-      [aisleX, yIn, sideWorldZ],
-      [aisleX, yIn, frontWorldZ],
-      [bx, yIn, frontWorldZ],
-      [bx, yIn, southDoorInnerZ],
-      [bx, yOut, southDoorOuterZ],
-      [bx, yOut, outdoorSouthZ],
-    ];
-  }
-
-  // Poste du 2e rang (avant) : accès sur le couloir avant Sud (frontWorldZ)
-  const startPt = [worldUx, yIn, worldUz + 2.1];
-  const onFrontCorridor = [worldUx, yIn, frontWorldZ];
-  if (doorType === 'south') {
-    return [
-      startPt,
-      onFrontCorridor,
-      [bx, yIn, frontWorldZ],
-      [bx, yIn, southDoorInnerZ],
-      [bx, yOut, southDoorOuterZ],
-      [bx, yOut, outdoorSouthZ],
-    ];
-  }
-  return [
-    startPt,
-    onFrontCorridor,
-    [aisleX, yIn, frontWorldZ],
-    [aisleX, yIn, sideWorldZ],
-    [sideDoorInnerX, yIn, sideWorldZ],
-    [sideDoorOuterX, yOut, sideWorldZ],
-    [outdoorCorrX, yOut, sideWorldZ],
-  ];
+/** File de priorité minimale (tas binaire) pour le plus court chemin. */
+function createHeap() {
+  const items = [];
+  const swap = (i, j) => ([items[i], items[j]] = [items[j], items[i]]);
+  return {
+    get size() {
+      return items.length;
+    },
+    push(item) {
+      items.push(item);
+      for (let i = items.length - 1; i > 0; ) {
+        const parent = (i - 1) >> 1;
+        if (items[parent][0] <= items[i][0]) break;
+        swap(i, parent);
+        i = parent;
+      }
+    },
+    pop() {
+      const top = items[0];
+      const last = items.pop();
+      if (items.length) {
+        items[0] = last;
+        for (let i = 0; ; ) {
+          const l = 2 * i + 1;
+          const r = l + 1;
+          let m = i;
+          if (l < items.length && items[l][0] < items[m][0]) m = l;
+          if (r < items.length && items[r][0] < items[m][0]) m = r;
+          if (m === i) break;
+          swap(i, m);
+          i = m;
+        }
+      }
+      return top;
+    },
+  };
 }
+
+/**
+ * Plus court chemin sur le réseau des couloirs piétons (plan du site), d'un poste à un autre :
+ * couloirs intérieurs, portes, couloirs le long de la voirie et passages piétons. Au seuil d'une
+ * porte, l'opérateur passe de la dalle du bâtiment au pavé extérieur.
+ */
+function walkRoute(graph, from, to) {
+  if (!graph || from === undefined || to === undefined || from === to) return null;
+  const dist = new Map([[from, 0]]);
+  const prev = new Map();
+  const heap = createHeap();
+  heap.push([0, from]);
+  while (heap.size) {
+    const [d, u] = heap.pop();
+    if (u === to) break;
+    if (d > dist.get(u)) continue;
+    for (const { to: v, w, sill } of graph.adjacency[u]) {
+      const nd = d + w;
+      if (nd < (dist.get(v) ?? Infinity)) {
+        dist.set(v, nd);
+        prev.set(v, { node: u, sill });
+        heap.push([nd, v]);
+      }
+    }
+  }
+  if (!prev.has(to)) return null;
+
+  const path = [to];
+  const sills = [];
+  for (let n = to; prev.has(n); n = prev.get(n).node) {
+    sills.unshift(prev.get(n).sill);
+    path.unshift(prev.get(n).node);
+  }
+  const waypoints = [];
+  path.forEach((id, i) => {
+    if (i > 0 && sills[i - 1]) waypoints.push([sills[i - 1][0], Y_INDOOR, sills[i - 1][1]]);
+    const n = graph.nodes[id];
+    waypoints.push([n.x, n.indoor ? Y_INDOOR : Y_OUTDOOR, n.z]);
+  });
+  return waypoints;
+}
+
+// Opérateurs du site de démonstration ; sur un autre DUER, leurs trajets relient automatiquement
+// des postes de bâtiments différents
+const PERSONAS = [
+  { id: 'agent-1', name: 'Marc (Chef d’Atelier)', role: 'Production ↔ Études', helmetColor: '#f59e0b', suitColor: '#2563eb', from: 'UT14', to: 'UT8', pace: 1.05, phaseOffset: 0.0 },
+  { id: 'agent-2', name: 'Sophie (Ingénieure HSE)', role: 'Audit Sécurité Peinture ↔ Admin', helmetColor: '#10b981', suitColor: '#0f766e', from: 'UT3', to: 'UT4', pace: 0.92, phaseOffset: 0.35 },
+  { id: 'agent-3', name: 'Karim (Cariste / Flux)', role: 'Cariste ↔ Fret Aérien', helmetColor: '#ef4444', suitColor: '#ea580c', from: 'UT17', to: 'UT12', pace: 1.1, phaseOffset: 0.65 },
+  { id: 'agent-4', name: 'Léa (Support & Réseau)', role: 'IT ↔ Cabine Peinture', helmetColor: '#38bdf8', suitColor: '#4f46e5', from: 'UT7', to: 'UT18', pace: 0.96, phaseOffset: 0.18 },
+  { id: 'agent-5', name: 'Thomas (Logistique / VRP)', role: 'Coursiers ↔ Commerciaux VRP', helmetColor: '#eab308', suitColor: '#7c3aed', from: 'UT11', to: 'UT5', pace: 0.88, phaseOffset: 0.5 },
+];
 
 /**
  * Étape 4 — Cinématique des flux & Déplacements d'agents humanoïdes animés
@@ -174,8 +160,8 @@ function getBuildingExitWaypoints(ut, building, doorType = 'side') {
  * franchissent les portes piétonnes des bâtiments et traversent sur les passages piétons.
  */
 export default function WorkerAgents({
-  allWorkUnits = [],
   buildings = [],
+  site,
   showPaths = true,
   agentsEnabled = true,
   speedMultiplier = 1,
@@ -183,131 +169,46 @@ export default function WorkerAgents({
   showLabels = true,
 }) {
   const agentRoutes = useMemo(() => {
-    if (!allWorkUnits.length) return [];
+    const allWorkUnits = buildings.flatMap((b) => b.workUnits || []);
+    if (allWorkUnits.length < 2 || !site?.walkGraph) return [];
 
-    const findUt = (refOrKeyword) =>
-      allWorkUnits.find(
-        (u) =>
-          u.ref?.toLowerCase() === refOrKeyword.toLowerCase() ||
-          u.label?.toLowerCase().includes(refOrKeyword.toLowerCase())
-      ) || allWorkUnits[0];
+    const findUt = (ref) => allWorkUnits.find((u) => u.ref?.toLowerCase() === ref.toLowerCase());
+    // Repli : postes de deux bâtiments différents (ou deux postes du même s'il n'y en a qu'un)
+    const staffed = buildings.filter((b) => b.workUnits?.length);
+    const autoPair = (i) => {
+      const a = staffed[(i * 2) % staffed.length];
+      const b = staffed[(i * 2 + 1) % staffed.length];
+      const fromUt = a.workUnits[(i * 3) % a.workUnits.length];
+      const toUt = b.workUnits.find((u, k) => u !== fromUt && k >= (i * 5 + 1) % b.workUnits.length) || allWorkUnits.find((u) => u !== fromUt);
+      return [fromUt, toUt];
+    };
 
-    const findBuildingForUt = (ut) =>
-      buildings.find(
-        (b) => b.ref === ut?.parentBuildingRef || b.children?.some((c) => c.id === ut?.id)
-      ) || buildings[0];
+    return PERSONAS.flatMap((persona, i) => {
+      const preferred = [findUt(persona.from), findUt(persona.to)];
+      const [fromUt, toUt] = preferred[0] && preferred[1] ? preferred : autoPair(i);
+      const waypoints = walkRoute(site.walkGraph, fromUt?.layout3D?.walkNode, toUt?.layout3D?.walkNode);
+      if (!waypoints) return [];
 
-    const yOut = 0.04;
-
-    const pairs = [
-      {
-        id: 'agent-1',
-        name: 'Marc (Chef d’Atelier)',
-        role: 'Production ↔ Études',
-        helmetColor: '#f59e0b',
-        suitColor: '#2563eb',
-        fromUt: findUt('UT14'), // Soudeurs et chaudronnerie (GP2)
-        toUt: findUt('UT8'),    // Bureau d'études (GP1)
-        fromDoor: 'side',       // Porte latérale Ouest GP2
-        toDoor: 'south',        // Porte principale Sud GP1
-        outdoorWaypoints: [
-          [6.2, yOut, -5.4],
-          [-4.25, yOut, -5.4],
-          [-4.25, yOut, -3.25],
-        ],
-        speed: 0.055,
-        phaseOffset: 0.0,
-      },
-      {
-        id: 'agent-2',
-        name: 'Sophie (Ingénieure HSE)',
-        role: 'Audit Sécurité Peinture ↔ Admin',
-        helmetColor: '#10b981',
-        suitColor: '#0f766e',
-        fromUt: findUt('UT3'),  // Accrochage - Décrochage (GP3 Peinture)
-        toUt: findUt('UT4'),    // Administratif et finance (GP1 Bureaux)
-        fromDoor: 'side',       // Porte latérale Est GP3
-        toDoor: 'side',         // Porte latérale Est GP1
-        outdoorWaypoints: [
-          [-6.2, yOut, -3.25],
-          [-4.25, yOut, -3.25],
-        ],
-        speed: 0.048,
-        phaseOffset: 0.35,
-      },
-      {
-        id: 'agent-3',
-        name: 'Karim (Cariste / Flux)',
-        role: 'Cariste ↔ Fret Aérien',
-        helmetColor: '#ef4444',
-        suitColor: '#ea580c',
-        fromUt: findUt('UT17'), // Cariste (GP2 Production)
-        toUt: findUt('UT12'),   // Fret aérien (GP4 Logistique)
-        fromDoor: 'south',      // Porte principale Sud GP2
-        toDoor: 'side',         // Porte latérale Ouest GP4
-        outdoorWaypoints: [
-          [6.2, yOut, -5.4],
-        ],
-        speed: 0.058,
-        phaseOffset: 0.65,
-      },
-      {
-        id: 'agent-4',
-        name: 'Léa (Support & Réseau)',
-        role: 'IT ↔ Cabine Peinture',
-        helmetColor: '#38bdf8',
-        suitColor: '#4f46e5',
-        fromUt: findUt('UT7'),  // Assistance informatique (GP1 Bureaux)
-        toUt: findUt('UT18'),   // Cabine de peinture poudre (GP3 Peinture)
-        fromDoor: 'south',      // Porte principale Sud GP1
-        toDoor: 'side',         // Porte latérale Est GP3
-        outdoorWaypoints: [
-          [-6.2, yOut, -3.25],
-        ],
-        speed: 0.05,
-        phaseOffset: 0.18,
-      },
-      {
-        id: 'agent-5',
-        name: 'Thomas (Logistique / VRP)',
-        role: 'Coursiers ↔ Commerciaux VRP',
-        helmetColor: '#eab308',
-        suitColor: '#7c3aed',
-        fromUt: findUt('UT11'), // Coursiers (GP4 Logistique)
-        toUt: findUt('UT5'),    // Commerciaux VRP (GP1 Bureaux)
-        fromDoor: 'side',       // Porte latérale Ouest GP4
-        toDoor: 'side',         // Porte latérale Est GP1
-        outdoorWaypoints: [
-          [6.2, yOut, 5.4],
-          [-6.2, yOut, 5.4],
-          [-6.2, yOut, -3.25],
-          [-4.25, yOut, -3.25],
-        ],
-        speed: 0.046,
-        phaseOffset: 0.5,
-      },
-    ];
-
-    return pairs.map((p, i) => {
-      const fromBuilding = findBuildingForUt(p.fromUt);
-      const toBuilding = findBuildingForUt(p.toUt);
-
-      const exitWaypoints = getBuildingExitWaypoints(p.fromUt, fromBuilding, p.fromDoor);
-      const entryWaypoints = getBuildingExitWaypoints(p.toUt, toBuilding, p.toDoor).slice().reverse();
-      const allWaypoints = [...exitWaypoints, ...(p.outdoorWaypoints || []), ...entryWaypoints];
-
-      const curve = buildRoundedIndustrialCurve(allWaypoints, 0.42);
-      const points = curve.getSpacedPoints(96).map((pt) => new THREE.Vector3(pt.x, pt.y + 0.04, pt.z));
-
-      return {
-        ...p,
-        variant: i,
-        vestColor: i === 2 ? '#f97316' : '#facc15',
-        curve,
-        points,
-      };
+      const curve = buildRoundedIndustrialCurve(waypoints, 0.42);
+      const length = curve.getLength();
+      const points = curve
+        .getSpacedPoints(Math.max(96, Math.round(length * 2)))
+        .map((pt) => new THREE.Vector3(pt.x, pt.y + 0.04, pt.z));
+      return [
+        {
+          ...persona,
+          fromUt,
+          toUt,
+          // Cycles aller-retour par seconde : vitesse de marche constante quelle que soit la longueur
+          speed: (WALK_SPEED * persona.pace) / (2 * Math.max(length, 1)),
+          variant: i,
+          vestColor: i === 2 ? '#f97316' : '#facc15',
+          curve,
+          points,
+        },
+      ];
     });
-  }, [allWorkUnits, buildings]);
+  }, [buildings, site]);
 
   if (!agentsEnabled) return null;
 
@@ -388,13 +289,16 @@ function AnimatedHumanoidAgent({ route, speedMultiplier, onSelectUt, showLabels 
   return (
     <group ref={groupRef}>
       <group ref={bodyRef}>
-        {/* Opérateur articulé avec EPI (casque et gilet aux couleurs de l'agent) */}
-        <Person
-          outfit="worker"
-          variant={route.variant}
-          colors={{ top: route.suitColor, helmet: route.helmetColor, vest: route.vestColor }}
-          limbs={limbs}
-        />
+        {/* Opérateur articulé avec EPI (casque et gilet aux couleurs de l'agent) ; corps et membres
+            fusionnés séparément (les membres restent animés) */}
+        <MergeStatic deps={[route.variant, route.suitColor, route.helmetColor, route.vestColor]}>
+          <Person
+            outfit="worker"
+            variant={route.variant}
+            colors={{ top: route.suitColor, helmet: route.helmetColor, vest: route.vestColor }}
+            limbs={limbs}
+          />
+        </MergeStatic>
       </group>
 
       {/* Badge flottant de l'agent avec son trajet UT A <-> UT B */}

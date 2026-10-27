@@ -399,6 +399,15 @@ body,
   margin-bottom: 6px;
 }
 
+/* Sous-groupement : ligne de groupement plus compacte, imbriquée sous son parent */
+.tree-subgroup {
+  margin: 2px 0;
+}
+
+.tree-subgroup > .tree-building-row {
+  padding: 5px 6px;
+}
+
 .tree-building-row {
   display: flex;
   align-items: center;
@@ -578,6 +587,129 @@ body,
 .building-sub {
   font-size: 10px;
   color: #94a3b8;
+}
+
+/* Étiquette au sol d'un sous-groupement (zone de postes dans un bâtiment) */
+.subgroup-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px 3px 4px;
+  background: rgba(9, 13, 22, 0.85);
+  border: 1.5px solid #3b82f6;
+  border-radius: 7px;
+  color: #f1f5f9;
+  font-size: 10.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.subgroup-tag:hover,
+.subgroup-tag.selected {
+  transform: scale(1.06);
+}
+
+.subgroup-ref {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 4px;
+  color: #fff;
+}
+
+.subgroup-label {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.subgroup-score {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+}
+
+/* Infobulle des équipements de sécurité (extincteurs, trousses de secours) */
+.equipment-tooltip {
+  min-width: 210px;
+  padding: 8px 10px;
+  background: rgba(9, 13, 22, 0.94);
+  border: 1.5px solid #22c55e;
+  border-radius: 9px;
+  color: #e2e8f0;
+  font-size: 11px;
+  line-height: 1.35;
+  white-space: nowrap;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+}
+
+.equipment-tooltip.soon {
+  border-color: #f97316;
+}
+
+.equipment-tooltip.late {
+  border-color: #ef4444;
+}
+
+.equipment-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #f8fafc;
+}
+
+.equipment-head span {
+  color: #94a3b8;
+  font-size: 10.5px;
+}
+
+.equipment-owner {
+  margin: 2px 0 6px;
+  color: #94a3b8;
+  font-size: 10.5px;
+}
+
+.equipment-tooltip dl {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 2px 10px;
+  margin: 0;
+}
+
+.equipment-tooltip dt {
+  color: #94a3b8;
+}
+
+.equipment-tooltip dd {
+  margin: 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  color: #f8fafc;
+  text-align: right;
+}
+
+.equipment-status {
+  margin-top: 6px;
+  font-weight: 700;
+  color: #22c55e;
+}
+
+.equipment-tooltip.soon .equipment-status {
+  color: #fb923c;
+}
+
+.equipment-tooltip.late .equipment-status {
+  color: #f87171;
+}
+
+.equipment-demo {
+  margin-top: 3px;
+  color: #64748b;
+  font-size: 9.5px;
+  font-style: italic;
 }
 
 .building-signs-row {
