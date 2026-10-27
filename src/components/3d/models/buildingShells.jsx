@@ -22,6 +22,7 @@ import {
 } from './kit';
 import { getTexture } from './textures';
 import { shellFinish } from '../../../services/skins';
+import { sideDoorZ } from '../../../services/siteLayout';
 
 /**
  * Enveloppes architecturales des Groupements DigiRisk (vue « maison de poupée ») :
@@ -42,20 +43,22 @@ export const SHELL_HEADER_HEIGHT = {
   factory: 7.6,
   paint: 6.6,
   logistics: 6.4,
+  yard: 5.6,
 };
 
 /**
- * Coordonnée Z locale de la porte piétonne latérale (côté allée centrale du campus) :
- * alignée sur l'allée transversale principale du bâtiment.
+ * Coordonnée Z locale de la porte piétonne latérale (côté voie d'accès) : alignée sur l'allée
+ * transversale la plus centrale du bâtiment, quel que soit son nombre de rangées de postes.
  */
 export function getBuildingDoorZ(depth) {
-  return depth < 14 ? depth / 2 - 1.7 : 0.4;
+  return sideDoorZ(depth);
 }
 
 export default function BuildingShell({ archetype, ...props }) {
   if (archetype === 'office') return <OfficeShell {...props} />;
   if (archetype === 'paint') return <PaintShell {...props} />;
   if (archetype === 'logistics') return <WarehouseShell {...props} />;
+  if (archetype === 'yard') return <YardShell {...props} />;
   return <FactoryShell {...props} />;
 }
 
@@ -198,9 +201,9 @@ function IndustrialDoorway({
         </group>
       ))}
 
-      {/* Potelets de protection et panneau d'obligation piétons de part et d'autre du seuil */}
-      <Bollard position={[-(halfW + 0.24), 0, 0.36]} height={0.72} />
-      <Bollard position={[halfW + 0.24, 0, 0.36]} height={0.72} />
+      {/* Potelets de protection (dehors, au sol et non sur la dalle) et panneau d'obligation piétons */}
+      <Bollard position={[-(halfW + 0.24), -Y0, 0.36]} height={0.72} />
+      <Bollard position={[halfW + 0.24, -Y0, 0.36]} height={0.72} />
       <SafetySign kind="mandatory" position={[halfW + 0.26, 0, -0.25]} height={1.25} size={0.26} />
 
       {/* Garde-corps latéraux en façade avant pour canaliser le flux vers la porte */}
@@ -352,6 +355,40 @@ function RoofFan({ speed = 4, ...rest }) {
       <group ref={bladesRef} userData={DYNAMIC} position={[0, 0.66, 0]}>
         <Box size={[0.78, 0.02, 0.12]} color="#374151" metal={0.5} />
         <Box rotation={[0, Math.PI / 2, 0]} size={[0.78, 0.02, 0.12]} color="#374151" metal={0.5} />
+      </group>
+    </group>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Zone extérieure : aire à ciel ouvert des UT rattachées à la racine   */
+/* ------------------------------------------------------------------ */
+
+function YardShell({ width, depth, themeColor, highlight }) {
+  const corners = [[-1, -1], [1, -1], [-1, 1], [1, 1]];
+  return (
+    <group>
+      {/* Liseré de délimitation de l'aire */}
+      {[-1, 1].map((s) => (
+        <group key={s}>
+          <Box position={[0, Y0 + 0.012, s * (depth / 2 - 0.25)]} size={[width - 0.5, 0.01, 0.18]} color={PALETTE.safetyYellow} shadow={false} />
+          <Box position={[s * (width / 2 - 0.25), Y0 + 0.012, 0]} size={[0.18, 0.01, depth - 0.5]} color={PALETTE.safetyYellow} shadow={false} />
+        </group>
+      ))}
+      {/* Mâts d'éclairage aux angles, projecteurs tournés vers l'aire */}
+      {corners.map(([sx, sz]) => (
+        <group key={`${sx}${sz}`} position={[sx * (width / 2 - 0.5), Y0, sz * (depth / 2 - 0.5)]}>
+          <Cylinder position={[0, 2.2, 0]} radius={0.06} height={4.4} color="#64748b" metal={0.6} />
+          <Box position={[-sx * 0.2, 4.35, -sz * 0.2]} size={[0.5, 0.14, 0.3]} color="#1f2937" metal={0.5} />
+          <Box position={[-sx * 0.2, 4.27, -sz * 0.2]} size={[0.44, 0.02, 0.26]} color="#fef9c3" glow={1.4} shadow={false} />
+        </group>
+      ))}
+      {/* Panneau d'identification au fond de l'aire */}
+      <group position={[0, Y0, -depth / 2 + 0.4]}>
+        {[-1, 1].map((sx) => (
+          <Box key={sx} position={[sx * 2.2, 1.1, 0]} size={[0.12, 2.2, 0.12]} color="#475569" metal={0.5} />
+        ))}
+        <SignBand width={4.8} y={2.0} z={0} themeColor={themeColor} highlight={highlight} />
       </group>
     </group>
   );

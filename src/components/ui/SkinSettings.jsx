@@ -14,8 +14,10 @@ import {
  */
 export default function SkinSettings({ data, skins, onChange, onReset, onFocus, onClose, cotationMode }) {
   const [tab, setTab] = useState('gp');
-  const buildings = data?.buildings || [];
-  const utCount = buildings.reduce((n, b) => n + b.children.length, 0);
+  // Bâtiments (la zone extérieure n'a pas d'enveloppe) ; UT de chaque bâtiment, sous-groupements compris
+  const blocks = data?.buildings || [];
+  const buildings = blocks.filter((b) => !b.isYard);
+  const utCount = blocks.reduce((n, b) => n + b.workUnits.length, 0);
   const customCount = Object.keys(skins).length;
 
   const setSkin = (id, value) => onChange(id, value === 'auto' ? null : value);
@@ -81,13 +83,13 @@ export default function SkinSettings({ data, skins, onChange, onReset, onFocus, 
           })}
 
         {tab === 'ut' &&
-          buildings.map((b) => (
+          blocks.map((b) => (
             <div key={b.id} className="skin-group">
               <div className="skin-group-title">
                 <span style={{ background: b.layout3D.themeColor }} />
                 {b.ref} · {b.label}
               </div>
-              {b.children.map((ut) => {
+              {b.workUnits.map((ut) => {
                 const custom = skins[ut.id];
                 const scale = scaleOf(ut);
                 return (

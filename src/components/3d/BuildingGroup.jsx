@@ -1,119 +1,78 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Html, Edges } from '@react-three/drei';
 import WorkUnitZone from './WorkUnitZone';
-import BuildingShell, { SHELL_HEADER_HEIGHT, getBuildingDoorZ } from './models/buildingShells';
-import { FloorZone, WalkwayStrip, WalkwayNode } from './models/kit';
+import BuildingShell, { SHELL_HEADER_HEIGHT } from './models/buildingShells';
+import { FloorZone, FirstAidKit, WalkwayStrip, WalkwayNode } from './models/kit';
 import MergeStatic from './models/MergeStatic';
 import { getTexture } from './models/textures';
+import { StationModel } from './WorkstationProps';
+import { EquipmentOwner } from './equipment/equipment';
+import { sideDoorZ } from '../../services/siteLayout';
+
+/**
+ * Équipements métier de toutes les UT du bâtiment, fusionnés ensemble : un maillage par matériau pour
+ * le bâtiment entier (et non par poste), si bien que le nombre de draw calls ne croît plus avec le
+ * nombre d'UT. Les pièces animées et les zones de survol des équipements restent à part.
+ */
+function BuildingStations({ workUnits, cotationMode }) {
+  const owners = useMemo(() => new Map(workUnits.map((ut) => [ut.id, { id: ut.id, ref: ut.ref, label: ut.label }])), [workUnits]);
+  const stations = workUnits.map((ut) => {
+    const scale = cotationMode === 'brute' ? ut.stats.scaleBrute : ut.stats.scaleResiduelle;
+    return { ut, accent: scale.strokeColor || scale.color };
+  });
+  const mergeKey = stations.map(({ ut, accent }) => `${ut.id}:${ut.archetype}:${accent}:${ut.layout3D.localPosition.join(',')}`).join('|');
+
+  return (
+    <MergeStatic deps={[mergeKey]}>
+      {stations.map(({ ut, accent }) => {
+        const [x, y, z] = ut.layout3D.localPosition;
+        return (
+          // Le sol des modèles (y = 0) correspond au dessus de la dalle de l'UT
+          <group key={ut.id} position={[x, y + 0.12, z]}>
+            <EquipmentOwner.Provider value={owners.get(ut.id)}>
+              <StationModel archetype={ut.archetype} accent={accent} />
+            </EquipmentOwner.Provider>
+          </group>
+        );
+      })}
+    </MergeStatic>
+  );
+}
+
+const FLOOR_TEXTURE = { office: 'concrete', yard: 'asphalt' };
 
 /**
  * Réseau de couloirs piétons balisés (norme INRS : bande verte + bordures jaunes + chevrons)
- * à l'intérieur d'un bâtiment, reliant la Porte Latérale, la Porte Principale Sud et chaque UT.
+ * à l'intérieur d'un bâtiment, calculé par le plan du site (services/siteLayout.js) : allées
+ * devant chaque rangée de postes et entre les colonnes, embranchements vers chaque UT, seuils
+ * zébrés des portes latérale et principale (arrêtés au nu de la dalle).
  */
-function BuildingWalkways({ width, depth, outward = [1, 1], children = [] }) {
-  const [ox] = outward;
+function BuildingWalkways({ walkways }) {
+  if (!walkways) return null;
   const y = 0.172;
-  const doorZ = getBuildingDoorZ(depth);
-  const sideDoorEdgeX = -ox * (width / 2 + 0.15);
-  const southDoorEdgeZ = depth / 2 + 0.15;
-
-  const utXs = children.map((u) => u.layout3D.localPosition[0]);
-  const minUtX = utXs.length ? Math.min(...utXs, 0) : -3.1;
-  const maxUtX = utXs.length ? Math.max(...utXs, 0) : 3.1;
-  const corridorMinX = ox > 0 ? sideDoorEdgeX : minUtX;
-  const corridorMaxX = ox < 0 ? sideDoorEdgeX : maxUtX;
-
-  // Bâtiment à 1 rangée d'UT (ex. GP2 Atelier Production, depth = 11.4)
-  if (depth < 14) {
-    return (
-      <group>
-        {/* Couloir transversal principal depuis la porte latérale */}
-        <WalkwayStrip from={[corridorMinX, doorZ]} to={[corridorMaxX, doorZ]} y={y} />
-        {/* Seuil zébré de la porte latérale */}
-        <WalkwayStrip
-          from={[-ox * (width / 2 - 0.55), doorZ]}
-          to={[-ox * (width / 2 + 0.45), doorZ]}
-          y={y + 0.002}
-          zebra
-        />
-        {/* Allée centrale Nord-Sud depuis la porte principale Sud */}
-        <WalkwayStrip from={[0, southDoorEdgeZ]} to={[0, 0.4]} y={y} />
-        {/* Seuil zébré de la porte principale Sud */}
-        <WalkwayStrip from={[0, depth / 2 - 0.55]} to={[0, depth / 2 + 0.45]} y={y + 0.002} zebra />
-        <WalkwayNode position={[0, doorZ]} y={y} />
-
-        {/* Embranchements vers l'entrée de chaque Unité de Travail */}
-        {children.map((ut) => {
-          const [ux, , uz] = ut.layout3D.localPosition;
-          return (
-            <React.Fragment key={`wk-${ut.id}`}>
-              <WalkwayNode position={[ux, doorZ]} y={y} />
-              <WalkwayStrip from={[ux, doorZ]} to={[ux, uz + 2.35]} y={y} arrows={false} />
-            </React.Fragment>
-          );
-        })}
-      </group>
-    );
-  }
-
-  // Bâtiment à 2 rangées d'UT (ex. GP1 Bureaux, GP3 Peinture, GP4 Logistique, depth = 16.8)
-  const frontZ = depth / 2 - 1.6; // +6.8
-  const isThreeCols = children.length > 4;
-  const aisleXs = isThreeCols ? [-3.1, 3.1] : [0];
-
   return (
     <group>
-      {/* Couloir transversal central (z = +0.4) relié à la porte piétonne latérale */}
-      <WalkwayStrip from={[corridorMinX, doorZ]} to={[corridorMaxX, doorZ]} y={y} />
-      {/* Seuil zébré de la porte latérale */}
-      <WalkwayStrip
-        from={[-ox * (width / 2 - 0.55), doorZ]}
-        to={[-ox * (width / 2 + 0.45), doorZ]}
-        y={y + 0.002}
-        zebra
-      />
-
-      {/* Couloir transversal avant Sud (z = +6.8) */}
-      <WalkwayStrip from={[minUtX, frontZ]} to={[maxUtX, frontZ]} y={y} />
-
-      {/* Allées Nord-Sud reliant le couloir central et le couloir avant */}
-      {aisleXs.map((ax) => (
-        <React.Fragment key={`aisle-ns-${ax}`}>
-          <WalkwayStrip
-            from={[ax, isThreeCols ? doorZ : -2.3]}
-            to={[ax, frontZ]}
-            y={y}
-          />
-          <WalkwayNode position={[ax, doorZ]} y={y} />
-          <WalkwayNode position={[ax, frontZ]} y={y} />
-        </React.Fragment>
+      {walkways.strips.map((s) => (
+        <WalkwayStrip
+          key={`${s.from}-${s.to}`}
+          from={s.from}
+          to={s.to}
+          y={s.zebra ? y + 0.002 : y}
+          arrows={Boolean(s.arrows)}
+          zebra={Boolean(s.zebra)}
+        />
       ))}
-
-      {/* Entrée principale Sud (x = 0, de la façade Sud jusqu'au couloir avant) */}
-      <WalkwayStrip from={[0, southDoorEdgeZ]} to={[0, frontZ]} y={y} />
-      <WalkwayStrip from={[0, depth / 2 - 0.55]} to={[0, depth / 2 + 0.45]} y={y + 0.002} zebra />
-      <WalkwayNode position={[0, frontZ]} y={y} />
-
-      {/* Embranchements vers chaque poste de travail */}
-      {children.map((ut) => {
-        const [ux, , uz] = ut.layout3D.localPosition;
-        if (uz > 0) {
-          return (
-            <React.Fragment key={`wk-${ut.id}`}>
-              <WalkwayNode position={[ux, frontZ]} y={y} />
-              <WalkwayStrip from={[ux, frontZ]} to={[ux, uz + 2.35]} y={y} arrows={false} />
-            </React.Fragment>
-          );
-        }
-        return <WalkwayNode key={`wk-${ut.id}`} position={[ux, doorZ]} y={y} />;
-      })}
+      {walkways.nodes.map((n) => (
+        <WalkwayNode key={`${n}`} position={n} y={y} />
+      ))}
     </group>
   );
 }
 
 /**
- * Représentation 3D d'un Groupement DigiRisk (Bâtiment / Site).
- * Contient ses sous-espaces (Unités de Travail) et affiche la synthèse globale du bâtiment.
+ * Représentation 3D d'un Groupement DigiRisk (Bâtiment / Site) ou de la zone extérieure des UT
+ * rattachées à la racine. Contient ses postes (Unités de Travail, y compris celles des
+ * sous-groupements, repérés par une zone au sol) et affiche la synthèse globale du bâtiment.
  */
 export default function BuildingGroup({
   building,
@@ -141,11 +100,15 @@ export default function BuildingGroup({
       ? building.stats.maxBrute
       : building.stats.maxResiduelle;
 
-  const isBuildingSelected = selectedElement?.id === building.id;
+  const workUnits = building.workUnits || [];
+  const [ox] = building.layout3D.outward;
+  const equipmentOwner = useMemo(() => ({ id: building.id, ref: building.ref, label: building.label }), [building.id, building.ref, building.label]);
+  const aisleKey = workUnits.map((ut) => ut.layout3D.localPosition.join(',')).join(';');
+  const isBuildingSelected = selectedElement?.id === (building.selectTarget || building).id;
 
   const handleBuildingClick = (e) => {
     e.stopPropagation();
-    onSelectElement(building);
+    onSelectElement(building.selectTarget || building);
   };
 
   return (
@@ -184,7 +147,7 @@ export default function BuildingGroup({
           map={
             visualMode === 'whitebox'
               ? null
-              : getTexture(archetype === 'office' ? 'concrete' : 'epoxy', (width - 0.35) / 3, (depth - 0.35) / 3)
+              : getTexture(FLOOR_TEXTURE[archetype] || 'epoxy', (width - 0.35) / 3, (depth - 0.35) / 3)
           }
           roughness={0.6}
           metalness={0.1}
@@ -205,16 +168,11 @@ export default function BuildingGroup({
             />
             <Edges scale={1} color={themeColor} />
           </mesh>
-          <BuildingWalkways
-            width={width}
-            depth={depth}
-            outward={building.layout3D.outward}
-            children={building.children}
-          />
+          <BuildingWalkways walkways={building.layout3D.walkways} />
         </group>
       ) : (
         /* Mode Étape 3 : enveloppe métier (bureaux, usine, atelier peinture, entrepôt) */
-        <MergeStatic deps={[archetype, building.layout3D.finish, width, height, depth, themeColor, showRoof, building.children.length]}>
+        <MergeStatic deps={[archetype, building.layout3D.finish, width, height, depth, themeColor, showRoof, aisleKey, building.layout3D.outward.join()]}>
           <BuildingShell
             archetype={archetype}
             width={width}
@@ -227,15 +185,17 @@ export default function BuildingGroup({
             highlight={hoveredBuilding || isBuildingSelected}
           />
           {/* Couloirs piétons industriels balisés (vert/jaune + chevrons + seuils de portes) */}
-          <BuildingWalkways
-            width={width}
-            depth={depth}
-            outward={building.layout3D.outward}
-            children={building.children}
-          />
+          <BuildingWalkways walkways={building.layout3D.walkways} />
+          {/* Trousse de secours à côté de la porte latérale, tournée vers l'intérieur */}
+          <EquipmentOwner.Provider value={equipmentOwner}>
+            <FirstAidKit
+              position={[-ox * (width / 2 - 0.7), 0.16, sideDoorZ(depth) - 1.5]}
+              rotation={[0, (ox * Math.PI) / 2, 0]}
+            />
+          </EquipmentOwner.Provider>
           {/* Marquage au sol des zones de sécurité autour des postes (bâtiments industriels) */}
           {archetype !== 'office' &&
-            building.children.map((ut) => (
+            workUnits.map((ut) => (
               <FloorZone
                 key={`aisle-${ut.id}`}
                 position={[ut.layout3D.localPosition[0], 0.17, ut.layout3D.localPosition[2]]}
@@ -247,6 +207,21 @@ export default function BuildingGroup({
             ))}
         </MergeStatic>
       )}
+
+      {/* Équipements métier des postes (fusionnés à l'échelle du bâtiment) */}
+      {visualMode !== 'whitebox' && <BuildingStations workUnits={workUnits} cotationMode={cotationMode} />}
+
+      {/* Zones des sous-groupements (rangées de postes regroupées) */}
+      {(building.zones || []).map((zone) => (
+        <SubGroupZone
+          key={zone.id}
+          zone={zone}
+          cotationMode={cotationMode}
+          isSelected={selectedElement?.id === zone.id}
+          onSelect={onSelectElement}
+          showLabels={showLabels}
+        />
+      ))}
 
       {/* Enseigne Holographique du Groupement (Bâtiment) */}
       {showLabels && (
@@ -275,7 +250,8 @@ export default function BuildingGroup({
             <div className="building-title-block">
               <div className="building-name">{building.label}</div>
               <div className="building-sub">
-                {building.children.length} UT • {building.stats.totalRisks} risques
+                {workUnits.length} UT • {building.stats.totalRisks} risques
+                {building.zones?.length > 0 ? ` • ${building.zones.length} sous-groupement${building.zones.length > 1 ? 's' : ''}` : ''}
                 {building.directRisks.length > 0
                   ? ` (dont ${building.directRisks.length} globaux)`
                   : ''}
@@ -308,8 +284,8 @@ export default function BuildingGroup({
         </Html>
       )}
 
-      {/* Unités de Travail (Ateliers / Postes) rattachées à ce Groupement */}
-      {building.children.map((ut) => (
+      {/* Unités de Travail (Ateliers / Postes) rattachées à ce Groupement ou à ses sous-groupements */}
+      {workUnits.map((ut) => (
         <WorkUnitZone
           key={ut.id}
           ut={ut}
@@ -321,6 +297,61 @@ export default function BuildingGroup({
           showLabels={showLabels}
         />
       ))}
+    </group>
+  );
+}
+
+/**
+ * Zone au sol d'un sous-groupement : liseré aux couleurs du bâtiment, voile cliquable
+ * (sélection du sous-groupement) et étiquette avec sa cotation maximale.
+ */
+function SubGroupZone({ zone, cotationMode, isSelected, onSelect, showLabels }) {
+  const [hovered, setHovered] = useState(false);
+  const [x, , z] = zone.layout3D.localPosition;
+  const [w, , d] = zone.layout3D.size;
+  const color = zone.layout3D.themeColor || '#3b82f6';
+  const scale = cotationMode === 'brute' ? zone.stats.scaleBrute : zone.stats.scaleResiduelle;
+  const maxScore = cotationMode === 'brute' ? zone.stats.maxBrute : zone.stats.maxResiduelle;
+
+  const handleClick = (e) => {
+    e.stopPropagation();
+    onSelect(zone);
+  };
+
+  return (
+    <group position={[x, 0, z]}>
+      <mesh
+        position={[0, 0.176, 0]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        userData={{ noCollide: true }}
+        onClick={handleClick}
+        onPointerOver={(e) => {
+          e.stopPropagation();
+          setHovered(true);
+        }}
+        onPointerOut={(e) => {
+          e.stopPropagation();
+          setHovered(false);
+        }}
+      >
+        <planeGeometry args={[w, d]} />
+        <meshStandardMaterial color={color} transparent opacity={isSelected ? 0.3 : hovered ? 0.22 : 0.1} depthWrite={false} />
+      </mesh>
+      <FloorZone position={[0, 0.17, 0]} width={w} depth={d} line={0.14} color={isSelected ? '#ffffff' : color} />
+
+      {showLabels && (
+        <Html position={[-w / 2 + 0.4, 0.4, d / 2 - 0.3]} distanceFactor={22} zIndexRange={[12, 0]}>
+          <div className={`subgroup-tag ${isSelected ? 'selected' : ''}`} style={{ borderColor: color }} onClick={handleClick}>
+            <span className="subgroup-ref" style={{ background: color }}>
+              {zone.ref}
+            </span>
+            <span className="subgroup-label">{zone.label}</span>
+            <span className="subgroup-score" style={{ color: scale.scoreTextColor || scale.color }}>
+              {maxScore}
+            </span>
+          </div>
+        </Html>
+      )}
     </group>
   );
 }

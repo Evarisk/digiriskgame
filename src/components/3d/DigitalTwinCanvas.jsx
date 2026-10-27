@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useLayoutEffect } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Grid, Html, Environment, Lightformer } from '@react-three/drei';
@@ -8,6 +8,15 @@ import CampusScenery from './CampusScenery';
 import { getTexture } from './models/textures';
 import FirstPersonExplorer from './explorer/FirstPersonExplorer';
 import { explorerStore } from './explorer/explorerStore';
+import { EquipmentTooltip } from './equipment/equipment';
+
+/**
+ * Facteur d'échelle de la scène selon l'emprise du site (1 pour le site de démonstration à 4 bâtiments) :
+ * cadrage de la vue d'ensemble, ombres, brouillard et terrain suivent la taille réelle du DUER.
+ */
+function siteScale(site) {
+  return Math.max(1, (site?.radius || 0) / 45);
+}
 
 export default function DigitalTwinCanvas({
   data,
@@ -26,6 +35,8 @@ export default function DigitalTwinCanvas({
   onInspect,
 }) {
   const showLabels = !explorerMode;
+  const site = data?.site;
+  const k = siteScale(site);
   return (
     <div className="canvas-wrapper">
       <Canvas
@@ -42,21 +53,12 @@ export default function DigitalTwinCanvas({
         />
         <fog
           attach="fog"
-          args={[visualMode === 'whitebox' ? '#f1f5f9' : '#090d16', 55, 135]}
+          args={[visualMode === 'whitebox' ? '#f1f5f9' : '#090d16', 55 * k, 135 * k]}
         />
 
         {/* Éclairage directionnel & ambiant */}
         <ambientLight intensity={visualMode === 'whitebox' ? 0.85 : 0.55} />
-        <directionalLight
-          castShadow
-          position={[28, 42, 24]}
-          intensity={visualMode === 'whitebox' ? 1.1 : 1.35}
-          shadow-mapSize={[2048, 2048]}
-          shadow-camera-left={-45}
-          shadow-camera-right={45}
-          shadow-camera-top={45}
-          shadow-camera-bottom={-45}
-        />
+        <SunLight site={site} intensity={visualMode === 'whitebox' ? 1.1 : 1.35} />
         <hemisphereLight
           skyColor="#38bdf8"
           groundColor="#0f172a"
@@ -77,13 +79,13 @@ export default function DigitalTwinCanvas({
             onInspect={onInspect}
           />
         ) : (
-          <CameraNavigator cameraTarget={cameraTarget} />
+          <CameraNavigator cameraTarget={cameraTarget} site={site} />
         )}
 
-        {/* Sol industriel, voirie & Totem central GP5 */}
+        {/* Sol industriel, voirie & Totem central de l'entité mère */}
         <CampusGround
           visualMode={visualMode}
-          buildings={data?.buildings}
+          site={site}
           companyName={data?.entityName}
           companyLogo={data?.entityLogo}
           rootEntity={data?.rootEntity}
@@ -92,7 +94,7 @@ export default function DigitalTwinCanvas({
           showLabels={showLabels}
         />
 
-        {/* Bâtiments (Groupements GP1..GP4) & Ateliers (Unités de Travail UT1..UT18) */}
+        {/* Bâtiments (Groupements de premier niveau, zone extérieure) & postes (Unités de Travail) */}
         {(data?.buildings || []).map((building) => (
           <BuildingGroup
             key={building.id}
@@ -107,10 +109,13 @@ export default function DigitalTwinCanvas({
           />
         ))}
 
+        {/* Dates de vérification de l'extincteur / la trousse de secours survolé(e) ou visé(e) */}
+        <EquipmentTooltip />
+
         {/* Flux cinématiques d'opérateurs entre les Unités de Travail */}
         <WorkerAgents
-          allWorkUnits={data?.allWorkUnitsWorld || []}
           buildings={data?.buildings || []}
+          site={site}
           showPaths={showPaths}
           agentsEnabled={agentsEnabled}
           speedMultiplier={agentSpeed}
@@ -132,29 +137,89 @@ export function StudioEnvironment() {
   );
 }
 
-function CameraNavigator({ cameraTarget }) {
+/** Soleil : ombres portées cadrées sur l'emprise du site. */
+function SunLight({ site, intensity }) {
+  const lightRef = useRef();
+  const k = siteScale(site);
+  const [cx, cz] = site?.center || [0, 0];
+
+  useLayoutEffect(() => {
+    const light = lightRef.current;
+    if (!light) return;
+    light.target.position.set(cx, 0, cz);
+    light.target.updateMatrixWorld();
+    const cam = light.shadow.camera;
+    cam.left = -45 * k;
+    cam.right = 45 * k;
+    cam.top = 45 * k;
+    cam.bottom = -45 * k;
+    cam.far = 500 * k;
+    cam.updateProjectionMatrix();
+  }, [cx, cz, k]);
+
+  return (
+    <directionalLight
+      ref={lightRef}
+      castShadow
+      position={[cx + 28 * k, 42 * k, cz + 24 * k]}
+      intensity={intensity}
+      shadow-mapSize={[2048, 2048]}
+    />
+  );
+}
+
+/** Cadrage de la vue d'ensemble : tout le site, depuis le sud. */
+function overviewPose(site) {
+  const k = siteScale(site);
+  const [cx, cz] = site?.center || [0, 0];
+  return { target: new THREE.Vector3(cx, 0, cz), position: new THREE.Vector3(cx, 34 * k, cz + 42 * k) };
+}
+
+function CameraNavigator({ cameraTarget, site }) {
   const controlsRef = useRef();
   const { camera } = useThree();
   const desiredTarget = useRef(new THREE.Vector3(0, 0, 0));
   const desiredCameraPos = useRef(null);
+  const framedRadius = useRef(0);
+  const k = siteScale(site);
+
+  useEffect(() => {
+    camera.far = 250 * k;
+    camera.updateProjectionMatrix();
+  }, [camera, k]);
 
   useEffect(() => {
     if (!cameraTarget) return;
     if (cameraTarget.type === 'overview') {
-      desiredTarget.current.set(0, 0, 0);
-      desiredCameraPos.current = new THREE.Vector3(0, 34, 42);
+      const pose = overviewPose(site);
+      desiredTarget.current.copy(pose.target);
+      desiredCameraPos.current = pose.position;
+      framedRadius.current = site?.radius || 0;
     } else if (cameraTarget.position) {
       const [x, y, z] = cameraTarget.position;
       desiredTarget.current.set(x, y, z);
-      const offsetDist = cameraTarget.isBuilding ? 22 : 13;
-      const offsetHeight = cameraTarget.isBuilding ? 16 : 9.5;
+      // Recul proportionnel à la taille de l'élément (UT, zone, bâtiment)
+      const offsetDist = Math.max(13, (cameraTarget.radius || 0) * 1.85);
+      const offsetHeight = offsetDist * 0.73;
       desiredCameraPos.current = new THREE.Vector3(
         x + offsetDist * 0.45,
         y + offsetHeight,
         z + offsetDist
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cameraTarget]);
+
+  // Premier chargement ou changement notable de l'emprise : recadrer la vue d'ensemble
+  useEffect(() => {
+    if (!site || cameraTarget?.type !== 'overview') return;
+    if (Math.abs(site.radius - framedRadius.current) < framedRadius.current * 0.1) return;
+    const pose = overviewPose(site);
+    desiredTarget.current.copy(pose.target);
+    desiredCameraPos.current = pose.position;
+    framedRadius.current = site.radius;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [site]);
 
   useFrame(() => {
     if (!controlsRef.current) return;
@@ -176,51 +241,55 @@ function CameraNavigator({ cameraTarget }) {
       dampingFactor={0.07}
       maxPolarAngle={Math.PI / 2 - 0.04}
       minDistance={5}
-      maxDistance={85}
+      maxDistance={85 * k}
     />
   );
 }
 
-function CampusGround({ visualMode, buildings, companyName, companyLogo, rootEntity, isSelected, onSelectRoot, showLabels }) {
+function CampusGround({ visualMode, site, companyName, companyLogo, rootEntity, isSelected, onSelectRoot, showLabels }) {
+  const k = siteScale(site);
+  const [cx, cz] = site?.center || [0, 0];
+  const [hx, hz] = site?.hub || [0, 0];
+  const groundSize = Math.max(160, 2 * (site?.radius || 0) + 110);
   return (
     <group>
       {/* Terrain autour du site industriel (l'enceinte pavée est dessinée par CampusScenery) */}
       <mesh
         rotation={[-Math.PI / 2, 0, 0]}
-        position={[0, -0.02, 0]}
+        position={[cx, -0.02, cz]}
         receiveShadow
       >
-        <planeGeometry args={[160, 160]} />
+        <planeGeometry args={[groundSize, groundSize]} />
         <meshStandardMaterial
           color={visualMode === 'whitebox' ? '#e2e8f0' : '#ffffff'}
-          map={visualMode === 'whitebox' ? null : getTexture('grass', 40, 40)}
+          map={visualMode === 'whitebox' ? null : getTexture('grass', groundSize / 4, groundSize / 4)}
           roughness={0.9}
         />
       </mesh>
 
       {/* Grille métrique de référence */}
       <Grid
-        position={[0, 0.01, 0]}
-        args={[90, 90]}
+        position={[cx, 0.01, cz]}
+        args={[90 * k, 90 * k]}
         cellSize={2}
         cellThickness={0.6}
         cellColor={visualMode === 'whitebox' ? '#cbd5e1' : '#1e293b'}
         sectionSize={10}
         sectionThickness={1.2}
         sectionColor={visualMode === 'whitebox' ? '#94a3b8' : '#334155'}
-        fadeDistance={85}
+        fadeDistance={85 * k}
         fadeStrength={1}
       />
 
       {/* Voirie, rond-point, éclairage, végétation et clôture d'enceinte */}
       {visualMode !== 'whitebox' && (
-        <CampusScenery buildings={buildings} companyName={companyName} companyLogo={companyLogo} />
+        <CampusScenery site={site} companyName={companyName} companyLogo={companyLogo} />
       )}
 
-      {/* Totem Central de l'Entité Mère (GP5 Industrie Standard) */}
+      {/* Totem central de l'entité mère, au milieu du rond-point */}
       {rootEntity && (
         <group
-          position={[0, 0, 0]}
+          position={[hx, 0, hz]}
           onClick={(e) => {
             e.stopPropagation();
             onSelectRoot();

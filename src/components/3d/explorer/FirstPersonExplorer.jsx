@@ -2,8 +2,8 @@ import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 import { CollisionWorld } from './collisionWorld';
-import { explorerStore } from './explorerStore';
-import { computeSiteBounds } from '../CampusScenery';
+import { explorerStore, useExplorer } from './explorerStore';
+import { equipmentStore, findAimedEquipment } from '../equipment/equipment';
 import InspectorTablet from './InspectorTablet';
 
 /**
@@ -25,12 +25,13 @@ const GRAVITY = 13;
 const JUMP_SPEED = 3.7;
 const SENSITIVITY = 0.0022;
 const AIM_RANGE = 6;
+const EQUIPMENT_RANGE = 3.5; // visée d'un extincteur / d'une trousse de secours (≈ 5 m)
 const INTRO_SECONDS = 1.3;
 const WALL_HEIGHTS = [0.3, 0.55, 0.8, 1.05];
 const WALL_DIRS = Array.from({ length: 8 }, (_, i) => new THREE.Vector3(Math.cos((i * Math.PI) / 4), 0, Math.sin((i * Math.PI) / 4)));
 const DOWN = new THREE.Vector3(0, -1, 0);
 const UP = new THREE.Vector3(0, 1, 0);
-const WORLD_LIMIT = 76;
+const WORLD_MARGIN = 30; // déplacement possible au-delà de la clôture
 
 const MOVE_KEYS = {
   forward: ['KeyW', 'ArrowUp'],
@@ -40,35 +41,29 @@ const MOVE_KEYS = {
   run: ['ShiftLeft', 'ShiftRight'],
 };
 
-/** Emprises des UT, groupements et du totem central (repère monde) pour la visée et la localisation. */
+/**
+ * Emprises des UT, zones de sous-groupement, groupements et du totem central (repère monde)
+ * pour la visée et la localisation.
+ */
 function buildZones(data) {
-  const buildings = (data?.buildings || []).map((b) => {
-    const [x, , z] = b.layout3D.position;
-    const [w, h, d] = b.layout3D.size;
-    return { element: b, minX: x - w / 2, maxX: x + w / 2, minZ: z - d / 2, maxZ: z + d / 2, maxY: h + 6 };
-  });
-  const units = (data?.allWorkUnitsWorld || []).map((ut) => {
-    const [x, , z] = ut.layout3D.worldPosition;
-    const [w, h, d] = ut.layout3D.size;
-    return { element: ut, minX: x - w / 2, maxX: x + w / 2, minZ: z - d / 2, maxZ: z + d / 2, maxY: h + 0.6 };
-  });
-  return { buildings, units, root: data?.rootEntity || null };
+  const box = (element, [x, , z], [w, h, d], extraY) => ({ element, minX: x - w / 2, maxX: x + w / 2, minZ: z - d / 2, maxZ: z + d / 2, maxY: h + extraY });
+  const blocks = data?.buildings || [];
+  // Zone extérieure : la visée désigne l'entité mère, la localisation la zone elle-même
+  const buildings = blocks.map((b) => ({ ...box(b.selectTarget || b, b.layout3D.position, b.layout3D.size, 6), place: b }));
+  const sections = blocks.flatMap((b) => (b.zones || []).map((zone) => box(zone, zone.layout3D.position, zone.layout3D.size, 1)));
+  const units = (data?.allWorkUnitsWorld || []).map((ut) => box(ut, ut.layout3D.worldPosition, ut.layout3D.size, 0.6));
+  return { buildings, sections, units, root: data?.rootEntity || null, hub: data?.site?.hub || [0, 0] };
 }
 
 function inside(zone, x, z, margin = 0) {
   return x > zone.minX - margin && x < zone.maxX + margin && z > zone.minZ - margin && z < zone.maxZ + margin;
 }
 
-/** Point d'apparition : devant l'élément ciblé, sinon à l'entrée du site (portail sud). */
+/** Point d'apparition : devant l'élément ciblé (calculé par le plan du site), sinon au portail d'entrée. */
 function spawnFor(cameraTarget, data) {
-  if (cameraTarget?.type === 'focus' && cameraTarget.position) {
-    const [x, , z] = cameraTarget.position;
-    if (!cameraTarget.isBuilding) return { x, z: z + 2.7, yaw: 0 };
-    const building = data?.buildings?.find((b) => b.layout3D.position[0] === x && b.layout3D.position[2] === z);
-    return { x, z: z + (building ? building.layout3D.size[2] / 2 : 8) + 2.4, yaw: 0 };
-  }
-  const fenceZ = data?.buildings?.length ? computeSiteBounds(data.buildings).fence.maxZ : 24;
-  return { x: 0, z: fenceZ + 3, yaw: 0 };
+  if (cameraTarget?.type === 'focus' && cameraTarget.spawn) return cameraTarget.spawn;
+  const gate = data?.site?.gate || { x: 0, z: 24 };
+  return { x: gate.x, z: gate.z + 3, yaw: 0 };
 }
 
 export default function FirstPersonExplorer({ data, cameraTarget, onInspect, cotationMode, inspectedIds }) {
@@ -81,6 +76,8 @@ export default function FirstPersonExplorer({ data, cameraTarget, onInspect, cot
   zonesRef.current = zones;
   const onInspectRef = useRef(onInspect);
   onInspectRef.current = onInspect;
+  const inspectedRef = useRef(inspectedIds);
+  inspectedRef.current = inspectedIds;
 
   const s = useRef({
     feet: new THREE.Vector3(),
@@ -95,6 +92,7 @@ export default function FirstPersonExplorer({ data, cameraTarget, onInspect, cot
     refreshIn: 0,
     nearIn: 0,
     publishIn: 0,
+    nextIn: 0,
     intro: null,
     targetTs: cameraTarget?.ts,
   }).current;
@@ -135,6 +133,7 @@ export default function FirstPersonExplorer({ data, cameraTarget, onInspect, cot
       setEvents({ enabled: true });
       explorerStore.releaseLock();
       explorerStore.reset();
+      equipmentStore.set({ aimed: null });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -250,18 +249,26 @@ export default function FirstPersonExplorer({ data, cameraTarget, onInspect, cot
     return hit ? hit.point.y : -Infinity;
   };
 
-  /** Élément visé : premier impact du regard, rattaché à l'UT / au groupement qui le contient. */
+  /**
+   * Élément visé : premier impact du regard, rattaché à l'UT / au groupement qui le contient.
+   * Un extincteur ou une trousse de secours visé(e) de près affiche ses dates de vérification.
+   */
   const findTarget = () => {
     camera.getWorldDirection(tmp.dir);
     const hit = world.raycast(camera.position, tmp.dir, AIM_RANGE, world.wide);
+    const aimed = findAimedEquipment(camera.position, tmp.dir, EQUIPMENT_RANGE, hit ? hit.distance : Infinity);
+    if (aimed !== equipmentStore.get().aimed) equipmentStore.set({ aimed });
     if (!hit) return null;
     const { x, y, z } = hit.point;
-    const { units, buildings, root } = zonesRef.current;
+    const { units, sections, buildings, root, hub } = zonesRef.current;
     const unit = units.find((u) => inside(u, x, z, 0.15) && y < u.maxY);
     if (unit) return unit.element;
+    // Sous-groupement le plus imbriqué contenant le point visé
+    const section = sections.filter((sz) => inside(sz, x, z) && y < sz.maxY).sort((a, b) => b.element.layout3D.level - a.element.layout3D.level)[0];
+    if (section) return section.element;
     const building = buildings.find((b) => inside(b, x, z, 0.3) && y < b.maxY);
     if (building) return building.element;
-    if (root && Math.hypot(x, z) < 3.4 && y < 3) return root;
+    if (root && Math.hypot(x - hub[0], z - hub[1]) < 3.4 && y < 3) return root;
     return null;
   };
 
@@ -322,8 +329,11 @@ export default function FirstPersonExplorer({ data, cameraTarget, onInspect, cot
       s.feet.z += (s.vel.z * dt) / steps;
       resolveWalls();
     }
-    s.feet.x = THREE.MathUtils.clamp(s.feet.x, -WORLD_LIMIT, WORLD_LIMIT);
-    s.feet.z = THREE.MathUtils.clamp(s.feet.z, -WORLD_LIMIT, WORLD_LIMIT);
+    const fence = data?.site?.fence;
+    if (fence) {
+      s.feet.x = THREE.MathUtils.clamp(s.feet.x, fence.minX - WORLD_MARGIN, fence.maxX + WORLD_MARGIN);
+      s.feet.z = THREE.MathUtils.clamp(s.feet.z, fence.minZ - WORLD_MARGIN, fence.maxZ + WORLD_MARGIN);
+    }
 
     // Gravité, sol, plafond
     if (!s.grounded) s.vel.y -= GRAVITY * dt;
@@ -368,7 +378,7 @@ export default function FirstPersonExplorer({ data, cameraTarget, onInspect, cot
     const target = findTarget();
     const { units, buildings } = zonesRef.current;
     const zoneUt = units.find((u) => inside(u, s.feet.x, s.feet.z, 0.1))?.element || null;
-    const zoneBuilding = buildings.find((b) => inside(b, s.feet.x, s.feet.z))?.element || null;
+    const zoneBuilding = buildings.find((b) => inside(b, s.feet.x, s.feet.z))?.place || null;
     const changes = {};
     if (target !== state.target) changes.target = target;
     if (zoneUt !== state.zoneUt) changes.zoneUt = zoneUt;
@@ -377,15 +387,69 @@ export default function FirstPersonExplorer({ data, cameraTarget, onInspect, cot
       changes.player = { x: s.feet.x, z: s.feet.z, yaw: s.yaw };
       s.publishIn = 0.1;
     }
+    // Objectif de la mission : poste non inspecté le plus proche (conservé tant qu'un autre
+    // n'est pas nettement plus près, pour ne pas changer de cible à chaque pas)
+    if ((s.nextIn -= dt) <= 0) {
+      s.nextIn = 0.25;
+      const pending = units.filter((u) => !inspectedRef.current?.has(u.element.id));
+      const distance = (u) => Math.hypot((u.minX + u.maxX) / 2 - s.feet.x, (u.minZ + u.maxZ) / 2 - s.feet.z);
+      let next = null;
+      let best = Infinity;
+      for (const u of pending) {
+        const d = distance(u);
+        if (d < best) {
+          best = d;
+          next = u;
+        }
+      }
+      const current = pending.find((u) => u.element === state.nextUt);
+      const nextUt = current && distance(current) <= best + 3 ? current.element : next?.element || null;
+      if (nextUt !== state.nextUt) changes.nextUt = nextUt;
+    }
     if (Object.keys(changes).length) explorerStore.set(changes);
   });
 
   return (
-    <InspectorTablet
-      ref={tabletRef}
-      cotationMode={cotationMode}
-      inspectedIds={inspectedIds}
-      total={data?.allWorkUnitsWorld?.length || 0}
-    />
+    <>
+      <MissionBeacon />
+      <InspectorTablet
+        ref={tabletRef}
+        cotationMode={cotationMode}
+        inspectedIds={inspectedIds}
+        total={data?.allWorkUnitsWorld?.length || 0}
+      />
+    </>
+  );
+}
+
+/** Balise au-dessus du prochain poste à inspecter, visible à travers les murs pour guider le joueur. */
+function MissionBeacon() {
+  const next = useExplorer((st) => st.nextUt);
+  const gemRef = useRef();
+  const materials = useMemo(
+    () => ({
+      gem: new THREE.MeshBasicMaterial({ color: '#38bdf8', transparent: true, opacity: 0.9, depthTest: false, depthWrite: false }),
+      beam: new THREE.MeshBasicMaterial({ color: '#38bdf8', transparent: true, opacity: 0.22, depthTest: false, depthWrite: false }),
+    }),
+    []
+  );
+  useEffect(() => () => Object.values(materials).forEach((m) => m.dispose()), [materials]);
+  useFrame(({ clock }) => {
+    if (!gemRef.current) return;
+    const t = clock.getElapsedTime();
+    gemRef.current.rotation.y = t * 1.4;
+    gemRef.current.position.y = 3.1 + Math.sin(t * 2.2) * 0.15;
+  });
+  if (!next) return null;
+  const [x, , z] = next.layout3D.worldPosition;
+  return (
+    <group position={[x, 0, z]} userData={{ noCollide: true }}>
+      <mesh ref={gemRef} material={materials.gem} renderOrder={990} scale={[0.3, 0.48, 0.3]} raycast={() => null}>
+        <octahedronGeometry args={[1, 0]} />
+      </mesh>
+      <mesh material={materials.beam} renderOrder={989} position={[0, 1.45, 0]} raycast={() => null}>
+        <cylinderGeometry args={[0.035, 0.035, 2.6, 8]} />
+      </mesh>
+    </group>
   );
 }

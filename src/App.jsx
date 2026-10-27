@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { loadDigiRiskData } from './services/digiriskApi';
-import { applySkins, loadSkins, saveSkins } from './services/skins';
+import { layoutTwin } from './services/siteLayout';
+import { loadSkins, saveSkins } from './services/skins';
 import SkinSettings from './components/ui/SkinSettings';
 import DigitalTwinCanvas from './components/3d/DigitalTwinCanvas';
 import TopHudBar from './components/ui/TopHudBar';
@@ -13,10 +14,10 @@ export default function App() {
   const [rawData, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Skins 3D choisis par élément (Paramètres), appliqués aux données positionnées
+  // Skins 3D choisis par élément (Paramètres) ; le plan du site est recalculé avec eux
   const [skins, setSkins] = useState(loadSkins);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const data = useMemo(() => applySkins(rawData, skins), [rawData, skins]);
+  const data = useMemo(() => layoutTwin(rawData, skins), [rawData, skins]);
   useEffect(() => saveSkins(skins), [skins]);
 
   const handleSkinChange = (elementId, skinId) => {
@@ -61,15 +62,19 @@ export default function App() {
       setLoading(false);
 
       // Sur grand écran uniquement, sélectionner UT14 par défaut au premier chargement
+      // (sinon la première UT de l'arborescence)
       setSelectedElement((prev) => {
         if (prev) return prev;
         if (typeof window !== 'undefined' && window.innerWidth < 960) {
           return null;
         }
-        const criticalUt = result.allWorkUnitsWorld?.find(
-          (u) => u.ref === 'UT14'
-        );
-        return criticalUt || result.allWorkUnitsWorld?.[0] || null;
+        const units = [];
+        const collect = (node) => {
+          if (node.elementType === 'workunit') units.push(node);
+          (node.children || []).forEach(collect);
+        };
+        if (result.rootEntity) collect(result.rootEntity);
+        return units.find((u) => u.ref === 'UT14') || units[0] || null;
       });
     },
     [apiKey]
@@ -78,6 +83,12 @@ export default function App() {
   useEffect(() => {
     fetchTwinData(false);
   }, [fetchTwinData]);
+
+  // La sélection pointe toujours vers l'élément positionné courant (chargement, changement de skin)
+  useEffect(() => {
+    if (!data?.elementsById) return;
+    setSelectedElement((prev) => (prev ? data.elementsById[prev.id] || null : prev));
+  }, [data]);
 
   const handleSelectElement = (element) => {
     setSelectedElement(element);
@@ -89,23 +100,9 @@ export default function App() {
       setTreeCollapsed(true);
     }
 
-    if (element.elementType === 'workunit' && element.layout3D?.worldPosition) {
-      setCameraTarget({
-        type: 'focus',
-        isBuilding: false,
-        position: element.layout3D.worldPosition,
-        ts: Date.now(),
-      });
-    } else if (element.elementType === 'groupment' && element.layout3D?.position) {
-      setCameraTarget({
-        type: 'focus',
-        isBuilding: true,
-        position: element.layout3D.position,
-        ts: Date.now(),
-      });
-    } else {
-      setCameraTarget({ type: 'overview', ts: Date.now() });
-    }
+    // Cadrage (et point d'apparition en visite) calculés par le plan du site ; entité mère : vue d'ensemble
+    const focus = element.layout3D?.focus;
+    setCameraTarget(focus ? { type: 'focus', ...focus, ts: Date.now() } : { type: 'overview', ts: Date.now() });
   };
 
   const handleResetCamera = () => {

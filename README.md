@@ -46,7 +46,13 @@ En développement, le serveur Vite émule aussi le mode photo de `api-proxy.php`
 ## Modèles 3D
 
 - Le type de chaque bâtiment (bureaux, usine, atelier peinture, entrepôt) et de chaque poste (soudure, cisaille, cabine poudre, cariste, VRP, salon...) est déduit des libellés DigiRisk (`src/services/archetypes.js`).
-- Les modèles sont procéduraux (`src/components/3d/models/`) et leur géométrie statique est fusionnée (`MergeStatic`) pour limiter les draw calls ; tout élément animé porte `userData={DYNAMIC}`.
+- **Plan du site calculé pour n'importe quel nombre de GP et d'UT** (`src/services/siteLayout.js`) :
+  - chaque GP de premier niveau est un bâtiment, ses UT rangées en grille presque carrée ; un sous-groupement commence une nouvelle rangée et forme une zone repérée au sol (à toute profondeur) ;
+  - les UT rattachées directement à la racine sont regroupées dans une *Zone extérieure* ;
+  - les bâtiments forment des îlots en grille autour du rond-point central, séparés par des voies ; enceinte, caméra, ombres, terrain et minicarte suivent la taille du site ;
+  - les couloirs piétons (intérieurs, le long des voies, portes, passages piétons) forment un graphe : il sert au dessin et aux trajets des opérateurs.
+- Les modèles sont procéduraux (`src/components/3d/models/`) et leur géométrie statique est fusionnée (`MergeStatic`) pour limiter les draw calls : les postes d'un bâtiment sont fusionnés ensemble, et les pièces du kit qui ne diffèrent que par leur couleur, rugosité ou lueur partagent un maillage (valeurs reportées dans les sommets). Tout élément animé porte `userData={DYNAMIC}`, de même que tout groupe dont le code d'animation modifie un enfant.
+- **Extincteurs et trousses de secours** : au survol (ou en visant en visite), une infobulle donne la dernière et la prochaine vérification et le statut (à jour, à prévoir sous 30 jours, en retard). Ces dates sont pour l'instant des données de démonstration (`src/services/equipmentChecks.js`), signalées comme telles.
 - Galerie de revue : `http://localhost:5173/?galerie` (filtres : `bureaux`, `production`, `peinture`, `logistique`, `batiments` (tous les skins de bâtiment) ou un archétype, ex. `?galerie=welding`).
 - Les drapeaux du rond-point affichent le logo de la société configuré dans Dolibarr (`entity_logo` de `risks/creation-options`), à défaut un monogramme.
 - **Skins** (bouton *Paramètres*) : chaque groupement peut prendre une autre enveloppe et finition (bureaux verre bleu / bronze / vert, usine brique / acier / béton, peinture blanc / anthracite / sable, entrepôt gris / bleu / vert) et chaque unité de travail n'importe lequel des 24 modèles de poste. « Auto » suit le libellé ; les choix sont mémorisés dans le navigateur (`src/services/skins.js`).
@@ -56,7 +62,8 @@ En développement, le serveur Vite émule aussi le mode photo de `api-proxy.php`
 Bouton *Visite 1re pers.* (souris + clavier requis) : on parcourt le site à hauteur d'homme avec une tablette DigiRisk en main.
 
 - ZQSD / WASD ou flèches pour se déplacer, souris pour regarder, Maj pour courir, Espace pour sauter, Échap pour la pause.
-- E ou clic : inspecte l'élément visé (UT, groupement, entité) et ouvre sa fiche risques ; la mission compte les UT inspectées, la minicarte les marque en vert.
+- E ou clic : inspecte l'élément visé (UT, groupement, entité) et ouvre sa fiche risques.
+- **Mission guidée « Visite de sécurité »** : inspecter chaque poste de travail (UT). Un briefing l'explique au départ ; le panneau de mission et la tablette indiquent le prochain poste (le plus proche non inspecté), sa direction et sa distance, et la consigne du moment (se déplacer, viser, appuyer sur E). Une balise bleue, visible à travers les murs, flotte au-dessus du poste. Chaque inspection est confirmée ; la carte de pause liste les postes par bâtiment et la minicarte les marque en vert.
 - Une alerte s'affiche à l'entrée d'une UT à risque élevé ou critique. En pause, choisir un élément dans l'arborescence y téléporte le joueur.
 - Les collisions utilisent la géométrie réelle des modèles (BVH `three-mesh-bvh`, `src/components/3d/explorer/`) ; un objet sans collision (volume holographique, fumée...) porte `userData={{ noCollide: true }}`.
 

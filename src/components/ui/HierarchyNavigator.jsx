@@ -6,10 +6,11 @@ import {
   ChevronRight,
   PanelLeftClose,
   FolderTree,
+  Layers,
 } from 'lucide-react';
 
 /**
- * Arborescence interactive DigiRisk (Groupement > Unité de Travail)
+ * Arborescence interactive DigiRisk (groupements, sous-groupements et Unités de Travail, à toute profondeur)
  * Se replie complètement à gauche en un bouton compact pour libérer la vue sur mobile et desktop.
  */
 export default function HierarchyNavigator({
@@ -20,19 +21,16 @@ export default function HierarchyNavigator({
   collapsed,
   setCollapsed,
 }) {
-  const [openBuildings, setOpenBuildings] = useState({
-    1: true,
-    3: true,
-    4: true,
-    15: true,
-  });
+  // Groupements dépliés par défaut ; repli mémorisé par identifiant
+  const [openGroups, setOpenGroups] = useState({});
 
-  const toggleBuilding = (id, e) => {
+  const toggleGroup = (id, e) => {
     e.stopPropagation();
-    setOpenBuildings((prev) => ({ ...prev, [id]: !prev[id] }));
+    setOpenGroups((prev) => ({ ...prev, [id]: prev[id] === false }));
   };
 
-  const buildings = data?.buildings || [];
+  // Premier niveau de l'arborescence : groupements (bâtiments) et UT rattachées à la racine
+  const topLevel = data?.rootEntity?.children || [];
 
   if (collapsed) {
     return (
@@ -74,102 +72,18 @@ export default function HierarchyNavigator({
       </div>
 
       <div className="hierarchy-list">
-        {buildings.map((b) => {
-          const isOpen = openBuildings[b.id] !== false;
-          const bScale =
-            cotationMode === 'brute'
-              ? b.stats.scaleBrute
-              : b.stats.scaleResiduelle;
-          const bMax =
-            cotationMode === 'brute'
-              ? b.stats.maxBrute
-              : b.stats.maxResiduelle;
-
-          return (
-            <div key={b.id} className="tree-group">
-              <div
-                className={`tree-building-row ${
-                  selectedElement?.id === b.id ? 'active' : ''
-                }`}
-                onClick={() => onSelectElement(b)}
-              >
-                <button
-                  type="button"
-                  className="tree-expand-btn"
-                  onClick={(e) => toggleBuilding(b.id, e)}
-                >
-                  {isOpen ? (
-                    <ChevronDown size={14} />
-                  ) : (
-                    <ChevronRight size={14} />
-                  )}
-                </button>
-                <Building2
-                  size={15}
-                  style={{ color: b.layout3D?.themeColor || '#3b82f6' }}
-                />
-                <span className="tree-ref">{b.ref}</span>
-                <span className="tree-label">{b.label}</span>
-                <span
-                  className="tree-score-pill"
-                  style={{
-                    backgroundColor: bScale.bgBadge || bScale.color,
-                    color: bScale.scoreTextColor || '#ffffff',
-                    borderColor: bScale.borderBadge || bScale.color,
-                  }}
-                >
-                  {bMax}
-                </span>
-              </div>
-
-              {isOpen && (
-                <div className="tree-ut-children">
-                  {b.children.map((ut) => {
-                    const utScale =
-                      cotationMode === 'brute'
-                        ? ut.stats.scaleBrute
-                        : ut.stats.scaleResiduelle;
-                    const utMax =
-                      cotationMode === 'brute'
-                        ? ut.stats.maxBrute
-                        : ut.stats.maxResiduelle;
-
-                    return (
-                      <div
-                        key={ut.id}
-                        className={`tree-ut-row ${
-                          selectedElement?.id === ut.id ? 'active' : ''
-                        }`}
-                        onClick={() => onSelectElement(ut)}
-                      >
-                        <Wrench
-                          size={13}
-                          style={{ color: utScale.strokeColor || utScale.color }}
-                        />
-                        <span className="tree-ut-ref">{ut.ref}</span>
-                        <span className="tree-ut-label">{ut.label}</span>
-                        <span
-                          className="tree-ut-dot"
-                          style={{
-                            backgroundColor: utScale.color,
-                            color: utScale.textColor || '#ffffff',
-                            border:
-                              utMax >= 81
-                                ? '1px solid #cbd5e1'
-                                : '1px solid transparent',
-                          }}
-                          title={`Cotation max : ${utMax}/100 (${utScale.label})`}
-                        >
-                          {utMax}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          );
-        })}
+        {topLevel.map((node) => (
+          <TreeNode
+            key={node.id}
+            node={node}
+            depth={0}
+            cotationMode={cotationMode}
+            selectedElement={selectedElement}
+            onSelectElement={onSelectElement}
+            openGroups={openGroups}
+            onToggle={toggleGroup}
+          />
+        ))}
       </div>
 
       {/* Légende officielle des échelles de cotation DigiRisk : Gris, Orange, Rouge, Noir */}
@@ -201,5 +115,78 @@ export default function HierarchyNavigator({
         </div>
       </div>
     </aside>
+  );
+}
+
+/**
+ * Élément de l'arborescence, à toute profondeur : groupement repliable (bâtiment au premier niveau,
+ * sous-groupement au-delà) ou Unité de Travail.
+ */
+function TreeNode({ node, depth, cotationMode, selectedElement, onSelectElement, openGroups, onToggle }) {
+  const scale = cotationMode === 'brute' ? node.stats.scaleBrute : node.stats.scaleResiduelle;
+  const max = cotationMode === 'brute' ? node.stats.maxBrute : node.stats.maxResiduelle;
+  const isActive = selectedElement?.id === node.id;
+
+  if (node.elementType !== 'groupment') {
+    return (
+      <div className={`tree-ut-row ${isActive ? 'active' : ''}`} onClick={() => onSelectElement(node)}>
+        <Wrench size={13} style={{ color: scale.strokeColor || scale.color }} />
+        <span className="tree-ut-ref">{node.ref}</span>
+        <span className="tree-ut-label">{node.label}</span>
+        <span
+          className="tree-ut-dot"
+          style={{
+            backgroundColor: scale.color,
+            color: scale.textColor || '#ffffff',
+            border: max >= 81 ? '1px solid #cbd5e1' : '1px solid transparent',
+          }}
+          title={`Cotation max : ${max}/100 (${scale.label})`}
+        >
+          {max}
+        </span>
+      </div>
+    );
+  }
+
+  const isOpen = openGroups[node.id] !== false;
+  const Icon = depth === 0 ? Building2 : Layers;
+  return (
+    <div className={depth === 0 ? 'tree-group' : 'tree-subgroup'}>
+      <div className={`tree-building-row ${isActive ? 'active' : ''}`} onClick={() => onSelectElement(node)}>
+        <button type="button" className="tree-expand-btn" onClick={(e) => onToggle(node.id, e)}>
+          {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+        </button>
+        <Icon size={depth === 0 ? 15 : 14} style={{ color: node.layout3D?.themeColor || '#3b82f6' }} />
+        <span className="tree-ref">{node.ref}</span>
+        <span className="tree-label">{node.label}</span>
+        <span
+          className="tree-score-pill"
+          style={{
+            backgroundColor: scale.bgBadge || scale.color,
+            color: scale.scoreTextColor || '#ffffff',
+            borderColor: scale.borderBadge || scale.color,
+          }}
+        >
+          {max}
+        </span>
+      </div>
+
+      {isOpen && node.children.length > 0 && (
+        <div className="tree-ut-children">
+          {node.children.map((child) => (
+            <TreeNode
+              key={child.id}
+              node={child}
+              depth={depth + 1}
+              cotationMode={cotationMode}
+              selectedElement={selectedElement}
+              onSelectElement={onSelectElement}
+              openGroups={openGroups}
+              onToggle={onToggle}
+            />
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

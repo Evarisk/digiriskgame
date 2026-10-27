@@ -63,15 +63,20 @@ const STATION_MODELS = {
   workshop: GenericWorkshop,
 };
 
-export default function WorkstationProps({ archetype, riskColor, isCritical }) {
+/** Modèle de poste d'un archétype, sans fusion (fusionné à l'échelle du bâtiment, voir BuildingGroup). */
+export function StationModel({ archetype, accent }) {
   const Station = STATION_MODELS[archetype] || GenericWorkshop;
+  return <Station accent={accent} />;
+}
 
+/** Poste isolé (galerie des modèles) : géométrie statique fusionnée et gyrophare si critique. */
+export default function WorkstationProps({ archetype, riskColor, isCritical }) {
   return (
     // Le sol des modèles (y = 0) correspond au dessus de la dalle de l'UT
     <group position={[0, 0.12, 0]}>
       {/* Géométrie statique fusionnée (un maillage par matériau) pour limiter les draw calls */}
       <MergeStatic deps={[archetype, riskColor]}>
-        <Station accent={riskColor} />
+        <StationModel archetype={archetype} accent={riskColor} />
       </MergeStatic>
 
       {/* Gyrophare d'alerte sur mât si cotation critique (>= 81) */}
@@ -80,7 +85,8 @@ export default function WorkstationProps({ archetype, riskColor, isCritical }) {
   );
 }
 
-function CriticalBeacon(props) {
+/** Gyrophare d'alerte sur mât (UT à cotation critique >= 81). */
+export function CriticalBeacon(props) {
   const headRef = useRef();
   useFrame(({ clock }) => {
     if (headRef.current) headRef.current.rotation.y = clock.getElapsedTime() * 4;

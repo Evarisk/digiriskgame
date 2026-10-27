@@ -1,7 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html, Edges } from '@react-three/drei';
-import WorkstationProps from './WorkstationProps';
+import { CriticalBeacon } from './WorkstationProps';
+
+// Au-delà de cette distance caméra, l'étiquette HTML de l'UT est masquée (lisibilité et coût du DOM
+// sur les sites à nombreuses UT) ; la vue d'ensemble du site de démonstration les garde toutes
+const LABEL_DISTANCE = 80;
 
 /**
  * Représentation 3D interactive d'une Unité de Travail (UT) rattachée à un Groupement.
@@ -19,6 +23,8 @@ export default function WorkUnitZone({
 }) {
   const [hovered, setHovered] = useState(false);
   const [photoCycleIdx, setPhotoCycleIdx] = useState(0);
+  const [labelNear, setLabelNear] = useState(true);
+  const labelLod = useRef({ wait: 0, near: true });
   const pulseRingRef = useRef();
 
   const [posX, posY, posZ] = ut.layout3D.localPosition;
@@ -52,11 +58,22 @@ export default function WorkUnitZone({
       ? risksWithPhoto[photoCycleIdx % risksWithPhoto.length]
       : null;
 
-  useFrame(({ clock }) => {
+  useFrame(({ clock, camera }, delta) => {
     if (pulseRingRef.current) {
       const t = clock.getElapsedTime();
       const s = 1 + Math.sin(t * 3.5) * 0.04;
       pulseRingRef.current.scale.set(s, 1, s);
+    }
+    // Distance caméra vérifiée quelques fois par seconde, avec hystérésis
+    const lod = labelLod.current;
+    if ((lod.wait -= delta) > 0) return;
+    lod.wait = 0.3;
+    const [wx, , wz] = ut.layout3D.worldPosition;
+    const d = Math.hypot(camera.position.x - wx, camera.position.y - 1, camera.position.z - wz);
+    const near = lod.near ? d < LABEL_DISTANCE + 4 : d < LABEL_DISTANCE - 4;
+    if (near !== lod.near) {
+      lod.near = near;
+      setLabelNear(near);
     }
   });
 
@@ -163,17 +180,14 @@ export default function WorkUnitZone({
             <Edges scale={1.0} color={isSelected ? '#ffffff' : edgeColor} />
           </mesh>
 
-          {/* Équipements 3D spécifiques au métier de l'UT */}
-          <WorkstationProps
-            archetype={ut.archetype}
-            riskColor={edgeColor}
-            isCritical={isCritical}
-          />
+          {/* Les équipements métier de l'UT sont fusionnés avec ceux du bâtiment (BuildingGroup) ;
+              gyrophare d'alerte sur mât si cotation critique (>= 81) */}
+          {isCritical && <CriticalBeacon position={[2.15, 0.12, -1.75]} />}
         </group>
       )}
 
       {/* Hologramme HTML flottant au-dessus de l'Unité de Travail + Projection Photo Risque */}
-      {showLabels && (
+      {showLabels && (labelNear || isSelected) && (
         <Html
           position={[0, sizeH + (activeUtRisk ? 1.35 : 0.55), 0]}
           center

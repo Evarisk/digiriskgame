@@ -1,13 +1,5 @@
 import snapshotData from '../data/digiriskSnapshot.json';
-import {
-  DEFAULT_DEMO_RISKSIGNS,
-  enrichRiskSign,
-} from '../data/signalisationCategories';
-import {
-  BUILDING_ARCHETYPES,
-  detectBuildingArchetype,
-  detectWorkUnitArchetype,
-} from './archetypes';
+import { DEFAULT_DEMO_RISKSIGNS } from '../data/signalisationCategories';
 
 const DEFAULT_API_KEY = '';
 const PUBLIC_HOST = import.meta.env.VITE_DIGIRISK_PUBLIC_URL || 'https://demodoli.digirisk.com/htdocs';
@@ -81,136 +73,45 @@ export function getCotationScale(score) {
   };
 }
 
-/**
- * Enrichit l'arbre hiérarchique avec des coordonnées spatiales 3D
- * pour positionner chaque Groupement (bâtiment) et chaque Unité de Travail (atelier/poste).
- */
-export function attachSpatialLayout(hierarchy) {
-  const buildings = hierarchy.buildings || [];
-  const rawSigns =
-    hierarchy.rawRiskSigns && hierarchy.rawRiskSigns.length > 0
-      ? hierarchy.rawRiskSigns
-      : DEFAULT_DEMO_RISKSIGNS;
-
-  const signsByElement = {};
-  for (const s of rawSigns) {
-    const enriched = enrichRiskSign(s);
-    if (!signsByElement[enriched.fkElement]) {
-      signsByElement[enriched.fkElement] = [];
-    }
-    signsByElement[enriched.fkElement].push(enriched);
-  }
-
-  // Quadrants sur le campus industriel (X, Z) ; le style du bâtiment dépend de son libellé
-  const buildingCenters = [
-    [-17, -12],
-    [17, -12],
-    [-17, 13],
-    [17, 13],
-  ];
-
-  const allWorkUnitsWorld = [];
-
-  const positionedBuildings = buildings.map((b, idx) => {
-    const buildingArchetype = detectBuildingArchetype(b, idx);
-    const preset = {
-      center: buildingCenters[idx] || [idx % 2 === 0 ? -17 : 17, Math.floor(idx / 2) * 24 - 12],
-      themeColor: BUILDING_ARCHETYPES[buildingArchetype].themeColor,
-    };
-
-    const workUnits = b.children || [];
-    const cols = workUnits.length > 4 ? 3 : 2;
-    const rows = Math.max(1, Math.ceil(workUnits.length / cols));
-
-    const cellW = 6.2;
-    const cellD = 5.4;
-    const padX = 2.6;
-    const padZ = 3.0;
-
-    const width = Math.max(13, cols * cellW + padX * 2);
-    const depth = Math.max(11, rows * cellD + padZ * 2);
-
-    const positionedWorkUnits = workUnits.map((ut, uIdx) => {
-      const col = uIdx % cols;
-      const row = Math.floor(uIdx / cols);
-      const localX = (col - (cols - 1) / 2) * cellW;
-      const localZ = (row - (rows - 1) / 2) * cellD + 0.4;
-      const worldX = preset.center[0] + localX;
-      const worldZ = preset.center[1] + localZ;
-
-      const utType = detectWorkUnitArchetype(ut.label, buildingArchetype);
-      const utDirectSigns = signsByElement[ut.id] || ut.directRiskSigns || [];
-
-      const enrichedUt = {
-        ...ut,
-        parentBuildingRef: b.ref,
-        parentBuildingLabel: b.label,
-        archetype: utType,
-        directRiskSigns: utDirectSigns,
-        allRiskSigns: utDirectSigns,
-        layout3D: {
-          localPosition: [localX, 0.15, localZ],
-          worldPosition: [worldX, 0.15, worldZ],
-          size: [4.8, 2.2, 4.0],
-        },
-      };
-
-      allWorkUnitsWorld.push(enrichedUt);
-      return enrichedUt;
-    });
-
-    const bDirectSigns = signsByElement[b.id] || b.directRiskSigns || [];
-    const bAllSigns = [
-      ...bDirectSigns,
-      ...positionedWorkUnits.flatMap((u) => u.directRiskSigns || []),
-    ];
-
-    return {
-      ...b,
-      directRiskSigns: bDirectSigns,
-      allRiskSigns: bAllSigns,
-      children: positionedWorkUnits,
-      layout3D: {
-        position: [preset.center[0], 0, preset.center[1]],
-        size: [width, 4.8, depth],
-        themeColor: preset.themeColor,
-        archetype: buildingArchetype,
-        // Côté extérieur du campus (parking, quais, cheminée... sont placés de ce côté)
-        outward: [Math.sign(preset.center[0]) || 1, Math.sign(preset.center[1]) || 1],
-      },
-    };
-  });
-
-  const rootDirectSigns =
-    hierarchy.rootEntity && signsByElement[hierarchy.rootEntity.id]
-      ? signsByElement[hierarchy.rootEntity.id]
-      : [];
+/** Synthèse des cotations d'un élément à partir de ses risques (directs + descendants). */
+export function statsFromRisks(allRisks, directRisksCount = 0) {
+  const maxBrute = allRisks.reduce((m, r) => Math.max(m, r.cotationBrute), 0);
+  const maxResiduelle = allRisks.reduce((m, r) => Math.max(m, r.cotationResiduelle), 0);
+  const avgResiduelle =
+    allRisks.length > 0
+      ? Math.round(allRisks.reduce((s, r) => s + r.cotationResiduelle, 0) / allRisks.length)
+      : 0;
+  const avgBrute =
+    allRisks.length > 0
+      ? Math.round(allRisks.reduce((s, r) => s + r.cotationBrute, 0) / allRisks.length)
+      : 0;
 
   return {
-    ...hierarchy,
-    rootEntity: hierarchy.rootEntity
-      ? {
-          ...hierarchy.rootEntity,
-          directRiskSigns: rootDirectSigns,
-          allRiskSigns: [
-            ...rootDirectSigns,
-            ...positionedBuildings.flatMap((b) => b.allRiskSigns || []),
-          ],
-        }
-      : null,
-    buildings: positionedBuildings,
-    allWorkUnitsWorld,
+    totalRisks: allRisks.length,
+    directRisksCount,
+    maxBrute,
+    maxResiduelle,
+    avgBrute,
+    avgResiduelle,
+    scaleBrute: getCotationScale(maxBrute),
+    scaleResiduelle: getCotationScale(maxResiduelle),
+    criticalCount: allRisks.filter((r) => r.cotationResiduelle >= 81).length,
+    highCount: allRisks.filter((r) => r.cotationResiduelle >= 51 && r.cotationResiduelle <= 80).length,
+    mediumCount: allRisks.filter((r) => r.cotationResiduelle >= 48 && r.cotationResiduelle <= 50).length,
+    lowCount: allRisks.filter((r) => r.cotationResiduelle < 48).length,
+    totalTasks: allRisks.reduce((s, r) => s + r.tasks.length, 0),
   };
 }
 
 /**
  * Interroge directement l'API REST Dolibarr/DigiRisk via le proxy Vite (/digirisk-api)
  * ou bascule sur le snapshot local en cas d'indisponibilité réseau.
+ * Renvoie l'arborescence DUER ; le plan 3D est calculé ensuite (services/siteLayout.js).
  */
 export async function loadDigiRiskData({ apiKey = DEFAULT_API_KEY, forceSnapshot = false } = {}) {
   if (forceSnapshot) {
     return {
-      ...attachSpatialLayout(snapshotData),
+      ...snapshotData,
       connectionMode: 'snapshot',
     };
   }
@@ -249,13 +150,13 @@ export async function loadDigiRiskData({ apiKey = DEFAULT_API_KEY, forceSnapshot
     });
 
     return {
-      ...attachSpatialLayout(hierarchy),
+      ...hierarchy,
       connectionMode: 'live',
     };
   } catch (error) {
     console.warn('Repli sur le snapshot local DigiRisk suite à erreur API :', error.message);
     return {
-      ...attachSpatialLayout(snapshotData),
+      ...snapshotData,
       connectionMode: 'snapshot-fallback',
       apiError: error.message,
     };
@@ -419,45 +320,37 @@ function transformRawToHierarchy({ tree, risks, assessments, creationOptions, ta
 
   function computeStats(node) {
     for (const child of node.children) computeStats(child);
-    const allRisks = [...node.directRisks, ...node.children.flatMap((c) => c.allRisks || [])];
-    node.allRisks = allRisks;
-
-    const maxBrute = allRisks.reduce((m, r) => Math.max(m, r.cotationBrute), 0);
-    const maxResiduelle = allRisks.reduce((m, r) => Math.max(m, r.cotationResiduelle), 0);
-    const avgResiduelle =
-      allRisks.length > 0
-        ? Math.round(allRisks.reduce((s, r) => s + r.cotationResiduelle, 0) / allRisks.length)
-        : 0;
-    const avgBrute =
-      allRisks.length > 0
-        ? Math.round(allRisks.reduce((s, r) => s + r.cotationBrute, 0) / allRisks.length)
-        : 0;
-
-    node.stats = {
-      totalRisks: allRisks.length,
-      directRisksCount: node.directRisks.length,
-      maxBrute,
-      maxResiduelle,
-      avgBrute,
-      avgResiduelle,
-      scaleBrute: getCotationScale(maxBrute),
-      scaleResiduelle: getCotationScale(maxResiduelle),
-      criticalCount: allRisks.filter((r) => r.cotationResiduelle >= 81).length,
-      highCount: allRisks.filter((r) => r.cotationResiduelle >= 51 && r.cotationResiduelle <= 80).length,
-      mediumCount: allRisks.filter((r) => r.cotationResiduelle >= 48 && r.cotationResiduelle <= 50).length,
-      lowCount: allRisks.filter((r) => r.cotationResiduelle < 48).length,
-      totalTasks: allRisks.reduce((s, r) => s + r.tasks.length, 0),
-    };
+    node.allRisks = [...node.directRisks, ...node.children.flatMap((c) => c.allRisks || [])];
+    node.stats = statsFromRisks(node.allRisks, node.directRisks.length);
   }
 
-  rootNodes.forEach(computeStats);
-  const rootEntity = rootNodes[0] || null;
+  // Cas usuel : un groupement racine unique porte tout le site. Sinon (plusieurs éléments de premier
+  // niveau, ou une UT seule), la société devient une racine virtuelle qui les regroupe.
+  const entityName = creationOptions?.entity_name || 'MetalOandCo-Industrie';
+  let rootEntity = rootNodes[0] || null;
+  if (rootNodes.length > 1 || (rootEntity && rootEntity.elementType !== 'groupment')) {
+    rootEntity = {
+      id: 0,
+      ref: 'DUER',
+      label: entityName,
+      description: '',
+      elementType: 'groupment',
+      fkParent: 0,
+      depth: -1,
+      ranks: 0,
+      photo: null,
+      directRisks: [],
+      children: rootNodes,
+      virtual: true,
+    };
+  }
+  if (rootEntity) computeStats(rootEntity);
   const buildings = rootEntity ? rootEntity.children.filter((c) => c.elementType === 'groupment') : [];
 
   return {
     fetchedAt: new Date().toISOString(),
     sourceUrl: API_BASE_URL,
-    entityName: creationOptions?.entity_name || 'MetalOandCo-Industrie',
+    entityName,
     // Logo de la société (data URI fourni par l'API DigiRisk, vide si non configuré)
     entityLogo: creationOptions?.entity_logo || null,
     rootEntity,
