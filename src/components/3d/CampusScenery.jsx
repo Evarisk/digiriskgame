@@ -20,18 +20,19 @@ import {
 import { getTexture } from './models/textures';
 import MergeStatic from './models/MergeStatic';
 import { EquipmentOwner } from './equipment/equipment';
-import { AVENUE_WIDTH } from '../../services/siteLayout';
+import { traffic } from './traffic';
+import { AVENUE_WIDTH, HUB } from '../../services/siteLayout';
 
 const GATE_OWNER = { id: 'site-gate', ref: 'Accès', label: 'Poste de garde' };
 
 /**
  * Décor du site industriel, d'après le plan calculé pour l'arborescence (services/siteLayout.js) :
  * voirie marquée et carrefours, couloirs piétons balisés (norme INRS) et passages piétons,
- * rond-point central, éclairage public, arbres, clôture d'enceinte et poste de garde.
+ * rond-point central, éclairage public, arbres, clôture d'enceinte, poste de garde et route
+ * départementale devant le portail.
  */
 
-const HUB_RADIUS = 4.4;
-const HUB_GAP = 4.8; // interruption des bordures autour du rond-point
+const HUB_GAP = 6.7; // interruption des bordures au débouché de l'anneau du rond-point
 const CROSSWALK_GAP = 0.95; // bordure abaissée au droit des passages piétons
 const WALKWAY_Y = 0.0125; // couloirs extérieurs posés sur le pavé
 
@@ -84,7 +85,7 @@ function segmentsOf(from, to, crossings, crosswalks) {
 function DashedLine({ street, from, to, crossings }) {
   const dashes = [];
   for (let c = from; c <= to; c += 2) {
-    if (crossings.some((k) => Math.abs(c - k.at) < (k.hub ? 4.5 : k.half + 0.5))) continue;
+    if (crossings.some((k) => Math.abs(c - k.at) < (k.hub ? HUB.ring + 0.3 : k.half + 0.5))) continue;
     dashes.push(c);
   }
   return dashes.map((c) => (
@@ -130,10 +131,12 @@ function Crosswalk({ position, across = 'z', width }) {
 /**
  * Réseau extérieur de cheminements piétons industriels balisés (vert/jaune + chevrons), calculé par le
  * plan du site : couloirs de part et d'autre de chaque voie, accès aux passages piétons, raccordement
- * des portes de chaque bâtiment ; barrières et panneaux aux débouchés des passages du rond-point.
+ * des portes de chaque bâtiment ; barrières le long de l'anneau du rond-point et panneaux aux
+ * passages piétons qui le bordent.
  */
 function CampusPedestrianNetwork({ site }) {
   const [hx, hz] = site.hub;
+  const guardrail = (HUB.ring + HUB.clear) / 2 - 0.25; // entre l'anneau et les cheminements diagonaux
   return (
     <group userData={{ noCollide: true }}>
       {site.walkways.strips.map((s) => (
@@ -143,12 +146,18 @@ function CampusPedestrianNetwork({ site }) {
         <WalkwayNode key={`${n}`} position={n} y={WALKWAY_Y} />
       ))}
 
-      {/* Barrières / arceaux de sécurité protégeant les débouchés des passages piétons du rond-point */}
+      {/* Barrières de sécurité séparant l'anneau du rond-point des cheminements, panneaux aux passages piétons */}
       <group position={[hx, 0, hz]}>
         {[[-1, -1], [-1, 1], [1, -1], [1, 1]].map(([sx, sz]) => (
           <React.Fragment key={`${sx}${sz}`}>
-            <SafetyGuardrail position={[sx * 5.1, 0, sz * 2.95]} length={1.3} height={0.68} axis="x" />
-            <SafetySign kind="mandatory" position={[sx * 7.2, 0, sz * 3.1]} height={1.25} size={0.28} />
+            <SafetyGuardrail
+              position={[(sx * guardrail) / Math.SQRT2, 0, (sz * guardrail) / Math.SQRT2]}
+              rotation={[0, Math.atan2(-sx, -sz), 0]}
+              length={2.4}
+              height={0.68}
+              axis="x"
+            />
+            <SafetySign kind="mandatory" position={[sx * 9.6, 0, sz * 3.15]} height={1.25} size={0.28} />
           </React.Fragment>
         ))}
       </group>
@@ -191,11 +200,39 @@ function Street({ street, site }) {
           );
         })
       )}
-      <DashedLine street={street} from={street.from + 1} to={street.main && !along ? end + 3 : end - 1} crossings={crossings} />
+      <DashedLine street={street} from={street.from + 1} to={street.main && !along ? site.road.z - site.road.width / 2 - 1 : end - 1} crossings={crossings} />
       {crosswalks.map((t) => {
         const [x, z] = at(t, 0);
         return <Crosswalk key={t} position={[x, 0, z]} across={along ? 'z' : 'x'} width={street.width - 0.6} />;
       })}
+    </>
+  );
+}
+
+/** Route départementale devant le portail : chaussée, lignes de rive et pointillés axiaux. */
+function PublicRoad({ road, gateX }) {
+  const length = road.to - road.from;
+  const mid = (road.from + road.to) / 2;
+  const half = road.width / 2;
+  const mouth = AVENUE_WIDTH / 2 + 0.6; // débouché de l'avenue (rive nord interrompue)
+  const dashes = [];
+  for (let x = road.from + 1.5; x < road.to - 1; x += 3) {
+    if (Math.abs(x - gateX) > mouth + 0.5) dashes.push(x);
+  }
+  const north = [
+    [road.from, gateX - mouth],
+    [gateX + mouth, road.to],
+  ];
+  return (
+    <>
+      <Box position={[mid, 0.02, road.z]} size={[length, 0.03, road.width]} map={getTexture('asphalt', length / 4, road.width / 4)} rough={0.85} shadow={false} receive />
+      <Box position={[mid, 0.035, road.z + half - 0.25]} size={[length, 0.006, 0.1]} color="#e2e8f0" shadow={false} />
+      {north.map(([a, b]) => (
+        <Box key={a} position={[(a + b) / 2, 0.035, road.z - half + 0.25]} size={[b - a, 0.006, 0.1]} color="#e2e8f0" shadow={false} />
+      ))}
+      {dashes.map((x) => (
+        <Box key={x} position={[x, 0.035, road.z]} size={[1.5, 0.006, 0.12]} color="#e2e8f0" shadow={false} />
+      ))}
     </>
   );
 }
@@ -292,11 +329,17 @@ function Flag({ material, phase = 0, ...rest }) {
 
 function GuardHouse({ side = 1, ...rest }) {
   const armRef = useRef();
-  useFrame(({ clock }) => {
+  useFrame(({ clock }, delta) => {
     if (!armRef.current) return;
-    const cycle = (clock.getElapsedTime() * 0.08) % 1;
-    const open = cycle < 0.15 ? cycle / 0.15 : cycle < 0.45 ? 1 : cycle < 0.6 ? 1 - (cycle - 0.45) / 0.15 : 0;
-    armRef.current.rotation.z = -side * open * 1.35;
+    const t = clock.getElapsedTime();
+    const cycle = (t * 0.08) % 1;
+    const scheduled = cycle < 0.15 ? cycle / 0.15 : cycle < 0.45 ? 1 : cycle < 0.6 ? 1 - (cycle - 0.45) / 0.15 : 0;
+    // Levée pour un véhicule qui approche (voir DeliveryTrucks), sinon cycle d'ouverture régulier
+    const gate = traffic.gate;
+    const target = t < gate.requestUntil ? 1 : scheduled;
+    const step = Math.min(delta, 0.1) / 1.6;
+    gate.open = target > gate.open ? Math.min(target, gate.open + step) : Math.max(target, gate.open - step);
+    armRef.current.rotation.z = -side * gate.open * 1.35;
   });
   return (
     <group {...rest}>
@@ -330,13 +373,18 @@ export default function CampusScenery({ site, companyName, companyLogo }) {
 
   const layout = useMemo(() => {
     if (!site) return null;
-    const { fence, footprints, streets, lots, gate, hub } = site;
+    const { fence, footprints, streets, lots, gate, hub, road } = site;
     const streetRects = streets.map(streetRect);
+    // Passage des camions de livraison (quais, traversée des trottoirs) : ni arbre ni lampadaire
+    const truckRoutes = site.deliveries.flatMap((d) => [d.outbound, d.inbound, d.dock]);
+    const onTruckRoute = (x, z, clearance) =>
+      truckRoutes.some((pts) => pts.some((p, k) => k > 0 && distanceToSegment(x, z, pts[k - 1], p) < clearance));
     const isFree = (x, z, pad = 1.2) =>
       !streetRects.some((r) => inRect(r, x, z, 1.2)) &&
       !footprints.some((r) => inRect(r, x, z, pad)) &&
       !site.walkways.strips.some((s) => distanceToSegment(x, z, s.from, s.to) < 0.4 + pad) &&
-      Math.hypot(x - hub[0], z - hub[1]) > HUB_RADIUS + 1;
+      !onTruckRoute(x, z, 1.6 + pad) &&
+      Math.hypot(x - hub[0], z - hub[1]) > HUB.clear + 1;
     const lengthX = fence.maxX - fence.minX;
     const lengthZ = fence.maxZ - fence.minZ;
 
@@ -379,6 +427,7 @@ export default function CampusScenery({ site, companyName, companyLogo }) {
       const x = side === 0 ? fence.minX - offset : side === 1 ? fence.maxX + offset : fence.minX + along * lengthX;
       const z = side === 2 ? fence.minZ - offset : side === 3 ? fence.maxZ + offset : fence.minZ + along * lengthZ;
       if (z > fence.maxZ - 1 && Math.abs(x - gate.x) < AVENUE_WIDTH / 2 + 1.5) continue;
+      if (Math.abs(z - road.z) < road.width / 2 + 1.5) continue;
       trees.push({ x, z, variant: k % 3 ? 'conifer' : 'round', size: 1 + seeded(k) * 0.6 });
     }
 
@@ -391,14 +440,19 @@ export default function CampusScenery({ site, companyName, companyLogo }) {
       const crosswalks = crosswalksOf(street, site);
       const end = Math.min(street.to, along ? fence.maxX : fence.maxZ);
       const nearCrossing = (t) =>
-        crossings.some((c) => Math.abs(t - c.at) < (c.hub ? 6 : c.half + 3)) || crosswalks.some((c) => Math.abs(t - c) < 1.4);
+        crossings.some((c) => Math.abs(t - c.at) < (c.hub ? HUB.clear + 2.5 : c.half + 3)) || crosswalks.some((c) => Math.abs(t - c) < 1.4);
       const offset = street.width / 2 + 0.45;
       for (let t = street.from + 4; t <= end - 4; t += 9) {
         if (nearCrossing(t)) continue;
         const side = Math.round(t / 9) % 2 ? 1 : -1;
         const at = (c) => (along ? [c, street.z + side * offset] : [street.x + side * offset, c]);
         const spot = [t, t - 4.5, t + 4.5].find(
-          (c) => !nearCrossing(c) && c > street.from + 1 && c < end - 1 && !footprints.some((r) => inRect(r, ...at(c), 0.3))
+          (c) =>
+            !nearCrossing(c) &&
+            c > street.from + 1 &&
+            c < end - 1 &&
+            !footprints.some((r) => inRect(r, ...at(c), 0.3)) &&
+            !onTruckRoute(...at(c), 1.6)
         );
         if (spot === undefined) continue;
         const [x, z] = at(spot);
@@ -442,10 +496,14 @@ export default function CampusScenery({ site, companyName, companyLogo }) {
       {/* Réseau de cheminements piétons balisés entre les portes des bâtiments et les passages piétons */}
       <CampusPedestrianNetwork site={site} />
 
-      {/* Rond-point engazonné et mâts de drapeaux autour du totem central */}
+      {/* Route départementale (départ et retour des camions de livraison) */}
+      <PublicRoad road={site.road} gateX={gate.x} />
+
+      {/* Rond-point : anneau de circulation, îlot engazonné et mâts de drapeaux autour du totem central */}
       <group position={[hub[0], 0, hub[1]]}>
-        <Cylinder position={[0, 0.04, 0]} radius={HUB_RADIUS} height={0.05} segments={40} color="#334155" rough={0.8} shadow={false} />
-        <Cylinder position={[0, 0.07, 0]} radius={HUB_RADIUS - 0.3} height={0.06} segments={40} color="#14532d" rough={0.95} shadow={false} />
+        <Cylinder position={[0, 0.022, 0]} radius={HUB.ring} height={0.03} segments={48} map={getTexture('asphalt', HUB.ring / 2, HUB.ring / 2)} rough={0.85} shadow={false} receiveShadow />
+        <Cylinder position={[0, 0.04, 0]} radius={HUB.island} height={0.05} segments={40} color="#334155" rough={0.8} shadow={false} />
+        <Cylinder position={[0, 0.07, 0]} radius={HUB.island - 0.3} height={0.06} segments={40} color="#14532d" rough={0.95} shadow={false} />
         {/* Drapeaux aux couleurs de la société (logo Dolibarr) */}
         <Flag position={[-2.2, 0.05, -3.0]} material={flagMaterial} phase={0} />
         <Flag position={[-0.3, 0.05, -3.5]} material={flagMaterial} phase={1.3} />

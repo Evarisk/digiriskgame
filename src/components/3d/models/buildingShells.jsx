@@ -15,14 +15,15 @@ import {
   PalletRack,
   SafetySign,
   SafetyGuardrail,
-  Wheel,
+  SemiTrailer,
+  TruckTractor,
   seeded,
   noRaycast,
   DYNAMIC,
 } from './kit';
 import { getTexture } from './textures';
 import { shellFinish } from '../../../services/skins';
-import { sideDoorZ } from '../../../services/siteLayout';
+import { sideDoorZ, warehouseDocks, TRUCK } from '../../../services/siteLayout';
 
 /**
  * Enveloppes architecturales des Groupements DigiRisk (vue « maison de poupée ») :
@@ -922,41 +923,25 @@ function DockDoor({ open = false, ...rest }) {
   );
 }
 
-function SemiTrailerTruck({ color = '#f8fafc', stripe = '#0891b2', ...rest }) {
-  // Remorque à quai : arrière en x = 0, cabine vers +X
-  const L = 6.0;
+/** Semi-remorque à quai : arrière en x = 0, cabine vers +X. */
+function SemiTrailerTruck(props) {
   return (
-    <group {...rest}>
-      <Box position={[L / 2, 1.45, 0]} size={[L, 1.9, 1.65]} color={color} rough={0.45} />
-      <Box position={[L / 2, 1.0, 0.83]} size={[L - 0.6, 0.25, 0.01]} color={stripe} glow={0.15} shadow={false} />
-      <Box position={[L / 2, 1.0, -0.83]} size={[L - 0.6, 0.25, 0.01]} color={stripe} glow={0.15} shadow={false} />
-      <Box position={[L / 2, 0.42, 0]} size={[L - 0.2, 0.16, 1.2]} color="#1f2937" />
-      {[0.9, 1.5, 2.1].map((x) =>
-        [-0.62, 0.62].map((z) => <Wheel key={`${x}${z}`} position={[x, 0.3, z]} radius={0.3} width={0.24} />)
-      )}
-      {/* Tracteur */}
-      <group position={[L + 0.1, 0, 0]}>
-        <Box position={[0.7, 0.45, 0]} size={[1.9, 0.3, 1.2]} color="#1f2937" />
-        <Box position={[1.15, 1.3, 0]} size={[1.0, 1.5, 1.7]} color="#dc2626" metal={0.4} rough={0.35} />
-        <Box position={[1.66, 1.6, 0]} size={[0.02, 0.6, 1.5]} color="#0b1220" metal={0.85} rough={0.12} />
-        <Box position={[1.66, 0.75, 0]} size={[0.04, 0.3, 1.4]} color="#94a3b8" metal={0.7} />
-        <Box position={[1.67, 0.75, 0.6]} size={[0.02, 0.12, 0.2]} color="#fef9c3" glow={1.4} shadow={false} />
-        <Box position={[1.67, 0.75, -0.6]} size={[0.02, 0.12, 0.2]} color="#fef9c3" glow={1.4} shadow={false} />
-        {[0.3, 1.25].map((x) =>
-          [-0.68, 0.68].map((z) => <Wheel key={`${x}${z}`} position={[x, 0.32, z]} radius={0.32} width={0.25} />)
-        )}
-      </group>
+    <group {...props}>
+      <SemiTrailer />
+      <TruckTractor position={[TRUCK.tractor, 0, 0]} />
     </group>
   );
 }
 
-function WarehouseShell({ width, height, depth, themeColor, outward = [1, 1], showRoof, highlight, finish }) {
-  const [ox] = outward;
+/**
+ * Entrepôt logistique. `truck` : semi-remorque à quai ; sur le site, c'est le camion de livraison animé
+ * (DeliveryTrucks) qui occupe le quai.
+ */
+function WarehouseShell({ width, height, depth, themeColor, outward = [1, 1], showRoof, highlight, finish, truck = true }) {
+  const [ox, oz] = outward;
   const cladding = shellFinish('logistics', finish).cladding;
   const rackBays = Math.max(4, Math.floor((width - 1.4) / 1.15));
-  const docks = Math.max(2, Math.min(4, Math.floor((depth - 2) / 3)));
-  const dockZs = Array.from({ length: docks }, (_, i) => -depth / 2 + 2.2 + (i * (depth - 4.4)) / Math.max(1, docks - 1));
-  const truckDock = Math.floor(docks / 2);
+  const { zs: dockZs, truck: truckDock } = warehouseDocks(depth, oz);
   const doorZ = getBuildingDoorZ(depth);
   const doorWidth = 2.0;
 
@@ -1010,10 +995,12 @@ function WarehouseShell({ width, height, depth, themeColor, outward = [1, 1], sh
       )}
 
       {/* Semi-remorque à quai + marquage et potelets */}
-      <SemiTrailerTruck
-        position={[ox * (width / 2 + 1.25), 0, dockZs[truckDock]]}
-        rotation={[0, ox > 0 ? 0 : Math.PI, 0]}
-      />
+      {truck && (
+        <SemiTrailerTruck
+          position={[ox * (width / 2 + TRUCK.dockGap), 0, dockZs[truckDock]]}
+          rotation={[0, ox > 0 ? 0 : Math.PI, 0]}
+        />
+      )}
       {dockZs.map((z) => (
         <group key={`b${z}`}>
           <Bollard position={[ox * (width / 2 + 1.5), 0, z - 1.35]} height={0.9} />

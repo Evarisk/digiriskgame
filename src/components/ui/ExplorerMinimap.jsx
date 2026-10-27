@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { explorerStore } from '../3d/explorer/explorerStore';
 import { streetRect } from '../3d/CampusScenery';
+import { HUB } from '../../services/siteLayout';
 
 /**
  * Minicarte du mode visite (nord en haut) : voirie, groupements et sous-groupements, UT teintées
@@ -45,7 +46,10 @@ export default function ExplorerMinimap({ data, cotationMode, inspectedIds }) {
         ctx.fillRect(...rect(r.minX, r.minZ, r.maxX, r.maxZ));
       }
       ctx.beginPath();
-      ctx.arc(px(site.hub[0]), pz(site.hub[1]), 4.4 * k, 0, Math.PI * 2);
+      ctx.arc(px(site.hub[0]), pz(site.hub[1]), HUB.ring * k, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(px(site.hub[0]), pz(site.hub[1]), HUB.island * k, 0, Math.PI * 2);
       ctx.fillStyle = '#14532d';
       ctx.fill();
 

@@ -27,12 +27,26 @@ export const AVENUE_WIDTH = 6.5; // avenue d'entrée Nord-Sud (x = 0)
 export const STREET_WIDTH = 5.5; // voie principale Est-Ouest (z = 0) et voies secondaires
 const SETBACK = 2.6; // recul entre la chaussée et l'emprise d'un îlot (éclairage + couloir piéton)
 const LANE = 1.6; // axe du couloir piéton extérieur, depuis le bord de chaussée
-const HUB_CROSSWALK = { alongX: 6.2, alongZ: 5.4 }; // passages piétons hors du rond-point central
+const HUB_CROSSWALK = { alongX: 8.2, alongZ: 8.0 }; // passages piétons au-delà de l'anneau du rond-point
 const FENCE_MARGIN = 3.5;
 const MIN_SITE = [67, 47]; // emprise minimale de l'enceinte (X, Z)
+const ROAD_OFFSET = 9.5; // axe de la route départementale, au-delà du portail
+const ROAD_WIDTH = 6;
 
-// Débord des annexes extérieures côté `outward` (parking, quais et camion, cuves, cheminée)
-const OUTWARD_MARGIN = { office: 6.6, factory: 2.6, paint: 4.4, logistics: 10.2, yard: 0.6 };
+/** Rond-point central : îlot, axe et bord extérieur de l'anneau de circulation, dégagement des couloirs piétons. */
+export const HUB = { island: 4.4, lane: 5.8, ring: 7.2, clear: 8.1 };
+
+/**
+ * Semi-remorque de livraison (repère du modèle : arrière de la remorque en x = 0, avant vers +X) :
+ * recul au quai, essieux de la remorque, pivot d'attelage, tracteur et son essieu moteur.
+ */
+export const TRUCK = { dockGap: 1.25, bogie: 1.5, kingpin: 5.6, tractor: 6.1, axle: 6.4, front: 7.8 };
+const TRUCK_TURN = 2.4; // rayon des virages de la semi-remorque
+const HUB_APPROACH = 11.5; // début de l'entrée / fin de la sortie du rond-point, depuis son centre
+const HUB_EASE = Math.PI / 12; // l'anneau est rejoint (et quitté) 15° au-delà du point d'insertion
+
+// Débord des annexes extérieures côté `outward` (parking, quais et manœuvre du camion, cuves, cheminée)
+const OUTWARD_MARGIN = { office: 6.6, factory: 2.6, paint: 4.4, logistics: 11.2, yard: 0.6 };
 const SIDE_MARGIN = 0.6;
 const BACK_MARGIN = 0.6;
 const FRONT_MARGIN = 1.2; // auvent et jardinières de l'entrée des bureaux
@@ -136,6 +150,21 @@ export function sideDoorZ(depth) {
   return (gap + 0.5 - (rows - 1) / 2) * CELL_D + 0.4;
 }
 
+/**
+ * Quais de l'entrepôt (coordonnées Z locales, croissantes) et quai de la semi-remorque : le plus proche
+ * de la voie qui borde l'îlot côté rond-point (`oz` : côté extérieur de l'îlot en Z).
+ */
+export function warehouseDocks(depth, oz = 1) {
+  const count = Math.max(2, Math.min(4, Math.floor((depth - 2) / 3)));
+  const zs = Array.from({ length: count }, (_, i) => -depth / 2 + 2.2 + (i * (depth - 4.4)) / Math.max(1, count - 1));
+  return { zs, truck: oz > 0 ? 0 : count - 1 };
+}
+
+/** Facteur d'échelle de la scène selon l'emprise du site (1 pour le site de démonstration à 4 bâtiments). */
+export function siteScale(site) {
+  return Math.max(1, (site?.radius || 0) / 45);
+}
+
 /** Graphe des cheminements piétons ; les nœuds sont dédoublonnés par position. */
 function createWalkGraph() {
   const nodes = [];
@@ -223,19 +252,26 @@ function interiorWalkways(g, p) {
 
 /**
  * Couloirs extérieurs : de chaque côté de chaque voie (îlots entourés), interrompus aux carrefours
- * où ils se rejoignent ; passages piétons de part et d'autre de chaque carrefour ; raccordement
- * des portes de chaque bâtiment au couloir le plus proche.
+ * où ils se rejoignent (en diagonale autour de l'anneau du rond-point) ; passages piétons de part et
+ * d'autre de chaque carrefour ; raccordement des portes de chaque bâtiment au couloir le plus proche.
  */
 function outdoorWalkways(g, streets, extent, plans, doors) {
   const ns = streets.filter((s) => s.axis === 'z');
   const ew = streets.filter((s) => s.axis === 'x');
   const off = (s) => s.width / 2 + LANE;
+  // Autour du rond-point, un couloir s'arrête au cercle de dégagement de l'anneau
+  const hubReach = (lateral) => Math.sqrt(Math.max(0, HUB.clear ** 2 - lateral ** 2));
+  const cut = (s, cross) => {
+    const half = s.main && cross.main ? Math.max(off(cross), hubReach(off(s))) : off(cross);
+    const at = cross.axis === 'z' ? cross.x : cross.z;
+    return [at - half, at + half];
+  };
   const lanes = [
     ...ns.flatMap((s) =>
-      [-1, 1].map((side) => ({ axis: 'z', at: s.x + side * off(s), street: s, side, from: extent.minZ, to: extent.maxZ, cuts: ew.map((e) => [e.z - off(e), e.z + off(e)]), ids: [] }))
+      [-1, 1].map((side) => ({ axis: 'z', at: s.x + side * off(s), street: s, side, from: extent.minZ, to: extent.maxZ, cuts: ew.map((e) => cut(s, e)), ids: [] }))
     ),
     ...ew.flatMap((s) =>
-      [-1, 1].map((side) => ({ axis: 'x', at: s.z + side * off(s), street: s, side, from: extent.minX, to: extent.maxX, cuts: ns.map((n) => [n.x - off(n), n.x + off(n)]), ids: [] }))
+      [-1, 1].map((side) => ({ axis: 'x', at: s.z + side * off(s), street: s, side, from: extent.minX, to: extent.maxX, cuts: ns.map((n) => cut(s, n)), ids: [] }))
     ),
   ];
   const stop = (lane, t) => {
@@ -250,6 +286,18 @@ function outdoorWalkways(g, streets, extent, plans, doors) {
     for (const [a, b] of lane.cuts) {
       if (a > lane.from && a < lane.to) stop(lane, a);
       if (b > lane.from && b < lane.to) stop(lane, b);
+    }
+  }
+  // Couloirs du rond-point raccordés en diagonale, par-delà l'anneau, dans chaque quart
+  const hubNs = ns.find((s) => s.main);
+  const hubEw = ew.find((s) => s.main);
+  if (hubNs && hubEw) {
+    for (const sx of [-1, 1]) {
+      for (const sz of [-1, 1]) {
+        const a = stop(laneOf(hubNs, sx), hubEw.z + sz * hubReach(off(hubNs)));
+        const b = stop(laneOf(hubEw, sz), hubNs.x + sx * hubReach(off(hubEw)));
+        g.edge(a, b, 'lane');
+      }
     }
   }
 
@@ -358,6 +406,94 @@ function grow(min, max, size) {
   return [min - extra, max + extra];
 }
 
+/** Côté droit d'une direction [dx, dz] (circulation à droite). */
+const rightOf = ([dx, dz]) => [-dz, dx];
+/** Décalage de l'axe d'une file de circulation depuis l'axe de la voie. */
+const laneOffset = (street) => street.width / 4;
+
+/**
+ * Traversée du rond-point (sens giratoire : îlot à gauche), du bras `a` au bras `b` (vecteurs unitaires
+ * du centre vers chaque bras) : entrée dans la file de droite, arc de l'anneau, sortie dans la file de droite.
+ */
+function roundabout(hub, a, laneIn, b, laneOut) {
+  const nIn = rightOf([-a[0], -a[1]]);
+  const nOut = rightOf(b);
+  const point = (u, n, offset, t) => [hub[0] + u[0] * t + n[0] * offset, hub[1] + u[1] * t + n[1] * offset];
+  const insertion = (u, n, offset) => {
+    const [x, z] = point(u, n, offset, Math.sqrt(HUB.lane ** 2 - offset ** 2));
+    return Math.atan2(z - hub[1], x - hub[0]);
+  };
+  const thetaIn = insertion(a, nIn, laneIn);
+  let thetaOut = insertion(b, nOut, laneOut);
+  while (thetaOut >= thetaIn) thetaOut -= 2 * Math.PI;
+  const from = thetaIn - HUB_EASE;
+  const to = thetaOut + HUB_EASE;
+  const steps = Math.ceil((from - to) / (Math.PI / 6));
+  const angles = from > to ? Array.from({ length: steps + 1 }, (_, i) => from - (i * (from - to)) / steps) : [(thetaIn + thetaOut) / 2];
+  return [
+    point(a, nIn, laneIn, HUB_APPROACH),
+    ...angles.map((t) => [hub[0] + HUB.lane * Math.cos(t), hub[1] + HUB.lane * Math.sin(t)]),
+    point(b, nOut, laneOut, HUB_APPROACH),
+  ];
+}
+
+/**
+ * Trajets de la semi-remorque d'un entrepôt (polylignes de l'essieu moteur dans le plan XZ, virages
+ * arrondis au rendu). Départ du quai le plus proche de la voie bordant l'îlot côté rond-point, par
+ * l'annexe des quais ; voie jusqu'à l'avenue, rond-point, portail, puis route départementale vers
+ * l'ouest. Retour par l'autre file, passage devant le quai et marche arrière (`dock`, parcouru à
+ * rebours). Chaque trajet commence par les essieux de la remorque, à l'arrêt dans l'alignement.
+ * `rings` : pour chaque trajet, indices [entrée, sortie] des points de traversée du rond-point
+ * (clignotants).
+ */
+function deliveryRoutes(p, street, oz, site) {
+  const { hub, gate, road } = site;
+  const avenue = site.streets.find((s) => s.axis === 'z' && s.main);
+  const { ox } = p;
+  const { zs, truck } = warehouseDocks(p.interior.depth, oz);
+  const wall = p.cx + (ox * p.interior.width) / 2;
+  const dockZ = p.cz + zs[truck];
+  const start = [wall + ox * (TRUCK.dockGap + TRUCK.bogie), dockZ];
+  const stripX = wall + ox * (TRUCK.dockGap + TRUCK.axle + TRUCK_TURN); // allée de manœuvre de l'annexe
+  const beyond = [stripX, dockZ + oz * (TRUCK_TURN + TRUCK.axle - TRUCK.bogie + 0.4)];
+  const laneE = laneOffset(street);
+  const laneA = laneOffset(avenue);
+  const laneR = road.width / 4;
+  const away = road.from + 12;
+  const rings = { outbound: [], inbound: [] };
+  const ring = (route, key, ...arms) => {
+    const pts = roundabout(hub, ...arms);
+    rings[key].push([route.length, route.length + pts.length - 1]);
+    route.push(...pts);
+  };
+
+  // Aller : file vers l'avenue sur la voie de l'îlot, puis file sud de l'avenue
+  const outZ = street.z + rightOf([-ox, 0])[1] * laneE;
+  const southX = gate.x + rightOf([0, 1])[0] * laneA;
+  const outbound = [start, [stripX, dockZ], [stripX, outZ]];
+  if (street.main) {
+    ring(outbound, 'outbound', [ox, 0], laneE, [0, 1], laneA);
+  } else {
+    outbound.push([southX, outZ]);
+    if (street.z < hub[1]) ring(outbound, 'outbound', [0, -1], laneA, [0, 1], laneA);
+  }
+  outbound.push([southX, road.z - laneR], [away, road.z - laneR]);
+
+  // Retour : file nord de l'avenue, puis file vers l'entrepôt sur la voie de l'îlot
+  const inZ = street.z + rightOf([ox, 0])[1] * laneE;
+  const northX = gate.x + rightOf([0, -1])[0] * laneA;
+  const inbound = [[away - 4, road.z + laneR], [northX, road.z + laneR]];
+  if (street.main) {
+    ring(inbound, 'inbound', [0, 1], laneA, [ox, 0], laneE);
+  } else {
+    if (street.z < hub[1]) ring(inbound, 'inbound', [0, 1], laneA, [0, -1], laneA);
+    inbound.push([northX, inZ]);
+  }
+  inbound.push([stripX, inZ], beyond);
+
+  return { id: p.block.id, outbound, inbound, dock: [start, [stripX, dockZ], beyond], rings };
+}
+
 /**
  * Positionne l'arborescence DUER dans la scène 3D et calcule le plan du site.
  * `skins` : choix des Paramètres (archétype de chaque GP, modèle de chaque UT), indexés par identifiant.
@@ -451,11 +587,11 @@ export function layoutTwin(hierarchy, skins = {}) {
   );
   const fence = { minX, maxX, minZ, maxZ };
 
-  // Voirie : voies Nord-Sud (avenue prolongée au-delà du portail) et Est-Ouest, carrefours
+  // Voirie : voies Nord-Sud (avenue prolongée jusqu'à la route départementale) et Est-Ouest, carrefours
   const streets = [
     ...Object.entries(xs.streets).map(([b, x]) => {
       const main = Number(b) === L;
-      return { axis: 'z', x, width: main ? AVENUE_WIDTH : STREET_WIDTH, from: minZ, to: maxZ + (main ? 8 : 0), main };
+      return { axis: 'z', x, width: main ? AVENUE_WIDTH : STREET_WIDTH, from: minZ, to: maxZ + (main ? ROAD_OFFSET : 0), main };
     }),
     ...Object.entries(zs.streets).map(([b, z]) => ({ axis: 'x', z, width: STREET_WIDTH, from: minX, to: maxX, main: Number(b) === M })),
   ];
@@ -572,25 +708,40 @@ export function layoutTwin(hierarchy, skins = {}) {
     elementsById[b.id] = b;
   });
 
+  const center = [(minX + maxX) / 2, (minZ + maxZ) / 2];
+  const radius = Math.hypot(maxX - minX, maxZ - minZ) / 2;
+  // Route départementale devant le portail, prolongée jusque dans le brouillard (départ et retour des camions)
+  const roadHalf = radius + 110 * siteScale({ radius });
+  const site = {
+    hub: [0, 0],
+    fence,
+    gate: { x: 0, z: maxZ },
+    road: { z: maxZ + ROAD_OFFSET, width: ROAD_WIDTH, from: center[0] - roadHalf, to: center[0] + roadHalf },
+    streets,
+    intersections,
+    crosswalks,
+    walkways: walk.outdoor,
+    walkGraph: walk.graph,
+    lots,
+    footprints: plans.map((p) => p.footprint),
+    center,
+    radius,
+  };
+  // Une semi-remorque par entrepôt, sur la voie qui borde son îlot côté rond-point
+  site.deliveries = plans
+    .filter((p) => p.skin.archetype === 'logistics')
+    .map((p) => {
+      const z = zs.streets[p.row >= M ? p.row : p.row + 1];
+      const street = streets.find((s) => s.axis === 'x' && Math.abs(s.z - z) < 0.01);
+      return deliveryRoutes(p, street, p.row >= M ? 1 : -1, site);
+    });
+
   return {
     ...hierarchy,
     rootEntity: root,
     buildings,
     allWorkUnitsWorld,
     elementsById,
-    site: {
-      hub: [0, 0],
-      fence,
-      gate: { x: 0, z: maxZ },
-      streets,
-      intersections,
-      crosswalks,
-      walkways: walk.outdoor,
-      walkGraph: walk.graph,
-      lots,
-      footprints: plans.map((p) => p.footprint),
-      center: [(minX + maxX) / 2, (minZ + maxZ) / 2],
-      radius: Math.hypot(maxX - minX, maxZ - minZ) / 2,
-    },
+    site,
   };
 }
