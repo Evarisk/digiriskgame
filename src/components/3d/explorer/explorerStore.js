@@ -11,6 +11,7 @@ const INITIAL = {
   zoneUt: null, // UT dans laquelle se trouve le joueur
   zoneBuilding: null, // groupement dans lequel se trouve le joueur
   player: null, // { x, z, yaw }
+  nextUt: null, // prochain poste à inspecter (le plus proche non inspecté) : objectif de la mission
 };
 
 let state = INITIAL;
@@ -52,6 +53,22 @@ if (typeof document !== 'undefined') {
 
 export function useExplorer(selector) {
   return useSyncExternalStore(explorerStore.subscribe, () => selector(state));
+}
+
+/**
+ * Guidage du joueur vers un élément : distance en mètres (1 unité ≈ 1,5 m), angle par rapport au
+ * regard (radians, positif = à gauche) et indication textuelle.
+ */
+export function guideTo(player, element) {
+  const position = element?.layout3D?.worldPosition;
+  if (!player || !position) return null;
+  const dx = position[0] - player.x;
+  const dz = position[2] - player.z;
+  let angle = Math.atan2(-dx, -dz) - player.yaw;
+  while (angle > Math.PI) angle -= 2 * Math.PI;
+  while (angle < -Math.PI) angle += 2 * Math.PI;
+  const turn = Math.abs(angle) < 0.35 ? 'droit devant' : Math.abs(angle) > 2.4 ? 'derrière vous' : angle > 0 ? 'sur votre gauche' : 'sur votre droite';
+  return { meters: Math.round(Math.hypot(dx, dz) * 1.5), angle, turn };
 }
 
 /** Le mode visite nécessite une souris (capture du pointeur) : indisponible sur écran tactile seul. */

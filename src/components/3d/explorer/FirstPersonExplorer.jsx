@@ -76,6 +76,8 @@ export default function FirstPersonExplorer({ data, cameraTarget, onInspect, cot
   zonesRef.current = zones;
   const onInspectRef = useRef(onInspect);
   onInspectRef.current = onInspect;
+  const inspectedRef = useRef(inspectedIds);
+  inspectedRef.current = inspectedIds;
 
   const s = useRef({
     feet: new THREE.Vector3(),
@@ -90,6 +92,7 @@ export default function FirstPersonExplorer({ data, cameraTarget, onInspect, cot
     refreshIn: 0,
     nearIn: 0,
     publishIn: 0,
+    nextIn: 0,
     intro: null,
     targetTs: cameraTarget?.ts,
   }).current;
@@ -384,15 +387,69 @@ export default function FirstPersonExplorer({ data, cameraTarget, onInspect, cot
       changes.player = { x: s.feet.x, z: s.feet.z, yaw: s.yaw };
       s.publishIn = 0.1;
     }
+    // Objectif de la mission : poste non inspecté le plus proche (conservé tant qu'un autre
+    // n'est pas nettement plus près, pour ne pas changer de cible à chaque pas)
+    if ((s.nextIn -= dt) <= 0) {
+      s.nextIn = 0.25;
+      const pending = units.filter((u) => !inspectedRef.current?.has(u.element.id));
+      const distance = (u) => Math.hypot((u.minX + u.maxX) / 2 - s.feet.x, (u.minZ + u.maxZ) / 2 - s.feet.z);
+      let next = null;
+      let best = Infinity;
+      for (const u of pending) {
+        const d = distance(u);
+        if (d < best) {
+          best = d;
+          next = u;
+        }
+      }
+      const current = pending.find((u) => u.element === state.nextUt);
+      const nextUt = current && distance(current) <= best + 3 ? current.element : next?.element || null;
+      if (nextUt !== state.nextUt) changes.nextUt = nextUt;
+    }
     if (Object.keys(changes).length) explorerStore.set(changes);
   });
 
   return (
-    <InspectorTablet
-      ref={tabletRef}
-      cotationMode={cotationMode}
-      inspectedIds={inspectedIds}
-      total={data?.allWorkUnitsWorld?.length || 0}
-    />
+    <>
+      <MissionBeacon />
+      <InspectorTablet
+        ref={tabletRef}
+        cotationMode={cotationMode}
+        inspectedIds={inspectedIds}
+        total={data?.allWorkUnitsWorld?.length || 0}
+      />
+    </>
+  );
+}
+
+/** Balise au-dessus du prochain poste à inspecter, visible à travers les murs pour guider le joueur. */
+function MissionBeacon() {
+  const next = useExplorer((st) => st.nextUt);
+  const gemRef = useRef();
+  const materials = useMemo(
+    () => ({
+      gem: new THREE.MeshBasicMaterial({ color: '#38bdf8', transparent: true, opacity: 0.9, depthTest: false, depthWrite: false }),
+      beam: new THREE.MeshBasicMaterial({ color: '#38bdf8', transparent: true, opacity: 0.22, depthTest: false, depthWrite: false }),
+    }),
+    []
+  );
+  useEffect(() => () => Object.values(materials).forEach((m) => m.dispose()), [materials]);
+  useFrame(({ clock }) => {
+    if (!gemRef.current) return;
+    const t = clock.getElapsedTime();
+    gemRef.current.rotation.y = t * 1.4;
+    gemRef.current.position.y = 3.1 + Math.sin(t * 2.2) * 0.15;
+  });
+  if (!next) return null;
+  const [x, , z] = next.layout3D.worldPosition;
+  return (
+    <group position={[x, 0, z]} userData={{ noCollide: true }}>
+      <mesh ref={gemRef} material={materials.gem} renderOrder={990} scale={[0.3, 0.48, 0.3]} raycast={() => null}>
+        <octahedronGeometry args={[1, 0]} />
+      </mesh>
+      <mesh material={materials.beam} renderOrder={989} position={[0, 1.45, 0]} raycast={() => null}>
+        <cylinderGeometry args={[0.035, 0.035, 2.6, 8]} />
+      </mesh>
+    </group>
   );
 }
