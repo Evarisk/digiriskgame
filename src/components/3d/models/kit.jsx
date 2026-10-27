@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
+import { EquipmentHotspot } from '../equipment/equipment';
 
 /**
  * Kit de primitives low-poly partagées par tous les modèles 3D (bâtiments, postes, décor).
@@ -113,6 +114,9 @@ export function getMaterial({
       material.emissive = new THREE.Color(emissive);
       material.emissiveIntensity = emissiveIntensity;
     }
+    // Matériau mutualisé et jamais modifié : MergeStatic peut fusionner les pièces qui ne diffèrent
+    // que par leur couleur (reportée dans les sommets)
+    material.userData.kitShared = true;
     materials.set(key, material);
   }
   return material;
@@ -473,7 +477,7 @@ export function SafetySign({ kind = 'warning', post = true, height = 1.05, size 
   );
 }
 
-/** Extincteur sur support avec panneau rouge. */
+/** Extincteur sur support avec panneau rouge ; survol : dates de vérification (voir equipment.jsx). */
 export function Extinguisher({ withSign = true, ...rest }) {
   return (
     <group {...rest}>
@@ -482,6 +486,23 @@ export function Extinguisher({ withSign = true, ...rest }) {
       <Box position={[0, 0.43, 0]} size={[0.05, 0.04, 0.03]} color={PALETTE.rubber} />
       <Tube points={[[0.02, 0.42, 0], [0.08, 0.38, 0.02], [0.07, 0.12, 0.04]]} radius={0.01} />
       {withSign && <SafetySign kind="fire" post={false} height={0.75} size={0.16} />}
+      <EquipmentHotspot kind="extinguisher" slot={String(rest.position || 'center')} center={[0, 0.3, 0]} size={[0.24, 0.62, 0.24]} />
+    </group>
+  );
+}
+
+/** Trousse de secours (boîtier blanc à croix verte) sur poteau ; survol : dates de contrôle du contenu. */
+export function FirstAidKit({ slot = 'kit', ...rest }) {
+  return (
+    <group {...rest}>
+      <Cylinder position={[0, 0.45, -0.07]} radius={0.022} height={0.9} color={PALETTE.darkSteel} metal={0.6} rough={0.4} />
+      <Box position={[0, 0.72, -0.05]} size={[0.14, 0.1, 0.03]} color={PALETTE.darkSteel} metal={0.6} />
+      <Box position={[0, 0.74, 0]} size={[0.28, 0.21, 0.08]} color="#f8fafc" rough={0.5} />
+      <Box position={[0, 0.74, 0.041]} size={[0.25, 0.18, 0.004]} color={PALETTE.safetyGreen} shadow={false} />
+      <Box position={[0, 0.74, 0.044]} size={[0.11, 0.035, 0.004]} color="#ffffff" shadow={false} />
+      <Box position={[0, 0.74, 0.044]} size={[0.035, 0.11, 0.004]} color="#ffffff" shadow={false} />
+      <Box position={[0, 0.865, 0]} size={[0.09, 0.025, 0.03]} color="#cbd5e1" metal={0.5} />
+      <EquipmentHotspot kind="firstaid" slot={slot} center={[0, 0.74, 0.02]} size={[0.4, 0.36, 0.22]} />
     </group>
   );
 }
