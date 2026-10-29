@@ -4,19 +4,15 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Grid, Html, Environment, Lightformer } from '@react-three/drei';
 import BuildingGroup from './BuildingGroup';
 import WorkerAgents from './WorkerAgents';
+import DeliveryTrucks from './DeliveryTrucks';
 import CampusScenery from './CampusScenery';
+import SkyDome, { SKY_HORIZON } from './SkyDome';
 import { getTexture } from './models/textures';
 import FirstPersonExplorer from './explorer/FirstPersonExplorer';
 import { explorerStore } from './explorer/explorerStore';
 import { EquipmentTooltip } from './equipment/equipment';
-
-/**
- * Facteur d'échelle de la scène selon l'emprise du site (1 pour le site de démonstration à 4 bâtiments) :
- * cadrage de la vue d'ensemble, ombres, brouillard et terrain suivent la taille réelle du DUER.
- */
-function siteScale(site) {
-  return Math.max(1, (site?.radius || 0) / 45);
-}
+// Échelle de la scène selon l'emprise du site : cadrage de la vue d'ensemble, ombres, brouillard et terrain
+import { siteScale } from '../../services/siteLayout';
 
 export default function DigitalTwinCanvas({
   data,
@@ -47,22 +43,22 @@ export default function DigitalTwinCanvas({
         }}
         onPointerMissed={() => !explorerMode && onSelectElement(null)}
       >
+        {/* Ciel de jour ; brume de l'horizon (le terrain lointain s'y fond) */}
         <color
           attach="background"
-          args={[visualMode === 'whitebox' ? '#f1f5f9' : '#090d16']}
+          args={[visualMode === 'whitebox' ? '#f1f5f9' : SKY_HORIZON]}
         />
         <fog
           attach="fog"
-          args={[visualMode === 'whitebox' ? '#f1f5f9' : '#090d16', 55 * k, 135 * k]}
+          args={[visualMode === 'whitebox' ? '#f1f5f9' : SKY_HORIZON, 55 * k, 135 * k]}
         />
+        {visualMode !== 'whitebox' && <SkyDome site={site} scale={k} />}
 
-        {/* Éclairage directionnel & ambiant */}
-        <ambientLight intensity={visualMode === 'whitebox' ? 0.85 : 0.55} />
-        <SunLight site={site} intensity={visualMode === 'whitebox' ? 1.1 : 1.35} />
+        {/* Éclairage directionnel & ambiant (lumière de jour, rebond du ciel et de la pelouse) */}
+        <ambientLight intensity={visualMode === 'whitebox' ? 0.85 : 0.5} />
+        <SunLight site={site} intensity={visualMode === 'whitebox' ? 1.1 : 1.5} />
         <hemisphereLight
-          skyColor="#38bdf8"
-          groundColor="#0f172a"
-          intensity={0.35}
+          args={visualMode === 'whitebox' ? ['#38bdf8', '#0f172a', 0.35] : ['#dbeafe', '#3f5f2a', 0.55]}
         />
 
         {/* Reflets d'environnement (calculés une seule fois, sans ressource réseau) */}
@@ -115,6 +111,7 @@ export default function DigitalTwinCanvas({
         {/* Flux cinématiques d'opérateurs entre les Unités de Travail */}
         <WorkerAgents
           buildings={data?.buildings || []}
+          employees={data?.employees}
           site={site}
           showPaths={showPaths}
           agentsEnabled={agentsEnabled}
@@ -122,6 +119,9 @@ export default function DigitalTwinCanvas({
           onSelectUt={onSelectElement}
           showLabels={showLabels}
         />
+
+        {/* Semi-remorques des entrepôts : quai, voirie du site, portail et route départementale */}
+        {visualMode !== 'whitebox' && <DeliveryTrucks site={site} enabled={agentsEnabled} speedMultiplier={agentSpeed} />}
       </Canvas>
     </div>
   );
@@ -250,7 +250,8 @@ function CampusGround({ visualMode, site, companyName, companyLogo, rootEntity, 
   const k = siteScale(site);
   const [cx, cz] = site?.center || [0, 0];
   const [hx, hz] = site?.hub || [0, 0];
-  const groundSize = Math.max(160, 2 * (site?.radius || 0) + 110);
+  // Le terrain porte aussi la route départementale, jusque dans le brouillard
+  const groundSize = Math.max(160, 2 * (site?.radius || 0) + 110, site?.road ? site.road.to - site.road.from : 0);
   return (
     <group>
       {/* Terrain autour du site industriel (l'enceinte pavée est dessinée par CampusScenery) */}

@@ -1,65 +1,12 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { Html, Line } from '@react-three/drei';
 import { Person } from './models/people';
 import MergeStatic from './models/MergeStatic';
-
-/**
- * Construit une trajectoire industrielle lisse (segments rectilignes strictement centrés
- * dans les couloirs piétons + virages à 90° arrondis par courbes de Bézier quadratiques).
- */
-function buildRoundedIndustrialCurve(rawWaypoints, cornerRadius = 0.42) {
-  const pts = [];
-  for (const p of rawWaypoints) {
-    const v = new THREE.Vector3(p[0], p[1], p[2]);
-    if (!pts.length || pts[pts.length - 1].distanceTo(v) > 0.05) {
-      pts.push(v);
-    }
-  }
-
-  const curvePath = new THREE.CurvePath();
-  if (pts.length < 2) {
-    curvePath.add(new THREE.LineCurve3(new THREE.Vector3(), new THREE.Vector3(1, 0, 0)));
-    return curvePath;
-  }
-
-  let currentStart = pts[0].clone();
-
-  for (let i = 1; i < pts.length - 1; i += 1) {
-    const prev = pts[i - 1];
-    const corner = pts[i];
-    const next = pts[i + 1];
-
-    const vIn = new THREE.Vector3().subVectors(corner, prev);
-    const vOut = new THREE.Vector3().subVectors(next, corner);
-    const lenIn = vIn.length();
-    const lenOut = vOut.length();
-    const r = Math.min(cornerRadius, lenIn * 0.42, lenOut * 0.42);
-
-    if (r > 0.04) {
-      const enterPt = corner.clone().addScaledVector(vIn.normalize(), -r);
-      const exitPt = corner.clone().addScaledVector(vOut.normalize(), r);
-      if (currentStart.distanceTo(enterPt) > 0.02) {
-        curvePath.add(new THREE.LineCurve3(currentStart, enterPt));
-      }
-      curvePath.add(new THREE.QuadraticBezierCurve3(enterPt, corner.clone(), exitPt));
-      currentStart = exitPt;
-    } else if (currentStart.distanceTo(corner) > 0.02) {
-      curvePath.add(new THREE.LineCurve3(currentStart, corner.clone()));
-      currentStart = corner.clone();
-    }
-  }
-
-  const lastPt = pts[pts.length - 1];
-  if (currentStart.distanceTo(lastPt) > 0.02) {
-    curvePath.add(new THREE.LineCurve3(currentStart, lastPt));
-  }
-
-  curvePath.arcLengthDivisions = 360;
-  curvePath.updateArcLengths();
-  return curvePath;
-}
+import { buildRoundedIndustrialCurve } from './roundedPath';
+import { traffic } from './traffic';
+import { planWalkers } from '../../services/employees';
 
 const Y_INDOOR = 0.18;
 const Y_OUTDOOR = 0.04;
@@ -144,23 +91,27 @@ function walkRoute(graph, from, to) {
   return waypoints;
 }
 
-// Opérateurs du site de démonstration ; sur un autre DUER, leurs trajets relient automatiquement
-// des postes de bâtiments différents
-const PERSONAS = [
-  { id: 'agent-1', name: 'Marc (Chef d’Atelier)', role: 'Production ↔ Études', helmetColor: '#f59e0b', suitColor: '#2563eb', from: 'UT14', to: 'UT8', pace: 1.05, phaseOffset: 0.0 },
-  { id: 'agent-2', name: 'Sophie (Ingénieure HSE)', role: 'Audit Sécurité Peinture ↔ Admin', helmetColor: '#10b981', suitColor: '#0f766e', from: 'UT3', to: 'UT4', pace: 0.92, phaseOffset: 0.35 },
-  { id: 'agent-3', name: 'Karim (Cariste / Flux)', role: 'Cariste ↔ Fret Aérien', helmetColor: '#ef4444', suitColor: '#ea580c', from: 'UT17', to: 'UT12', pace: 1.1, phaseOffset: 0.65 },
-  { id: 'agent-4', name: 'Léa (Support & Réseau)', role: 'IT ↔ Cabine Peinture', helmetColor: '#38bdf8', suitColor: '#4f46e5', from: 'UT7', to: 'UT18', pace: 0.96, phaseOffset: 0.18 },
-  { id: 'agent-5', name: 'Thomas (Logistique / VRP)', role: 'Coursiers ↔ Commerciaux VRP', helmetColor: '#eab308', suitColor: '#7c3aed', from: 'UT11', to: 'UT5', pace: 0.88, phaseOffset: 0.5 },
+// Tenues (casque, combinaison) et allure de chaque opérateur, dans l'ordre
+const OUTFITS = [
+  { helmetColor: '#f59e0b', suitColor: '#2563eb', pace: 1.05, phaseOffset: 0.0 },
+  { helmetColor: '#10b981', suitColor: '#0f766e', pace: 0.92, phaseOffset: 0.35 },
+  { helmetColor: '#ef4444', suitColor: '#ea580c', pace: 1.1, phaseOffset: 0.65 },
+  { helmetColor: '#38bdf8', suitColor: '#4f46e5', pace: 0.96, phaseOffset: 0.18 },
+  { helmetColor: '#eab308', suitColor: '#7c3aed', pace: 0.88, phaseOffset: 0.5 },
+  { helmetColor: '#f472b6', suitColor: '#334155', pace: 1.0, phaseOffset: 0.82 },
+  { helmetColor: '#a3e635', suitColor: '#1d4ed8', pace: 0.94, phaseOffset: 0.27 },
+  { helmetColor: '#fb923c', suitColor: '#0e7490', pace: 1.07, phaseOffset: 0.58 },
 ];
 
 /**
  * Étape 4 — Cinématique des flux & Déplacements d'agents humanoïdes animés
- * Les opérateurs circulent exclusivement le long des couloirs piétons balisés (verts/jaunes),
- * franchissent les portes piétonnes des bâtiments et traversent sur les passages piétons.
+ * Les opérateurs sont les salariés de l'entité (comptes Dolibarr, voir services/employees.js) ; ils
+ * circulent exclusivement le long des couloirs piétons balisés (verts/jaunes), franchissent les portes
+ * piétonnes des bâtiments et traversent sur les passages piétons.
  */
 export default function WorkerAgents({
   buildings = [],
+  employees = null,
   site,
   showPaths = true,
   agentsEnabled = true,
@@ -169,26 +120,13 @@ export default function WorkerAgents({
   showLabels = true,
 }) {
   const agentRoutes = useMemo(() => {
-    const allWorkUnits = buildings.flatMap((b) => b.workUnits || []);
-    if (allWorkUnits.length < 2 || !site?.walkGraph) return [];
-
-    const findUt = (ref) => allWorkUnits.find((u) => u.ref?.toLowerCase() === ref.toLowerCase());
-    // Repli : postes de deux bâtiments différents (ou deux postes du même s'il n'y en a qu'un)
-    const staffed = buildings.filter((b) => b.workUnits?.length);
-    const autoPair = (i) => {
-      const a = staffed[(i * 2) % staffed.length];
-      const b = staffed[(i * 2 + 1) % staffed.length];
-      const fromUt = a.workUnits[(i * 3) % a.workUnits.length];
-      const toUt = b.workUnits.find((u, k) => u !== fromUt && k >= (i * 5 + 1) % b.workUnits.length) || allWorkUnits.find((u) => u !== fromUt);
-      return [fromUt, toUt];
-    };
-
-    return PERSONAS.flatMap((persona, i) => {
-      const preferred = [findUt(persona.from), findUt(persona.to)];
-      const [fromUt, toUt] = preferred[0] && preferred[1] ? preferred : autoPair(i);
+    if (!site?.walkGraph) return [];
+    return planWalkers(employees, buildings).flatMap((walker, i) => {
+      const { fromUt, toUt } = walker;
       const waypoints = walkRoute(site.walkGraph, fromUt?.layout3D?.walkNode, toUt?.layout3D?.walkNode);
       if (!waypoints) return [];
 
+      const outfit = OUTFITS[i % OUTFITS.length];
       const curve = buildRoundedIndustrialCurve(waypoints, 0.42);
       const length = curve.getLength();
       const points = curve
@@ -196,11 +134,10 @@ export default function WorkerAgents({
         .map((pt) => new THREE.Vector3(pt.x, pt.y + 0.04, pt.z));
       return [
         {
-          ...persona,
-          fromUt,
-          toUt,
+          ...walker,
+          ...outfit,
           // Cycles aller-retour par seconde : vitesse de marche constante quelle que soit la longueur
-          speed: (WALK_SPEED * persona.pace) / (2 * Math.max(length, 1)),
+          speed: (WALK_SPEED * outfit.pace) / (2 * Math.max(length, 1)),
           variant: i,
           vestColor: i === 2 ? '#f97316' : '#facc15',
           curve,
@@ -208,7 +145,7 @@ export default function WorkerAgents({
         },
       ];
     });
-  }, [buildings, site]);
+  }, [buildings, employees, site]);
 
   if (!agentsEnabled) return null;
 
@@ -244,6 +181,12 @@ function AnimatedHumanoidAgent({ route, speedMultiplier, onSelectUt, showLabels 
   const groupRef = useRef();
   const limbs = useRef({}).current;
   const bodyRef = useRef();
+
+  // Position partagée avec les véhicules du site (ils s'arrêtent devant l'opérateur)
+  useEffect(() => {
+    traffic.pedestrians.set(route.id, groupRef.current.position);
+    return () => traffic.pedestrians.delete(route.id);
+  }, [route.id]);
 
   useFrame(({ clock }) => {
     if (!groupRef.current) return;
@@ -310,13 +253,13 @@ function AnimatedHumanoidAgent({ route, speedMultiplier, onSelectUt, showLabels 
               e.stopPropagation();
               if (route.fromUt && onSelectUt) onSelectUt(route.fromUt);
             }}
-            title="Cliquer pour inspecter l'Unité de Travail de départ"
+            title={`Poste : ${route.fromUt?.ref} ${route.fromUt?.label || ''} — cliquer pour inspecter cette unité de travail`}
           >
             <span
               className="agent-dot"
               style={{ backgroundColor: route.helmetColor }}
             />
-            <span className="agent-name">{route.name}</span>
+            <span className="agent-name">{route.job ? `${route.name} (${route.job})` : route.name}</span>
             <span className="agent-route">
               {route.fromUt?.ref} ↔ {route.toUt?.ref}
             </span>

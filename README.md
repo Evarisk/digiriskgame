@@ -12,8 +12,9 @@ Jumeau numérique 3D WebGL temps réel (**React + Vite + React Three Fiber + Dre
 3. **Mode « Assets 3D Métiers » & Coloration par Criticité**
    - Équipements 3D dédiés par type d'UT (postes de soudure avec étincelles, chariot élévateur cariste, cabine de peinture, cuves d'épuration/dépotage, quais logistiques, bureaux et baies serveurs).
    - Coloration dynamique selon l'échelle officielle DigiRisk (`0–47` Vert/Faible, `48–50` Orange/Modéré, `51–80` Rouge/Élevé, `81–100` Rouge Critique + gyrophare 3D).
-4. **Cinématique des Flux (Opérateurs Animés)**
-   - 5 agents humanoïdes articulés avec EPI se déplaçant en boucle le long de courbes de CatmullRom entre les Unités de Travail (ex. `UT14 Soudeurs ↔ UT8 Bureau d'études`, `UT17 Cariste ↔ UT12 Fret aérien`).
+4. **Cinématique des Flux (Opérateurs Animés et camions de livraison)**
+   - Les opérateurs sont les **salariés de l'entité** (comptes Dolibarr actifs marqués « salarié », hors comptes techniques) : chacun est rattaché à l'UT qui correspond le mieux à son poste (ex. « Conducteur chariot » → Cariste, « Comptable » → Administratif et finance) et fait l'aller-retour vers une UT d'un autre bâtiment par les couloirs piétons (`src/services/employees.js`, 8 opérateurs au plus). Sans accès à la liste des salariés, des « Opérateurs » anonymes les remplacent.
+   - Une **semi-remorque par entrepôt** quitte son quai, roule sur la voirie du site (rond-point, portail du poste de garde) jusqu'à la route départementale, puis revient se mettre à quai en marche arrière (`src/components/3d/DeliveryTrucks.jsx`). Elle met ses clignotants (au rond-point : à gauche en entrant pour tourner à gauche, à droite avant de sortir), ralentit en virage, attend la levée de la barrière et s'arrête devant un piéton ou le joueur en visite.
 5. **IHM & Raycasting (Sidebar Interactive)**
    - Clic 3D sur n'importe quel atelier ou bâtiment pour cibler la caméra et ouvrir le détail des risques INRS (pictogrammes officiels, cotations Brute vs Résiduelle, 5 critères avancés `Gravité`, `Exposition`, `Occurrence`, `Formation`, `Protection`) ainsi que le Plan d'Actions (`TKx`, avancement `%` et budget `€`).
 
@@ -40,8 +41,14 @@ VITE_DOLAPIKEY=<clé API de l'utilisateur>
 
 Côté Dolibarr : module API REST activé, et pour l'utilisateur de la clé les droits en lecture
 `digiriskdolibarr` (API, éléments, risques, signalisations) et `projet` (lecture des tâches, voir tous les projets),
-plus `societe > client > voir` pour lister les tâches du plan d'actions.
+plus `societe > client > voir` pour lister les tâches du plan d'actions,
+et `Utilisateurs > Consulter les autres utilisateurs` pour placer les salariés sur le site (seuls le nom, le prénom et le poste sont lus ; le relais `api-proxy.php` ne laisse passer que ces champs).
 En développement, le serveur Vite émule aussi le mode photo de `api-proxy.php` (photos des cotations).
+
+**Multisociété** : l'entité affichée se choisit dans *Paramètres* (en-tête `DOLAPIENTITY`, choix mémorisé dans le navigateur).
+La liste des entités demande le droit de lecture du module multisociété. L'API DigiRisk ne lit une autre entité que pour
+un utilisateur API global (entité 0) ; en mode transverse, il doit aussi être membre d'un groupe dans chaque entité, avec
+les droits de lecture ci-dessus. Une entité inaccessible est signalée dans *Paramètres* sans basculer sur le DUER de démonstration.
 
 ## Modèles 3D
 
@@ -50,11 +57,14 @@ En développement, le serveur Vite émule aussi le mode photo de `api-proxy.php`
   - chaque GP de premier niveau est un bâtiment, ses UT rangées en grille presque carrée ; un sous-groupement commence une nouvelle rangée et forme une zone repérée au sol (à toute profondeur) ;
   - les UT rattachées directement à la racine sont regroupées dans une *Zone extérieure* ;
   - les bâtiments forment des îlots en grille autour du rond-point central, séparés par des voies ; enceinte, caméra, ombres, terrain et minicarte suivent la taille du site ;
-  - les couloirs piétons (intérieurs, le long des voies, portes, passages piétons) forment un graphe : il sert au dessin et aux trajets des opérateurs.
+  - les couloirs piétons (intérieurs, le long des voies, portes, passages piétons) forment un graphe : il sert au dessin et aux trajets des opérateurs ;
+  - le rond-point central a un anneau de circulation (couloirs piétons et passages piétons au-delà) ; devant le portail, une route départementale part dans le brouillard ; le plan calcule aussi les trajets des camions de livraison (`site.deliveries`).
+- Ciel de jour (dégradé, halo du soleil, nuages low-poly qui dérivent hors de la vue plongeante) et brume claire à l'horizon (`src/components/3d/SkyDome.jsx`).
 - Les modèles sont procéduraux (`src/components/3d/models/`) et leur géométrie statique est fusionnée (`MergeStatic`) pour limiter les draw calls : les postes d'un bâtiment sont fusionnés ensemble, et les pièces du kit qui ne diffèrent que par leur couleur, rugosité ou lueur partagent un maillage (valeurs reportées dans les sommets). Tout élément animé porte `userData={DYNAMIC}`, de même que tout groupe dont le code d'animation modifie un enfant.
 - **Extincteurs et trousses de secours** : au survol (ou en visant en visite), une infobulle donne la dernière et la prochaine vérification et le statut (à jour, à prévoir sous 30 jours, en retard). Ces dates sont pour l'instant des données de démonstration (`src/services/equipmentChecks.js`), signalées comme telles.
 - Galerie de revue : `http://localhost:5173/?galerie` (filtres : `bureaux`, `production`, `peinture`, `logistique`, `batiments` (tous les skins de bâtiment) ou un archétype, ex. `?galerie=welding`).
 - Les drapeaux du rond-point affichent le logo de la société configuré dans Dolibarr (`entity_logo` de `risks/creation-options`), à défaut un monogramme.
+- **Paramètres** : choix de l'entité Dolibarr (multisociété, voir plus haut) et skins.
 - **Skins** (bouton *Paramètres*) : chaque groupement peut prendre une autre enveloppe et finition (bureaux verre bleu / bronze / vert, usine brique / acier / béton, peinture blanc / anthracite / sable, entrepôt gris / bleu / vert) et chaque unité de travail n'importe lequel des 24 modèles de poste. « Auto » suit le libellé ; les choix sont mémorisés dans le navigateur (`src/services/skins.js`).
 
 ## Visite en première personne

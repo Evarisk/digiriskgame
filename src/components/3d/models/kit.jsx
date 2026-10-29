@@ -873,6 +873,151 @@ export function Van({ color = '#f8fafc', stripe = '#2563eb', ...rest }) {
   );
 }
 
+const SIGNAL_AMBER = '#fbbf24';
+const LENS_AMBER = '#b45309';
+const CAB_GLASS = '#16243a';
+
+/**
+ * Feux commandés d'un véhicule (clignotants d'un côté, feux de recul) : groupe animé, éteint par
+ * défaut, allumé en basculant sa visibilité (`lightRef`). `lamps` : [[position, taille], ...] ; un halo
+ * translucide autour de chaque feu le rend lisible de loin.
+ */
+function SwitchedLamps({ lightRef, lamps, color = SIGNAL_AMBER, halo = 0.17 }) {
+  return (
+    <group ref={lightRef} userData={DYNAMIC} visible={false}>
+      {lamps.map(([position, size]) => (
+        <React.Fragment key={position.join()}>
+          <Box position={position} size={size} color={color} glow={3} shadow={false} />
+          {halo > 0 && <Ball position={position} radius={halo} color={color} glow={2} opacity={0.4} shadow={false} />}
+        </React.Fragment>
+      ))}
+    </group>
+  );
+}
+
+/**
+ * Semi-remorque fourgon (arrière en x = 0, avant vers +X, longueur 6, essieux autour de x = 1,5).
+ * `lights` : références des clignotants gauche (-Z) / droit (+Z) et des feux de recul.
+ */
+export function SemiTrailer({ color = '#f8fafc', stripe = '#0891b2', lights, ...rest }) {
+  const L = 6.0;
+  const rear = (z) => [-0.02, 0.62, z];
+  return (
+    <group {...rest}>
+      <Box position={[L / 2, 1.45, 0]} size={[L, 1.9, 1.65]} color={color} rough={0.45} />
+      <Box position={[L / 2, 1.0, 0.83]} size={[L - 0.6, 0.25, 0.01]} color={stripe} glow={0.15} shadow={false} />
+      <Box position={[L / 2, 1.0, -0.83]} size={[L - 0.6, 0.25, 0.01]} color={stripe} glow={0.15} shadow={false} />
+      <Box position={[L / 2, 0.42, 0]} size={[L - 0.2, 0.16, 1.2]} color="#1f2937" />
+      {[0.9, 1.5, 2.1].map((x) =>
+        [-0.62, 0.62].map((z) => <Wheel key={`${x}${z}`} position={[x, 0.3, z]} radius={0.3} width={0.24} />)
+      )}
+      {/* Feux de gabarit latéraux */}
+      {[0.6, 2.2, 3.8, 5.4].map((x) =>
+        [-0.831, 0.831].map((z) => <Box key={`${x}${z}`} position={[x, 0.58, z]} size={[0.07, 0.04, 0.01]} color={SIGNAL_AMBER} glow={0.9} shadow={false} />)
+      )}
+      {/* Portes arrière, feux (position, clignotants, recul) et barre anti-encastrement */}
+      <Box position={[-0.005, 1.45, 0]} size={[0.01, 1.8, 0.03]} color="#94a3b8" shadow={false} />
+      {[-1, 1].map((s) => (
+        <React.Fragment key={s}>
+          <Box position={[-0.01, 0.62, s * 0.5]} size={[0.02, 0.1, 0.2]} color="#ef4444" glow={1.2} shadow={false} />
+          <Box position={[-0.01, 0.62, s * 0.7]} size={[0.02, 0.1, 0.12]} color={LENS_AMBER} glow={0.3} shadow={false} />
+          <Box position={[-0.01, 0.62, s * 0.32]} size={[0.02, 0.1, 0.1]} color="#cbd5e1" shadow={false} />
+        </React.Fragment>
+      ))}
+      <SwitchedLamps lightRef={lights?.left} lamps={[[rear(-0.7), [0.02, 0.12, 0.14]]]} />
+      <SwitchedLamps lightRef={lights?.right} lamps={[[rear(0.7), [0.02, 0.12, 0.14]]]} />
+      <SwitchedLamps lightRef={lights?.reverse} color="#f8fafc" halo={0.12} lamps={[[rear(-0.32), [0.02, 0.11, 0.11]], [rear(0.32), [0.02, 0.11, 0.11]]]} />
+      <Box position={[0.05, 0.3, 0]} size={[0.08, 0.08, 1.5]} color="#475569" metal={0.5} />
+    </group>
+  );
+}
+
+/**
+ * Tracteur routier à cabine avancée (avant vers +X, essieu moteur en x = 0,3 ; sellette d'attelage vers
+ * x = -0,5) : pare-brise incliné, calandre chromée, déflecteur de toit, rétroviseurs et marchepieds.
+ * `lights` : références des clignotants gauche (-Z) / droit (+Z).
+ */
+export function TruckTractor({ color = '#c81e1e', lights, ...rest }) {
+  const face = (y) => 1.735 - (y - 0.98) * 0.0426; // face avant légèrement inclinée (avec chanfrein)
+  const front = (y, z) => [face(y) + 0.022, y, z];
+  return (
+    <group {...rest}>
+      {/* Châssis, flexibles d'air (rouge / jaune) vers la remorque */}
+      <Box position={[0.5, 0.47, 0]} size={[2.1, 0.2, 0.86]} color="#1f2937" />
+      <Tube points={[[0.6, 1.25, 0.18], [0.35, 1.02, 0.22], [0.12, 1.12, 0.26], [-0.08, 0.98, 0.25]]} radius={0.016} color="#dc2626" />
+      <Tube points={[[0.6, 1.25, -0.18], [0.35, 1.02, -0.22], [0.12, 1.12, -0.26], [-0.08, 0.98, -0.25]]} radius={0.016} color={PALETTE.safetyYellow} />
+
+      {/* Cabine et déflecteur de toit */}
+      <Profile points={[[0.62, 0.72], [1.66, 0.72], [1.7, 0.98], [1.66, 1.92], [1.56, 2.04], [0.62, 2.06]]} depth={1.62} bevel={0.035} color={color} metal={0.45} rough={0.32} />
+      <Profile points={[[0.64, 2.06], [1.4, 2.05], [1.02, 2.38], [0.64, 2.42]]} depth={1.5} bevel={0.03} color={color} metal={0.45} rough={0.32} />
+
+      {/* Pare-brise, pare-soleil, calandre, optiques, pare-chocs */}
+      <group position={[face(1.59), 1.59, 0]} rotation={[0, 0, 0.0426]}>
+        <Box position={[0.004, 0, 0]} size={[0.012, 0.6, 1.56]} color="#0b0f17" shadow={false} />
+        <Box position={[0.012, 0, 0]} size={[0.012, 0.52, 1.46]} color={CAB_GLASS} metal={0.85} rough={0.1} shadow={false} />
+      </group>
+      <Box position={[face(1.95) + 0.06, 1.95, 0]} size={[0.16, 0.045, 1.58]} color="#111827" />
+      <Box position={[face(1.07) + 0.004, 1.07, 0]} size={[0.02, 0.32, 0.9]} color="#0f172a" metal={0.5} rough={0.4} shadow={false} />
+      {[0.98, 1.07, 1.16].map((y) => (
+        <Box key={y} position={front(y, 0)} size={[0.01, 0.028, 0.86]} color="#d1d5db" metal={0.9} rough={0.25} shadow={false} />
+      ))}
+      <Box position={front(1.27, 0)} size={[0.01, 0.05, 0.22]} color="#e5e7eb" metal={0.8} rough={0.3} shadow={false} />
+      {[-1, 1].map((s) => (
+        <React.Fragment key={s}>
+          <Box position={[face(0.93) + 0.004, 0.93, s * 0.62]} size={[0.03, 0.1, 0.27]} color="#0f172a" shadow={false} />
+          <Box position={front(0.93, s * 0.62)} size={[0.01, 0.07, 0.22]} color="#fef9c3" glow={1.5} shadow={false} />
+          <Box position={front(0.93, s * 0.79)} size={[0.01, 0.07, 0.07]} color={LENS_AMBER} glow={0.3} shadow={false} />
+          <Box position={[1.785, 0.78, s * 0.55]} size={[0.01, 0.05, 0.12]} color="#fef3c7" glow={0.8} shadow={false} />
+        </React.Fragment>
+      ))}
+      <Box position={[1.73, 0.78, 0]} size={[0.1, 0.14, 1.7]} color="#374151" rough={0.55} />
+      <Box position={[1.7, 0.68, 0]} size={[0.08, 0.06, 1.5]} color="#111827" />
+
+      {/* Flancs : vitres, portière, liseré, répétiteurs, rétroviseurs, marchepieds, garde-boue */}
+      {[-1, 1].map((s) => (
+        <React.Fragment key={s}>
+          <Box position={[1.3, 1.6, s * 0.848]} size={[0.64, 0.52, 0.006]} color="#111827" shadow={false} />
+          <Box position={[1.3, 1.6, s * 0.852]} size={[0.58, 0.46, 0.006]} color={CAB_GLASS} metal={0.85} rough={0.1} shadow={false} />
+          <Box position={[0.98, 1.25, s * 0.851]} size={[0.012, 1.0, 0.006]} color="#7f1d1d" shadow={false} />
+          <Box position={[1.05, 1.22, s * 0.856]} size={[0.1, 0.025, 0.012]} color="#d1d5db" metal={0.8} shadow={false} />
+          <Box position={[1.15, 0.98, s * 0.852]} size={[1.0, 0.07, 0.006]} color="#f8fafc" shadow={false} />
+          <Box position={[1.55, 0.86, s * 0.853]} size={[0.08, 0.04, 0.006]} color={LENS_AMBER} glow={0.3} shadow={false} />
+          <Box position={[1.62, 1.78, s * 0.93]} size={[0.035, 0.035, 0.18]} color="#111827" />
+          <Box position={[1.6, 1.58, s * 1.03]} size={[0.06, 0.38, 0.09]} color="#111827" />
+          <Box position={[1.567, 1.58, s * 1.03]} size={[0.006, 0.32, 0.07]} color="#94a3b8" metal={0.9} rough={0.15} shadow={false} />
+          <Box position={[0.775, 0.5, s * 0.79]} size={[0.28, 0.34, 0.05]} color="#1f2937" />
+          <Box position={[0.775, 0.52, s * 0.83]} size={[0.24, 0.025, 0.1]} color="#9ca3af" metal={0.7} shadow={false} />
+          <Box position={[0.775, 0.36, s * 0.83]} size={[0.24, 0.025, 0.1]} color="#9ca3af" metal={0.7} shadow={false} />
+          <Box position={[0.3, 0.7, s * 0.68]} size={[0.74, 0.04, 0.3]} color="#111827" />
+        </React.Fragment>
+      ))}
+
+      {/* Feux de gabarit et gyrophares (circulation sur site) */}
+      {[-0.5, 0, 0.5].map((z) => (
+        <Box key={z} position={[1.5, 2.08, z]} size={[0.05, 0.03, 0.08]} color={SIGNAL_AMBER} glow={1.2} shadow={false} />
+      ))}
+      {[-0.45, 0.45].map((z) => (
+        <Cylinder key={z} position={[0.8, 2.48, z]} radius={0.06} height={0.08} color="#f59e0b" glow={1.4} shadow={false} />
+      ))}
+
+      {[0.3, 1.25].map((x) =>
+        [-0.68, 0.68].map((z) => <Wheel key={`${x}${z}`} position={[x, 0.32, z]} radius={0.32} width={0.25} />)
+      )}
+
+      {[[lights?.left, -1], [lights?.right, 1]].map(([lightRef, s]) => (
+        <SwitchedLamps
+          key={s}
+          lightRef={lightRef}
+          lamps={[
+            [[face(0.93) + 0.027, 0.93, s * 0.79], [0.012, 0.08, 0.08]],
+            [[1.55, 0.86, s * 0.858], [0.09, 0.05, 0.01]],
+          ]}
+        />
+      ))}
+    </group>
+  );
+}
+
 /**
  * Chariot élévateur frontal (fourches vers +X).
  * `carriageRef` permet d'animer la levée du tablier porte-fourches.

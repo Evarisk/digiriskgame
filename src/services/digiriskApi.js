@@ -103,12 +103,70 @@ export function statsFromRisks(allRisks, directRisksCount = 0) {
   };
 }
 
+// Champs des comptes utilisateurs lus pour placer les salariés sur le site (ni e-mail ni coordonnées)
+const EMPLOYEE_PROPERTIES = 'id,firstname,lastname,job,employee,statut,gender';
+
+/**
+ * Requête GET vers l'API REST Dolibarr / DigiRisk : proxy Vite (/digirisk-api) en développement,
+ * relais public/api-proxy.php une fois publié. `entity` : entité Dolibarr (multisociété), transmise
+ * dans l'en-tête DOLAPIENTITY ; sans elle, l'API travaille dans l'entité de l'utilisateur API.
+ */
+function apiClient({ apiKey, entity }) {
+  const headers = {
+    Accept: 'application/json',
+    ...(apiKey ? { DOLAPIKEY: apiKey } : {}),
+    ...(entity ? { DOLAPIENTITY: String(entity) } : {}),
+  };
+  return async (endpoint) => {
+    const url = import.meta.env.DEV
+      ? `/digirisk-api${endpoint}`
+      : `./api-proxy.php?endpoint=${encodeURIComponent(endpoint)}`;
+    const res = await fetch(url, { headers });
+    if (!res.ok) {
+      const detail = await res.json().catch(() => null);
+      throw new Error(`API HTTP ${res.status} (${endpoint})${detail?.error?.message ? ` : ${detail.error.message}` : ''}`);
+    }
+    return res.json();
+  };
+}
+
+/** Entités Dolibarr (module multisociété) ; liste vide si le module ou le droit de lecture manque. */
+export async function loadEntities({ apiKey = DEFAULT_API_KEY } = {}) {
+  try {
+    const list = await apiClient({ apiKey })('/multicompany?limit=200&properties=id,label,active');
+    return list.filter((e) => Number(e.active ?? 1) === 1).map((e) => ({ id: Number(e.id), label: e.label }));
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Salariés de l'entité : comptes actifs marqués « salarié », hors comptes techniques (API, tests).
+ * `null` si la liste n'est pas lisible (droit « Consulter les autres utilisateurs » manquant).
+ */
+function employeesFromUsers(users) {
+  if (!Array.isArray(users)) return null;
+  const technical = /\b(api|apirest|apitest|test\w*|demo)\b/i;
+  return users
+    .filter((u) => Number(u.employee) === 1 && Number(u.statut) === 1)
+    .map((u) => ({
+      id: Number(u.id),
+      firstname: (u.firstname || '').trim(),
+      lastname: (u.lastname || '').trim(),
+      job: (u.job || '').trim(),
+      gender: u.gender || null,
+    }))
+    .filter((u) => u.firstname && u.lastname && !technical.test(`${u.firstname} ${u.lastname}`))
+    .map((u) => ({ ...u, name: `${u.firstname} ${u.lastname}` }));
+}
+
 /**
  * Interroge directement l'API REST Dolibarr/DigiRisk via le proxy Vite (/digirisk-api)
- * ou bascule sur le snapshot local en cas d'indisponibilité réseau.
- * Renvoie l'arborescence DUER ; le plan 3D est calculé ensuite (services/siteLayout.js).
+ * ou bascule sur le snapshot local en cas d'indisponibilité réseau (sauf `fallback: false` :
+ * l'erreur est alors propagée, par exemple pour une entité choisie inaccessible).
+ * Renvoie l'arborescence DUER et les salariés ; le plan 3D est calculé ensuite (services/siteLayout.js).
  */
-export async function loadDigiRiskData({ apiKey = DEFAULT_API_KEY, forceSnapshot = false } = {}) {
+export async function loadDigiRiskData({ apiKey = DEFAULT_API_KEY, entity = null, forceSnapshot = false, fallback = true } = {}) {
   if (forceSnapshot) {
     return {
       ...snapshotData,
@@ -117,27 +175,16 @@ export async function loadDigiRiskData({ apiKey = DEFAULT_API_KEY, forceSnapshot
   }
 
   try {
-    const headers = {
-      Accept: 'application/json',
-      ...(apiKey ? { DOLAPIKEY: apiKey } : {}),
-    };
+    const fetchJson = apiClient({ apiKey, entity });
 
-    const fetchJson = async (endpoint) => {
-      const url = import.meta.env.DEV
-        ? `/digirisk-api${endpoint}`
-        : `./api-proxy.php?endpoint=${encodeURIComponent(endpoint)}`;
-      const res = await fetch(url, { headers });
-      if (!res.ok) throw new Error(`API HTTP ${res.status} (${endpoint})`);
-      return res.json();
-    };
-
-    const [tree, risks, assessments, creationOptions, tasks, riskSigns] = await Promise.all([
+    const [tree, risks, assessments, creationOptions, tasks, riskSigns, users] = await Promise.all([
       fetchJson('/digiriskdolibarr/digiriskelements/tree'),
       fetchJson('/digiriskdolibarr/risks?limit=500'),
       fetchJson('/digiriskdolibarr/riskassessments?limit=500'),
       fetchJson('/digiriskdolibarr/risks/creation-options'),
       fetchJson('/tasks?limit=500').catch(() => []),
       fetchJson('/digiriskdolibarr/risksigns?limit=500').catch(() => DEFAULT_DEMO_RISKSIGNS),
+      fetchJson(`/users?limit=500&sqlfilters=${encodeURIComponent('(t.statut:=:1)')}&properties=${EMPLOYEE_PROPERTIES}`).catch(() => null),
     ]);
 
     const hierarchy = transformRawToHierarchy({
@@ -151,9 +198,12 @@ export async function loadDigiRiskData({ apiKey = DEFAULT_API_KEY, forceSnapshot
 
     return {
       ...hierarchy,
+      entity,
+      employees: employeesFromUsers(users),
       connectionMode: 'live',
     };
   } catch (error) {
+    if (!fallback) throw error;
     console.warn('Repli sur le snapshot local DigiRisk suite à erreur API :', error.message);
     return {
       ...snapshotData,

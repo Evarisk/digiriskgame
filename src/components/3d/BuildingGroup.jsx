@@ -183,6 +183,7 @@ export default function BuildingGroup({
             finish={building.layout3D.finish}
             showRoof={showRoof}
             highlight={hoveredBuilding || isBuildingSelected}
+            truck={false}
           />
           {/* Couloirs piétons industriels balisés (vert/jaune + chevrons + seuils de portes) */}
           <BuildingWalkways walkways={building.layout3D.walkways} />
