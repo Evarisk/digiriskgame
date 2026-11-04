@@ -10,6 +10,7 @@ import {
   FolderTree,
   Footprints,
   Settings,
+  PenTool,
 } from 'lucide-react';
 import { API_BASE_URL, API_HOST_LABEL } from '../../services/digiriskApi';
 
@@ -135,6 +136,12 @@ export default function TopHudBar({
           <Settings size={14} />
           <span>Paramètres</span>
         </button>
+
+        {/* Éditeur de site : bâtiments sur mesure, éléments et personnages, export JSON */}
+        <a className="hud-btn icon-toggle" href="edit" title="Éditeur de site : dessiner ses bâtiments, poser éléments et personnages">
+          <PenTool size={14} />
+          <span>Éditeur</span>
+        </a>
 
         {/* Configuration Clé API & Synchronisation */}
         <div className="api-config-wrapper">
