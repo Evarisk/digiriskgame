@@ -5,16 +5,31 @@ import { buildWorld, floorAt, obstaclesAt, resolve, walkStep } from '../../servi
 
 /**
  * Visite en première personne du site conçu dans l'éditeur : souris capturée pour regarder,
- * ZQSD / WASD / flèches pour marcher, Maj pour courir. Collisions et hauteur du sol (étages, escaliers) :
- * voir services/editorWalkPhysics.js.
+ * ZQSD / WASD / flèches pour marcher, Maj pour courir. Sur écran tactile (téléphone, tablette) : joysticks
+ * à l'écran (voir TouchControls) — gauche pour se déplacer, droit ou glissé du doigt pour regarder.
+ * Collisions et hauteur du sol (étages, escaliers) : voir services/editorWalkPhysics.js.
  */
 
 export const walkControl = { canvas: null, onLockChange: null };
+
+/**
+ * Commandes tactiles en cours, écrites par TouchControls : `move` et `look` dans [−1, 1] (x vers la droite,
+ * y vers le bas de l'écran), `swipe` = glissé du doigt accumulé en pixels depuis la dernière image.
+ */
+export const touchInput = { move: [0, 0], look: [0, 0], swipe: [0, 0] };
+
+/** Visite tactile : écran tactile comme pointeur principal, ou `?touch` dans l'adresse (essai à la souris). */
+export const TOUCH_WALK =
+  typeof window !== 'undefined' &&
+  (Boolean(window.matchMedia?.('(pointer: coarse)').matches) || new URLSearchParams(window.location.search).has('touch'));
 
 const EYE = 1.1; // ≈ 1,65 m
 const WALK = 2.6;
 const RUN = 4.8;
 const LOOK = 0.0022;
+const STICK_TURN = 2.4; // rad/s : joystick droit poussé à fond (gauche / droite)
+const STICK_TILT = 1.4; // rad/s : joystick droit poussé à fond (haut / bas)
+const SWIPE = 0.0055; // rad par pixel glissé
 
 export default function EditorWalk({ scene }) {
   const { camera, gl } = useThree();
@@ -59,8 +74,9 @@ export default function EditorWalk({ scene }) {
       if (e.code.startsWith('Arrow') || e.code === 'Space') e.preventDefault();
     };
     const onKeyUp = (e) => state.keys.delete(e.code);
+    // Écran tactile : pas de capture du pointeur, les joysticks pilotent la visite
     const onClick = () => {
-      if (!locked()) gl.domElement.requestPointerLock?.();
+      if (!TOUCH_WALK && !locked()) gl.domElement.requestPointerLock?.();
     };
     const clear = () => state.keys.clear();
     document.addEventListener('pointerlockchange', onLockChange);
@@ -69,7 +85,10 @@ export default function EditorWalk({ scene }) {
     window.addEventListener('keyup', onKeyUp);
     window.addEventListener('blur', clear);
     gl.domElement.addEventListener('click', onClick);
-    gl.domElement.requestPointerLock?.();
+    if (!TOUCH_WALK) gl.domElement.requestPointerLock?.();
+    touchInput.move = [0, 0];
+    touchInput.look = [0, 0];
+    touchInput.swipe = [0, 0];
 
     return () => {
       document.removeEventListener('pointerlockchange', onLockChange);
@@ -91,11 +110,26 @@ export default function EditorWalk({ scene }) {
     if (!state.pos) return;
     const dt = Math.min(delta, 0.05);
     const k = state.keys;
-    const forward = (k.has('KeyW') || k.has('ArrowUp') ? 1 : 0) - (k.has('KeyS') || k.has('ArrowDown') ? 1 : 0);
-    const strafe = (k.has('KeyD') || k.has('ArrowRight') ? 1 : 0) - (k.has('KeyA') || k.has('ArrowLeft') ? 1 : 0);
-    if (forward || strafe) {
-      const speed = (k.has('ShiftLeft') || k.has('ShiftRight') ? RUN : WALK) * dt;
-      const len = Math.hypot(forward, strafe);
+    // Regard au toucher : joystick droit (vitesse de rotation, réponse douce au centre) et glissé du doigt
+    const [lx, ly] = touchInput.look;
+    if (lx || ly) {
+      state.yaw -= Math.sign(lx) * lx * lx * STICK_TURN * dt;
+      state.pitch = Math.max(-1.3, Math.min(1.3, state.pitch - Math.sign(ly) * ly * ly * STICK_TILT * dt));
+    }
+    const [sx, sy] = touchInput.swipe;
+    if (sx || sy) {
+      state.yaw -= sx * SWIPE;
+      state.pitch = Math.max(-1.3, Math.min(1.3, state.pitch - sy * SWIPE));
+      touchInput.swipe = [0, 0];
+    }
+    // Clavier et joystick gauche (pousser vers le haut de l'écran : avancer ; vitesse selon la poussée)
+    const [mx, my] = touchInput.move;
+    const forward = (k.has('KeyW') || k.has('ArrowUp') ? 1 : 0) - (k.has('KeyS') || k.has('ArrowDown') ? 1 : 0) - my;
+    const strafe = (k.has('KeyD') || k.has('ArrowRight') ? 1 : 0) - (k.has('KeyA') || k.has('ArrowLeft') ? 1 : 0) + mx;
+    const push = Math.hypot(forward, strafe);
+    if (push > 0.08) {
+      const speed = (k.has('ShiftLeft') || k.has('ShiftRight') ? RUN : WALK) * dt * Math.min(1, push);
+      const len = push;
       const sin = Math.sin(state.yaw);
       const cos = Math.cos(state.yaw);
       const dx = ((-sin * forward + cos * strafe) / len) * speed;

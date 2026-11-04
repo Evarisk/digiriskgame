@@ -21,7 +21,8 @@ import {
   Building2,
 } from 'lucide-react';
 import EditorCanvas from './EditorCanvas';
-import { walkControl } from './EditorWalk';
+import { walkControl, TOUCH_WALK } from './EditorWalk';
+import TouchControls from './TouchControls';
 import { LibraryPanel, OutlinerPanel, InspectorPanel, HelpPanel } from './EditorPanels';
 import { buildDemoScene } from '../../services/editorDemo';
 import { buildMairieScene } from '../../services/editorMairie';
@@ -439,7 +440,7 @@ export default function SiteEditor() {
   const counts = Object.keys(LIST_LABELS).reduce((n, list) => n + scene[list].length, 0);
 
   return (
-    <div className="editor-shell" {...dropHandlers}>
+    <div className={`editor-shell ${walking && TOUCH_WALK ? 'walk-touch-mode' : ''}`} {...dropHandlers}>
       <header className="editor-topbar">
         <div className="editor-brand">
           <a className="editor-back" href="./" title="Retour au jumeau numérique">
@@ -617,9 +618,12 @@ export default function SiteEditor() {
           </>
         )}
 
-        <ToolHint tool={tool} scene={scene} selected={selected} walking={walking} level={view.level} onFinish={() => (tool.mode === 'polygon' ? finishPolygon(tool.points) : setTool({ mode: 'select' }))} onCancel={cancelTool} />
+        {/* Visite sur écran tactile : joysticks à l'écran */}
+        {walking && TOUCH_WALK && <TouchControls />}
 
-        {walking && !walkLocked && (
+        <ToolHint tool={tool} scene={scene} selected={selected} walking={walking} level={view.level} onExitWalk={stopWalk} onFinish={() => (tool.mode === 'polygon' ? finishPolygon(tool.points) : setTool({ mode: 'select' }))} onCancel={cancelTool} />
+
+        {walking && !walkLocked && !TOUCH_WALK && (
           <div className="editor-walk-pause">
             <h3>Visite en pause</h3>
             <p>ZQSD / WASD ou flèches pour marcher, Maj pour courir, souris pour regarder.</p>
@@ -671,7 +675,20 @@ const TOOL_LABEL = (tool, scene) => {
 };
 
 /** Consigne de l'outil en cours (bas de l'écran). */
-function ToolHint({ tool, scene, selected, walking, level, onFinish, onCancel }) {
+function ToolHint({ tool, scene, selected, walking, level, onFinish, onCancel, onExitWalk }) {
+  if (walking && TOUCH_WALK) {
+    // Écran tactile : la barre d'outils est masquée, la consigne porte la sortie de la visite
+    return (
+      <div className="editor-hint">
+        <span>
+          Joystick gauche : <strong>se déplacer</strong> · joystick droit ou glisser : <strong>regarder</strong> · escaliers : avancer dessus
+        </span>
+        <button type="button" onClick={onExitWalk}>
+          Quitter
+        </button>
+      </div>
+    );
+  }
   if (walking) return <div className="editor-hint">ZQSD / WASD pour marcher · Maj : courir · souris : regarder · escaliers : avancer dessus · Échap : pause</div>;
   let text = null;
   let finish = null;
