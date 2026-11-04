@@ -312,13 +312,15 @@ export function WalkwayStrip({
   const markCount = arrows ? Math.max(1, Math.floor(len / 2.6)) : 0;
   const zebraCount = zebra ? Math.max(2, Math.floor(len / 0.34)) : 0;
 
+  // Marquages ≈ 1 cm au-dessus de la bande verte : sans scintillement, même vus de loin
+  const paint = 0.012;
   return (
     <group position={[cx, y, cz]} rotation={[0, angle, 0]} userData={{ noCollide: true }}>
       {/* Bande de roulement piétonne verte */}
       <Box position={[0, 0, 0]} size={[len, 0.008, width]} color={color} rough={0.85} shadow={false} />
       {/* Deux bandes latérales jaunes de sécurité */}
-      <Box position={[0, 0.002, -(width / 2 - line / 2)]} size={[len, 0.01, line]} color={borderColor} shadow={false} />
-      <Box position={[0, 0.002, width / 2 - line / 2]} size={[len, 0.01, line]} color={borderColor} shadow={false} />
+      <Box position={[0, paint, -(width / 2 - line / 2)]} size={[len, 0.01, line]} color={borderColor} shadow={false} />
+      <Box position={[0, paint, width / 2 - line / 2]} size={[len, 0.01, line]} color={borderColor} shadow={false} />
 
       {/* Zébra de seuil de porte / traversée de voie */}
       {zebra &&
@@ -327,7 +329,7 @@ export function WalkwayStrip({
           return (
             <Box
               key={`z${i}`}
-              position={[x, 0.004, 0]}
+              position={[x, paint, 0]}
               size={[0.14, 0.01, width - line * 2.4]}
               color={i % 2 === 0 ? '#f8fafc' : borderColor}
               shadow={false}
@@ -341,14 +343,14 @@ export function WalkwayStrip({
           const x = -len / 2 + ((i + 0.5) * len) / markCount;
           const isPedIcon = i % 2 === 1 && len >= 3.2;
           return isPedIcon ? (
-            <group key={`m${i}`} position={[x, 0.004, 0]}>
+            <group key={`m${i}`} position={[x, paint, 0]}>
               <Cylinder position={[-0.12, 0, 0]} radius={0.055} height={0.01} segments={12} color="#f8fafc" shadow={false} />
               <Box position={[0.04, 0, 0]} size={[0.18, 0.01, 0.12]} color="#f8fafc" shadow={false} />
               <Box position={[0.2, 0, -0.05]} rotation={[0, 0.2, 0]} size={[0.16, 0.01, 0.045]} color="#f8fafc" shadow={false} />
               <Box position={[0.2, 0, 0.05]} rotation={[0, -0.2, 0]} size={[0.16, 0.01, 0.045]} color="#f8fafc" shadow={false} />
             </group>
           ) : (
-            <group key={`m${i}`} position={[x, 0.004, 0]}>
+            <group key={`m${i}`} position={[x, paint, 0]}>
               <Box position={[0.06, 0, -0.08]} rotation={[0, 0.65, 0]} size={[0.22, 0.01, 0.045]} color="#f8fafc" shadow={false} />
               <Box position={[0.06, 0, 0.08]} rotation={[0, -0.65, 0]} size={[0.22, 0.01, 0.045]} color="#f8fafc" shadow={false} />
             </group>
