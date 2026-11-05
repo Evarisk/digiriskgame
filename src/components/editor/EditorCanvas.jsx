@@ -9,6 +9,7 @@ import { Person } from '../3d/models/people';
 import ElementModel from './ElementModel';
 import EditorNpc from './EditorNpc';
 import EditorWalk from './EditorWalk';
+import EditorPostFx from './EditorPostFx';
 import { CustomBuilding, InteriorWall, Surface, Walkway, PrefabBuilding, Outline, Label, SELECT_COLOR, HOVER_COLOR, LOW_WALL } from './EditorStructures';
 import { elementBox, SHAPE_PRESETS, PREFAB_DEFAULT_SIZE, ELEMENT_KINDS } from '../../services/editorCatalog';
 import {
@@ -369,7 +370,18 @@ function SunLight({ center, radius }) {
     Object.assign(light.shadow.camera, { left: -r, right: r, top: r, bottom: -r, far: 400 });
     light.shadow.camera.updateProjectionMatrix();
   }, [center, radius]);
-  return <directionalLight ref={ref} castShadow position={[center[0] + 40, 70, center[1] + 34]} intensity={1.5} shadow-mapSize={[4096, 4096]} shadow-bias={-0.0004} />;
+  return (
+    <directionalLight
+      ref={ref}
+      castShadow
+      color="#fff2df"
+      position={[center[0] + 40, 70, center[1] + 34]}
+      intensity={1.65}
+      shadow-mapSize={[4096, 4096]}
+      shadow-bias={-0.0004}
+      shadow-normalBias={0.02}
+    />
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -654,9 +666,11 @@ function EditorScene({ scene, selection, tool, view, walking, onSelect, onCommit
       <color attach="background" args={[SKY_HORIZON]} />
       <fog attach="fog" args={[SKY_HORIZON, fogNear, fogFar]} />
       <SkyDome site={skySite} scale={Math.max(1, radius / 45)} />
-      <ambientLight intensity={0.5} />
-      <hemisphereLight args={['#dbeafe', '#3f5f2a', 0.55]} />
+      {/* Lumière naturelle : ciel clair, sol ocre (rebond chaud), soleil légèrement doré */}
+      <ambientLight intensity={0.42} />
+      <hemisphereLight args={['#e8eef6', '#6e5c45', 0.6]} />
       <SunLight center={center} radius={radius} />
+      {view.fx && <EditorPostFx />}
       <StudioEnvironment />
       <CameraRig focus={focus} enabled={!walking} />
 

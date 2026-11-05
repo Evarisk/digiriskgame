@@ -19,6 +19,7 @@ import {
   X,
   Landmark,
   Building2,
+  Aperture,
 } from 'lucide-react';
 import EditorCanvas from './EditorCanvas';
 import { walkControl } from './EditorWalk';
@@ -120,7 +121,18 @@ export default function SiteEditor() {
   const [selection, setSelection] = useState(null);
   const [tool, setTool] = useState({ mode: 'select' });
   // `level` : niveau affiché et modifié (null : tous les niveaux, objets posés au rez-de-chaussée)
-  const [view, setView] = useState({ grid: true, snap: 1 / 3, lowWalls: false, roofs: false, labels: true, routes: false, animate: true, level: null });
+  // `fx` : rendu réaliste (occlusion ambiante, halo des lumières), coupé par défaut sur écran tactile (fluidité)
+  const [view, setView] = useState(() => ({
+    grid: true,
+    snap: 1 / 3,
+    lowWalls: false,
+    roofs: false,
+    labels: true,
+    routes: false,
+    animate: true,
+    level: null,
+    fx: !window.matchMedia?.('(pointer: coarse)').matches,
+  }));
   const [focus, setFocus] = useState(() => ({ ...sceneBounds(initial), instant: true }));
   const [tab, setTab] = useState('library');
   const [notice, setNotice] = useState(null);
@@ -529,6 +541,9 @@ export default function SiteEditor() {
             </label>
             <button type="button" className={`icon ${view.lowWalls ? 'on' : ''}`} onClick={() => toggle('lowWalls')} title="Murs arasés (vue de dessus)">
               <Layers size={15} />
+            </button>
+            <button type="button" className={`icon ${view.fx ? 'on' : ''}`} onClick={() => toggle('fx')} title="Rendu réaliste : ombres de contact, halo des lumières (plus gourmand)">
+              <Aperture size={15} />
             </button>
             <button type="button" className={`icon ${view.roofs ? 'on' : ''}`} onClick={() => toggle('roofs')} title="Toits">
               <Home size={15} />

@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
-import { buildWorld, floorAt, obstaclesAt, resolve, walkStep } from '../../services/editorWalkPhysics';
+import { buildWorld, floorAt, obstaclesAt, resolve, walkStep, levelAt, RADIUS } from '../../services/editorWalkPhysics';
+import { visit, pushOutOfBodies } from '../../services/visitState';
 
 /**
  * Visite en première personne du site conçu dans l'éditeur : souris capturée pour regarder,
  * ZQSD / WASD / flèches pour marcher, Maj pour courir. Collisions et hauteur du sol (étages, escaliers) :
- * voir services/editorWalkPhysics.js.
+ * voir services/editorWalkPhysics.js ; on ne traverse ni les personnages ni les voitures (services/visitState.js),
+ * et la position du visiteur est partagée (voitures qui s'arrêtent, passants qui attendent, pigeons qui s'envolent).
  */
 
 export const walkControl = { canvas: null, onLockChange: null };
@@ -45,6 +47,7 @@ export default function EditorWalk({ scene }) {
     state.feet = floorAt(sceneRef.current, world, state.pos, 0);
     state.pitch = -0.05;
     camera.rotation.order = 'YXZ';
+    visit.active = true;
 
     const locked = () => document.pointerLockElement === gl.domElement;
     const onLockChange = () => walkControl.onLockChange?.(locked());
@@ -83,6 +86,7 @@ export default function EditorWalk({ scene }) {
       camera.quaternion.copy(saved.quaternion);
       camera.rotation.order = saved.order;
       walkControl.canvas = null;
+      visit.active = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -102,6 +106,14 @@ export default function EditorWalk({ scene }) {
       const dz = ((-cos * forward - sin * strafe) / len) * speed;
       state.feet = walkStep(sceneRef.current, worldRef.current, state.pos, state.feet, dx, dz);
     }
+    // Personnages et voitures : le visiteur est repoussé hors de leur emprise (puis hors des murs)
+    const level = levelAt(state.feet);
+    pushOutOfBodies(state.pos, level, RADIUS);
+    resolve(state.pos, obstaclesAt(worldRef.current, level));
+    visit.x = state.pos[0];
+    visit.z = state.pos[1];
+    visit.feet = state.feet;
+    visit.level = level;
     // Montée des marches suivie en douceur ; une vraie chute (plus de 2 unités) est immédiate
     const targetY = state.feet + EYE;
     camera.position.set(state.pos[0], THREE.MathUtils.lerp(camera.position.y, targetY, Math.min(1, dt * 12)), state.pos[1]);
