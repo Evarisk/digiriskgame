@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 
 /**
- * Textures procédurales (canvas) : brique, béton, enrobé, sol époxy, panneaux, pelouse, pavés.
+ * Textures procédurales (canvas) : pierre de taille, parquet, brique, béton, enrobé, sol époxy, panneaux,
+ * pelouse, pavés.
  * Générées une seule fois puis clonées par facteur de répétition (l'image source est partagée).
  */
 
@@ -19,6 +20,44 @@ function noise(ctx, size, amount, alpha, seed = 1) {
 }
 
 const PAINTERS = {
+  // Pierre de taille : assises de blocs décalées, joints fins (façades anciennes)
+  ashlar(ctx, s) {
+    ctx.fillStyle = '#cbbd9f';
+    ctx.fillRect(0, 0, s, s);
+    // Répétée tous les 3 unités sur les façades : blocs d'environ 1,5 m × 0,55 m
+    const rows = 8;
+    const bh = s / rows;
+    const bw = s / 3;
+    for (let row = 0; row < rows; row += 1) {
+      const offset = row % 2 ? bw / 2 : 0;
+      for (let col = -1; col < 4; col += 1) {
+        const shade = 0.93 + rand(row * 17 + col * 5) * 0.1;
+        ctx.fillStyle = `rgb(${Math.round(232 * shade)},${Math.round(220 * shade)},${Math.round(196 * shade)})`;
+        ctx.fillRect(col * bw + offset + 1.5, row * bh + 1.5, bw - 3, bh - 3);
+      }
+    }
+    noise(ctx, s, 2600, 0.06, 8);
+  },
+  // Parquet ancien : bâtons de chêne posés en vannerie (trois lames par carré, sens alterné)
+  parquet(ctx, s) {
+    ctx.fillStyle = '#5c3b1e';
+    ctx.fillRect(0, 0, s, s);
+    // Répétée tous les 4 unités au sol : carrés de 0,75 m, lames de 25 cm
+    const n = 8;
+    const cell = s / n;
+    const lame = cell / 3;
+    for (let r = 0; r < n; r += 1) {
+      for (let c = 0; c < n; c += 1) {
+        for (let k = 0; k < 3; k += 1) {
+          const shade = 0.82 + rand(r * 31 + c * 7 + k * 3) * 0.3;
+          ctx.fillStyle = `rgb(${Math.round(150 * shade)},${Math.round(101 * shade)},${Math.round(58 * shade)})`;
+          if ((r + c) % 2) ctx.fillRect(c * cell + 1, r * cell + k * lame + 1, cell - 2, lame - 2);
+          else ctx.fillRect(c * cell + k * lame + 1, r * cell + 1, lame - 2, cell - 2);
+        }
+      }
+    }
+    noise(ctx, s, 2200, 0.05, 9);
+  },
   brick(ctx, s) {
     ctx.fillStyle = '#b9a58f';
     ctx.fillRect(0, 0, s, s);

@@ -2452,3 +2452,17 @@ body,
   opacity: 0.45;
   cursor: default;
 }
+
+a.hud-btn {
+  text-decoration: none;
+}
+
+/* Chargement de l'éditeur de site (/edit, styles propres dans editor.css) */
+.editor-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 14px;
+  color: var(--text-muted);
+}

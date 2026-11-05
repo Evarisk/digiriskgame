@@ -5,8 +5,13 @@ import { Box, Cylinder, Ball, PALETTE, DYNAMIC } from './kit';
  * Personnages low-poly articulés (≈ 1,75 m => 1,17 unité), face à +Z.
  * Tenues métiers : bureau, ouvrier EPI, soudeur, peintre (combinaison + masque), cariste, logisticien.
  * Poses : stand | sit | work (bras vers l'avant) | type (assis au clavier) | carry.
- * `limbs` (objet mutable) reçoit les groupes bras/jambes pour l'animation de marche.
+ * `limbs` (objet mutable) reçoit les groupes animables : bras, avant-bras (`leftArmFore`, `rightArmFore`),
+ * jambes et tête (marche, gestes de travail).
  */
+
+/** Angles épaule / coude (rad) de chaque pose : bras le long du corps, au clavier, au poste ou portant une charge. */
+const POSE_ARMS = { type: [-0.35, -1.3], work: [-0.55, -0.9], carry: [-0.3, -1.27] };
+export const armAngles = (pose) => POSE_ARMS[pose] || [0, -0.1];
 
 export const OUTFITS = {
   office: { top: '#3b82f6', pants: '#1f2937', shoes: '#111827', vest: null, helmet: null },
@@ -26,10 +31,10 @@ export function Person({ outfit = 'worker', pose = 'stand', variant = 0, colors,
   const skin = SKINS[variant % SKINS.length];
   const hair = HAIRS[(variant * 3 + 1) % HAIRS.length];
   const seated = pose === 'sit' || pose === 'type';
-  // Angles épaule / coude (rad) : bras le long du corps, au clavier, au poste ou portant une charge
-  const [shoulder, elbow] = { type: [-0.35, -1.3], work: [-0.55, -0.9], carry: [-0.3, -1.27] }[pose] || [0, -0.1];
+  const [shoulder, elbow] = armAngles(pose);
   const hipY = seated ? 0.33 : 0.56;
   const bodyY = hipY - 0.56;
+  const neckY = 1.0 + bodyY;
 
   const setLimb = (key) => (el) => {
     if (limbs && el) limbs[key] = el;
@@ -50,7 +55,7 @@ export function Person({ outfit = 'worker', pose = 'stand', variant = 0, colors,
   const arm = (side, key) => (
     <group ref={setLimb(key)} userData={limbData} position={[side * 0.165, 0.95 + bodyY, 0]} rotation={[shoulder, 0, side * 0.06]}>
       <Box position={[0, -0.11, 0]} size={[0.072, 0.22, 0.08]} color={o.top} rough={0.75} />
-      <group position={[0, -0.22, 0]} rotation={[elbow, 0, 0]}>
+      <group ref={setLimb(`${key}Fore`)} userData={limbData} position={[0, -0.22, 0]} rotation={[elbow, 0, 0]}>
         <Box position={[0, -0.1, 0]} size={[0.064, 0.2, 0.072]} color={o.top} rough={0.75} />
         <Box position={[0, -0.225, 0]} size={[0.06, 0.065, 0.045]} color={o.gloves || skin} rough={0.6} />
       </group>
@@ -74,33 +79,35 @@ export function Person({ outfit = 'worker', pose = 'stand', variant = 0, colors,
       {outfit === 'welder' && <Box position={[0, 0.66 + bodyY, 0.08]} size={[0.24, 0.42, 0.02]} color="#8b5a2b" rough={0.9} />}
       {arm(-1, 'leftArm')}
       {arm(1, 'rightArm')}
-      {/* Cou & tête */}
-      <Cylinder position={[0, 1.0 + bodyY, 0]} radius={0.035} height={0.06} color={skin} rough={0.6} />
-      <Ball position={[0, 1.085 + bodyY, 0]} radius={0.085} color={skin} rough={0.6} />
-      {!o.helmet && !o.hood && <Ball position={[0, 1.11 + bodyY, -0.01]} scale={[0.178, 0.13, 0.18]} color={hair} rough={0.9} />}
-      <Box position={[-0.03, 1.095 + bodyY, 0.082]} size={[0.018, 0.012, 0.006]} color="#111827" shadow={false} />
-      <Box position={[0.03, 1.095 + bodyY, 0.082]} size={[0.018, 0.012, 0.006]} color="#111827" shadow={false} />
-      {o.helmet && (
-        <group position={[0, 1.12 + bodyY, 0]}>
-          <Ball position={[0, 0.02, 0]} scale={[0.2, 0.15, 0.21]} color={o.helmet} rough={0.35} />
-          <Cylinder position={[0, -0.005, 0.02]} radius={0.115} height={0.012} segments={14} color={o.helmet} rough={0.35} />
-        </group>
-      )}
-      {o.hood && <Ball position={[0, 1.1 + bodyY, -0.005]} scale={[0.195, 0.2, 0.19]} color={o.hood} rough={0.9} />}
-      {o.mask === 'welding' && (
-        <group position={[0, 1.09 + bodyY, 0.07]}>
-          <Box size={[0.17, 0.19, 0.05]} color="#1f2937" rough={0.5} />
-          <Box position={[0, 0.02, 0.026]} size={[0.1, 0.035, 0.004]} color="#0ea5e9" glow={0.6} shadow={false} />
-        </group>
-      )}
-      {o.mask === 'respirator' && (
-        <group position={[0, 1.065 + bodyY, 0.08]}>
-          <Box size={[0.08, 0.06, 0.04]} color="#4b5563" rough={0.6} />
-          <Cylinder position={[-0.045, -0.01, 0.01]} rotation={[Math.PI / 2, 0, 0]} radius={0.022} height={0.03} color="#db2777" />
-          <Cylinder position={[0.045, -0.01, 0.01]} rotation={[Math.PI / 2, 0, 0]} radius={0.022} height={0.03} color="#db2777" />
-          <Box position={[0, 0.06, -0.005]} size={[0.15, 0.05, 0.01]} color="#bae6fd" opacity={0.6} shadow={false} />
-        </group>
-      )}
+      {/* Cou & tête (la tête pivote au cou : regard, hochements) */}
+      <Cylinder position={[0, neckY, 0]} radius={0.035} height={0.06} color={skin} rough={0.6} />
+      <group ref={setLimb('head')} userData={limbData} position={[0, neckY, 0]}>
+        <Ball position={[0, 0.085, 0]} radius={0.085} color={skin} rough={0.6} />
+        {!o.helmet && !o.hood && <Ball position={[0, 0.11, -0.01]} scale={[0.178, 0.13, 0.18]} color={hair} rough={0.9} />}
+        <Box position={[-0.03, 0.095, 0.082]} size={[0.018, 0.012, 0.006]} color="#111827" shadow={false} />
+        <Box position={[0.03, 0.095, 0.082]} size={[0.018, 0.012, 0.006]} color="#111827" shadow={false} />
+        {o.helmet && (
+          <group position={[0, 0.12, 0]}>
+            <Ball position={[0, 0.02, 0]} scale={[0.2, 0.15, 0.21]} color={o.helmet} rough={0.35} />
+            <Cylinder position={[0, -0.005, 0.02]} radius={0.115} height={0.012} segments={14} color={o.helmet} rough={0.35} />
+          </group>
+        )}
+        {o.hood && <Ball position={[0, 0.1, -0.005]} scale={[0.195, 0.2, 0.19]} color={o.hood} rough={0.9} />}
+        {o.mask === 'welding' && (
+          <group position={[0, 0.09, 0.07]}>
+            <Box size={[0.17, 0.19, 0.05]} color="#1f2937" rough={0.5} />
+            <Box position={[0, 0.02, 0.026]} size={[0.1, 0.035, 0.004]} color="#0ea5e9" glow={0.6} shadow={false} />
+          </group>
+        )}
+        {o.mask === 'respirator' && (
+          <group position={[0, 0.065, 0.08]}>
+            <Box size={[0.08, 0.06, 0.04]} color="#4b5563" rough={0.6} />
+            <Cylinder position={[-0.045, -0.01, 0.01]} rotation={[Math.PI / 2, 0, 0]} radius={0.022} height={0.03} color="#db2777" />
+            <Cylinder position={[0.045, -0.01, 0.01]} rotation={[Math.PI / 2, 0, 0]} radius={0.022} height={0.03} color="#db2777" />
+            <Box position={[0, 0.06, -0.005]} size={[0.15, 0.05, 0.01]} color="#bae6fd" opacity={0.6} shadow={false} />
+          </group>
+        )}
+      </group>
       {pose === 'carry' && <Box position={[0, 0.82 + bodyY, 0.24]} size={[0.26, 0.2, 0.2]} color={PALETTE.carton} rough={0.85} />}
     </group>
   );
