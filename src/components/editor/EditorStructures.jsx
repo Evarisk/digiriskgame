@@ -4,6 +4,7 @@ import { Html, Line } from '@react-three/drei';
 import { getMaterial, Cylinder, WalkwayStrip } from '../3d/models/kit';
 import { getTexture } from '../3d/models/textures';
 import BuildingShell from '../3d/models/buildingShells';
+import MergeStatic from '../3d/models/MergeStatic';
 import { BUILDING_STYLES, FLOOR_STYLES, DOOR_KINDS, SURFACE_MATERIALS, PREFAB_THEME } from '../../services/editorCatalog';
 import {
   FLOOR_Y,
@@ -297,33 +298,37 @@ export function CustomBuilding({ building, bind, highlight, showRoof, lowWalls, 
   }).filter((band) => band.height > 0.05);
   const floors = bands.filter((band) => band.k > 0 && band.y0 < roofTop - 0.3 && (cutLevel == null || band.k <= cutLevel));
 
+  // Pans de murs, linteaux, encadrements, planchers et toit fusionnés par matériau (une centaine de dessins par
+  // bâtiment sinon) ; les originaux masqués restent cliquables pour la sélection
   return (
     <group>
-      <mesh geometry={slab} material={floorMaterial} receiveShadow {...bind} />
-      {floors.map((band) => (
-        <StoreyFloor key={band.k} polygon={polygon} holes={holes[band.k] || null} y={band.y0} material={floorMaterial} bind={bind} />
-      ))}
-      {polygonEdges(polygon).map(([a, b], i) =>
-        bands.map((band) => (
-          <WallRun
-            key={`${i}:${band.k}`}
-            a={a}
-            b={b}
-            base={band.base}
-            y0={band.y0}
-            height={band.height}
-            top={cut}
-            thickness={t - 2 * inset(i)}
-            doors={[...(doorsByBand[`${i}:${band.k}`] || []), ...(bays[`${i}:${band.k}`] || [])]}
-            style={style}
-            bind={bind}
-            extend={t / 2 - inset(i)}
-          />
-        ))
-      )}
-      {showRoof && cutLevel == null && (
-        <mesh geometry={roof} position={[0, roofTop, 0]} material={getMaterial({ color: styleDef.roof, roughness: 0.7, metalness: 0.3 })} castShadow receiveShadow {...bind} />
-      )}
+      <MergeStatic name="structure:batiment" deps={[JSON.stringify(building), cut, showRoof, cutLevel, openings, windows]}>
+        <mesh geometry={slab} material={floorMaterial} receiveShadow {...bind} />
+        {floors.map((band) => (
+          <StoreyFloor key={band.k} polygon={polygon} holes={holes[band.k] || null} y={band.y0} material={floorMaterial} bind={bind} />
+        ))}
+        {polygonEdges(polygon).map(([a, b], i) =>
+          bands.map((band) => (
+            <WallRun
+              key={`${i}:${band.k}`}
+              a={a}
+              b={b}
+              base={band.base}
+              y0={band.y0}
+              height={band.height}
+              top={cut}
+              thickness={t - 2 * inset(i)}
+              doors={[...(doorsByBand[`${i}:${band.k}`] || []), ...(bays[`${i}:${band.k}`] || [])]}
+              style={style}
+              bind={bind}
+              extend={t / 2 - inset(i)}
+            />
+          ))
+        )}
+        {showRoof && cutLevel == null && (
+          <mesh geometry={roof} position={[0, roofTop, 0]} material={getMaterial({ color: styleDef.roof, roughness: 0.7, metalness: 0.3 })} castShadow receiveShadow {...bind} />
+        )}
+      </MergeStatic>
       {highlight && <Outline points={polygon} y={FLOOR_Y + 0.03} color={highlight} />}
       {showLabel && <Label position={[cx, Math.min(roofTop, cut) + 1.1, cz]}>{building.name}</Label>}
     </group>
@@ -350,19 +355,21 @@ export function InteriorWall({ wall, y0, base = 0, maxHeight = Infinity, cut = I
   const shown = Math.max(0, Math.min(y0 + height, cut) - y0);
   return (
     <group>
-      <WallRun
-        a={wall.a}
-        b={wall.b}
-        base={base}
-        y0={y0}
-        height={height}
-        top={cut}
-        thickness={wall.thickness}
-        doors={wall.door ? [wall.door] : []}
-        style={style}
-        bind={bind}
-        extend={wall.type === 'grillage' ? 0 : wall.thickness / 2}
-      />
+      <MergeStatic name="structure:cloison" deps={[JSON.stringify(wall), y0, base, maxHeight, cut]}>
+        <WallRun
+          a={wall.a}
+          b={wall.b}
+          base={base}
+          y0={y0}
+          height={height}
+          top={cut}
+          thickness={wall.thickness}
+          doors={wall.door ? [wall.door] : []}
+          style={style}
+          bind={bind}
+          extend={wall.type === 'grillage' ? 0 : wall.thickness / 2}
+        />
+      </MergeStatic>
       {highlight && (
         <Along a={wall.a} b={wall.b}>
           <Outline

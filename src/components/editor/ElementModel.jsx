@@ -357,7 +357,7 @@ export default function ElementModel({ element, upperHidden = false }) {
   const seed = seedOf(element.id);
   return (
     <>
-      <MergeStatic deps={[element.kind, color, JSON.stringify(params), level, guard, seed, element.label]}>
+      <MergeStatic name={`element:${element.kind}`} deps={[element.kind, color, JSON.stringify(params), level, guard, seed, element.label]}>
         <Model kind={element.kind} color={color} params={params} level={level} guard={guard} seed={seed} label={element.label} />
       </MergeStatic>
       {/* Gyrophare à l'angle du poste, ou de la zone d'unité de travail (taille réglable) */}

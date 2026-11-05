@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { Line } from '@react-three/drei';
 import { Person, armAngles } from '../3d/models/people';
 import MergeStatic from '../3d/models/MergeStatic';
+import { LOD_FAR, LOD_NEAR, forgetLimbs } from '../3d/models/personLod';
 import { Label } from './EditorStructures';
 import { visit, bodies } from '../../services/visitState';
 
@@ -22,6 +23,9 @@ const END_PAUSE = 3; // s d'arrêt aux extrémités d'un aller-retour (le temps 
 const ARM_KEYS = ['leftArm', 'rightArm', 'leftArmFore', 'rightArmFore'];
 const PICK_GEOMETRY = new THREE.BoxGeometry(0.5, 1.25, 0.5);
 const BODY_RADIUS = 0.22; // emprise d'un personnage pour les collisions du visiteur
+// Niveau de détail (voir personLod) : loin de la caméra, le personnage est fusionné en quelques maillages,
+// gestes figés — il continue d'avancer sur son trajet
+const worldPos = new THREE.Vector3();
 
 /** Le visiteur barre-t-il le passage (devant, à moins de 1,1 et à moins de 0,55 de côté) ? */
 function blockedBy(x, z, heading, level) {
@@ -290,7 +294,9 @@ export default function EditorNpc({ npc, animate, groundAt, bind, highlight, sho
   const limbs = useRef({}).current;
   const path = useMemo(() => buildPath(npc), [npc]);
   const walking = Boolean(animate && path);
-  const animated = Boolean(animate);
+  const [near, setNear] = useState(true);
+  const nearRef = useRef(true);
+  const animated = Boolean(animate) && near;
   const groundRef = useRef(groundAt);
   groundRef.current = groundAt;
   const walkClock = useRef(null);
@@ -298,10 +304,19 @@ export default function EditorNpc({ npc, animate, groundAt, bind, highlight, sho
   // Retiré des corps mobiles quand il disparaît de la scène
   useEffect(() => () => bodies.delete(npc.id), [npc.id]);
 
-  useFrame(({ clock }, delta) => {
+  useFrame(({ clock, camera }, delta) => {
     const group = groupRef.current;
     if (!group) return;
     const body = bodyRef.current;
+    if (animate) {
+      const d = camera.position.distanceTo(group.getWorldPosition(worldPos));
+      const isNear = nearRef.current ? d < LOD_FAR : d < LOD_NEAR;
+      if (isNear !== nearRef.current) {
+        nearRef.current = isNear;
+        if (!isNear) forgetLimbs(limbs);
+        setNear(isNear);
+      }
+    }
     if (!walking) {
       const [x, z] = npc.position;
       group.position.set(x, groundRef.current(x, z), z);
@@ -401,7 +416,7 @@ export default function EditorNpc({ npc, animate, groundAt, bind, highlight, sho
       <group ref={groupRef}>
         <group ref={bodyRef}>
           {/* Animé (marche ou travail) : bras, avant-bras, jambes et tête restent mobiles ; sinon tout est fusionné */}
-          <MergeStatic key={animated ? 'anim' : 'still'} deps={[npc.outfit, npc.variant, pose, animated]}>
+          <MergeStatic key={animated ? 'anim' : 'still'} name={animated ? 'npc:anime' : 'npc:fixe'} deps={[npc.outfit, npc.variant, pose, animated]}>
             <Person outfit={npc.outfit} pose={pose} variant={npc.variant} limbs={animated ? limbs : undefined} />
           </MergeStatic>
         </group>

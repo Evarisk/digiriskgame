@@ -121,7 +121,8 @@ export default function SiteEditor() {
   const [selection, setSelection] = useState(null);
   const [tool, setTool] = useState({ mode: 'select' });
   // `level` : niveau affiché et modifié (null : tous les niveaux, objets posés au rez-de-chaussée)
-  // `fx` : rendu réaliste (occlusion ambiante, halo des lumières), coupé par défaut sur écran tactile (fluidité)
+  // `fx` : rendu réaliste (occlusion ambiante, halo des lumières) — il redessine toute la scène une seconde
+  // fois : coupé par défaut pour la fluidité, à activer pour une capture ou sur une machine puissante
   const [view, setView] = useState(() => ({
     grid: true,
     snap: 1 / 3,
@@ -131,7 +132,7 @@ export default function SiteEditor() {
     routes: false,
     animate: true,
     level: null,
-    fx: !window.matchMedia?.('(pointer: coarse)').matches,
+    fx: false,
   }));
   const [focus, setFocus] = useState(() => ({ ...sceneBounds(initial), instant: true }));
   const [tab, setTab] = useState('library');
