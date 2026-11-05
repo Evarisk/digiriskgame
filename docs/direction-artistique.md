@@ -35,8 +35,8 @@ portent l'information DigiRisk (zones et pastilles de cotation, gilets haute vis
 
 - **Soleil légèrement doré** (`#fff2df`), ciel clair, **rebond chaud du sol** (ocre `#6e5c45` au lieu de vert),
   ambiance un peu baissée pour laisser travailler les ombres.
-- **Rendu réaliste** (bouton à diaphragme de la barre d'outils, actif par défaut sur ordinateur, coupé sur
-  écran tactile) :
+- **Rendu réaliste** (bouton à diaphragme de la barre d'outils, coupé par défaut : il redessine toute la
+  scène une seconde fois — à activer pour une capture ou sur une machine puissante) :
   - **occlusion ambiante GTAO** à l'échelle d'une pièce : coins, dessous des meubles, pieds des personnages,
     jonctions mur / sol s'assombrissent — c'est ce qui supprime l'aspect « plat » ;
   - **halo léger** des seules sources très lumineuses (lustres, lanternes, écrans) ;
@@ -191,8 +191,23 @@ pigeons sont simulés hors navigateur (`trafficLogic.js`, `pigeonLogic.js`). Une
 parcouru la scène du trottoir d'en face jusqu'au bureau de la maire, à l'étage : traversée du passage piéton
 au milieu des voitures, tour de la fontaine, perron, hall, escalier d'honneur dans les deux sens, galerie.
 
+**Fluidité** (mesure du 5 novembre 2026, vue d'ensemble de la mairie) : environ 11 900 dessins par image
+ramenés à 3 600, et 2,55 à 1,93 million de triangles —
+- rendu réaliste coupé par défaut (il redessinait toute la scène une seconde fois) ; résolution plafonnée à 1,5 ×
+  sur les écrans haute densité ;
+- **niveau de détail des personnages** (`personLod.jsx`) : au-delà de 40 unités de la caméra, un personnage
+  ou un enfant est fusionné en une dizaine de maillages, gestes figés (il continue d'avancer), et redevient
+  articulé en deçà de 34 ; visage, mains et articulations allégés (≈ 12 700 triangles au lieu de 19 300) ;
+- pans de murs, linteaux, encadrements, planchers et toits des bâtiments et des cloisons fusionnés par
+  matériau (`MergeStatic`, les originaux masqués restent cliquables) ;
+- pas d'ombre portée pour les pièces de moins de 9 cm (doigts, articulations, souris) : invisible à l'œil,
+  elle coûtait un dessin de plus par image dans la carte d'ombre.
+
 ## 8. Pistes suivantes (non réalisées)
 
+- Fluidité, étape suivante : instanciation des éléments répétés (fauteuils, fenêtres de façade, réverbères,
+  voitures) et vêtements des personnages réunis dans une même texture (une dizaine de dessins par personnage
+  fusionné aujourd'hui).
 - Textures légères sur le mobilier (veinage du bois, tissu des fauteuils) et sur les sols extérieurs (joints de pavés plus fins).
 - Heure de la journée réglable (matin, fin d'après-midi) avec lumières intérieures allumées le soir.
 - Postes du jumeau numérique (atelier, entrepôt) repris avec la même palette désaturée.
