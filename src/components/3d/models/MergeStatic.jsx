@@ -14,7 +14,13 @@ import { noRaycast } from './kit';
  * leur propre repère (elles suivent l'animation). Un maillage animé lui-même n'est jamais fusionné ; tout
  * groupe dont le code d'animation modifie un enfant (visibilité, position...) doit donc être marqué aussi.
  * `deps` : valeurs dont le changement impose de refaire la fusion (géométrie / disposition).
+ * `isolated` : sous-arbre qui se fusionne lui-même (MergeStatic imbriqué dont le contenu change, par exemple
+ * un personnage qui passe d'un niveau de détail à l'autre) — une fusion englobante ne le touche pas.
+ * Les petites pièces (moins de SHADOW_TRIM de rayon : doigts, articulations, souris...) ne portent pas
+ * d'ombre : invisible à l'œil, elle coûterait un dessin de plus par image dans la carte d'ombre.
  */
+
+const SHADOW_TRIM = 0.06;
 
 const KEPT_ATTRIBUTES = ['position', 'normal', 'uv'];
 
@@ -98,7 +104,7 @@ function useHmrVersion() {
   return version;
 }
 
-export default function MergeStatic({ children, deps = [] }) {
+export default function MergeStatic({ children, deps = [], name, isolated = false }) {
   const rootRef = useRef();
   const hmrVersion = useHmrVersion();
 
@@ -115,6 +121,10 @@ export default function MergeStatic({ children, deps = [] }) {
     // un maillage lui-même animé est laissé tel quel
     const scopeOf = (obj) => {
       if (obj.userData?.dynamic) return null;
+      // Sous-arbre isolé (MergeStatic imbriqué) : il gère sa propre fusion
+      for (let node = obj.parent; node && node !== root; node = node.parent) {
+        if (node.userData?.noMerge) return null;
+      }
       for (let node = obj.parent; node && node !== root; node = node.parent) {
         if (node.userData?.dynamic) return node;
       }
@@ -167,8 +177,24 @@ export default function MergeStatic({ children, deps = [] }) {
       obj.matrixAutoUpdate = false;
       obj.matrixWorldAutoUpdate = false;
     });
+    // Petites pièces restées visibles (fusionnées ou non) : pas d'ombre portée
+    const trimmed = [];
+    const scale = new THREE.Vector3();
+    root.traverse((obj) => {
+      if (!obj.isMesh || !obj.visible || !obj.castShadow || !obj.geometry?.attributes?.position) return;
+      if (obj !== root && hasFlag(obj.parent, root, 'noMerge')) return;
+      if (!obj.geometry.boundingSphere) obj.geometry.computeBoundingSphere();
+      obj.getWorldScale(scale);
+      if (obj.geometry.boundingSphere.radius * Math.max(scale.x, scale.y, scale.z) < SHADOW_TRIM) {
+        obj.castShadow = false;
+        trimmed.push(obj);
+      }
+    });
 
     return () => {
+      trimmed.forEach((obj) => {
+        obj.castShadow = true;
+      });
       merged.forEach((mesh) => {
         mesh.parent?.remove(mesh);
         mesh.geometry.dispose();
@@ -183,5 +209,9 @@ export default function MergeStatic({ children, deps = [] }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [...deps, hmrVersion]);
 
-  return <group ref={rootRef}>{children}</group>;
+  return (
+    <group ref={rootRef} name={name} userData={isolated ? { noMerge: true } : undefined}>
+      {children}
+    </group>
+  );
 }

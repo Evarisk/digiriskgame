@@ -2,7 +2,7 @@ import React, { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Box, Cylinder, Ball, DYNAMIC, seeded } from './kit';
 import { canvasTexture } from './civicProps';
-import { Person } from './people';
+import { LodPerson, useDistanceLod, forgetLimbs } from './personLod';
 
 /**
  * Équipement des services techniques et de l'école pour l'éditeur de site : établi et panneau à outils,
@@ -284,6 +284,8 @@ export function KidsLunch({ seed = 0 }) {
       ),
     [seed]
   );
+  const rootRef = useRef();
+  const close = useDistanceLod(rootRef, (near) => !near && kids.forEach((k) => forgetLimbs(k.limbs)));
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
     kids.forEach((k, i) => {
@@ -298,7 +300,7 @@ export function KidsLunch({ seed = 0 }) {
     });
   });
   return (
-    <group>
+    <group ref={rootRef}>
       {kids.map((k, i) => (
         <group key={i} position={[k.x, 0, k.z]} rotation={[0, k.facing, 0]}>
           {/* Plateau, assiette, verre (côté table) */}
@@ -310,7 +312,7 @@ export function KidsLunch({ seed = 0 }) {
           </group>
           {/* Enfant assis (petit gabarit, rehaussé au niveau du banc) */}
           <group position={[0, 0.13, -0.02]} scale={[0.62, 0.62, 0.62]} userData={DYNAMIC}>
-            <Person outfit="office" pose="meet" variant={k.variant} colors={k.colors} limbs={k.limbs} />
+            <LodPerson close={close} outfit="office" pose="meet" variant={k.variant} colors={k.colors} limbs={k.limbs} />
           </group>
         </group>
       ))}

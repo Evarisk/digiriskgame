@@ -4,7 +4,7 @@ import { useFrame } from '@react-three/fiber';
 import { Box, Cylinder, Ball, Car, Van, Truck, DYNAMIC, getMaterial, noRaycast, seeded } from './kit';
 import { canvasTexture } from './civicProps';
 import { Leaves } from './natureProps';
-import { Person } from './people';
+import { LodPerson, useDistanceLod, forgetLimbs } from './personLod';
 import { digiriskPoster } from './cardGameProps';
 import { visit, bodies } from '../../../services/visitState';
 import { LANE, stepTraffic } from '../../../services/trafficLogic';
@@ -698,6 +698,8 @@ export function PlayingChildren({ count = 6, spread = 3, seed = 0 }) {
     [count, spread, seed]
   );
   const roots = useRef([]);
+  const rootRef = useRef();
+  const close = useDistanceLod(rootRef, (near) => !near && kids.forEach((k) => forgetLimbs(k.limbs)));
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime() + seed * 40;
     kids.forEach((k, i) => {
@@ -734,11 +736,11 @@ export function PlayingChildren({ count = 6, spread = 3, seed = 0 }) {
     });
   });
   return (
-    <group>
+    <group ref={rootRef}>
       {kids.map((k, i) => (
         <group key={i} ref={(el) => (roots.current[i] = el)} userData={DYNAMIC}>
           <group scale={[0.62, 0.62, 0.62]}>
-            <Person outfit="office" variant={k.variant} colors={k.colors} limbs={k.limbs} />
+            <LodPerson close={close} outfit="office" variant={k.variant} colors={k.colors} limbs={k.limbs} />
           </group>
         </group>
       ))}

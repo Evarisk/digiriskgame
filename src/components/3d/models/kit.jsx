@@ -42,6 +42,8 @@ export const PALETTE = {
 
 const UNIT_BOX = new THREE.BoxGeometry(1, 1, 1);
 const UNIT_SPHERE = new THREE.SphereGeometry(0.5, 16, 12);
+// Sphère basse définition pour les petits reliefs (nez, oreilles, boutons) : 120 triangles au lieu de 352
+const UNIT_SPHERE_LOW = new THREE.SphereGeometry(0.5, 10, 7);
 const UNIT_ICOSA = new THREE.IcosahedronGeometry(0.5, 0);
 const UNIT_DODECA = new THREE.DodecahedronGeometry(0.5, 0);
 const UNIT_TORUS = new THREE.TorusGeometry(0.5, 0.14, 8, 28);
@@ -172,7 +174,7 @@ export function Cylinder({ radius = 0.5, height = 1, top = 1, segments = 16, ope
 }
 
 export function Ball({ radius = 0.5, scale, shape = 'sphere', color, metal, rough, glow, glowColor, opacity, flat, shadow = true, ...rest }) {
-  const geometry = shape === 'icosa' ? UNIT_ICOSA : shape === 'dodeca' ? UNIT_DODECA : UNIT_SPHERE;
+  const geometry = shape === 'icosa' ? UNIT_ICOSA : shape === 'dodeca' ? UNIT_DODECA : shape === 'low' ? UNIT_SPHERE_LOW : UNIT_SPHERE;
   const s = scale || [radius * 2, radius * 2, radius * 2];
   return (
     <mesh

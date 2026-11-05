@@ -217,7 +217,8 @@ function bodyGeometry(sex, part) {
   return geometryCache.get(key);
 }
 
-const SPHERE = new THREE.SphereGeometry(0.5, 24, 16);
+// Articulations, chignons : 16 × 12 suffisent (352 triangles au lieu de 720)
+const SPHERE = new THREE.SphereGeometry(0.5, 16, 12);
 
 const smoothstep = (a, b, x) => {
   const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
@@ -933,11 +934,12 @@ function HairVolume({ style, color }) {
 /* Mains                                                                */
 /* ------------------------------------------------------------------ */
 
-const PALM = new RoundedBoxGeometry(0.022, 0.052, 0.05, 2, 0.008);
+// Main allégée (≈ 600 triangles au lieu de 2 100) : à 5 cm de long, une découpe plus fine ne se voit pas
+const PALM = new RoundedBoxGeometry(0.022, 0.052, 0.05, 1, 0.008);
 const capsules = new Map();
 function capsule(radius, length) {
   const key = `${radius}|${length}`;
-  if (!capsules.has(key)) capsules.set(key, new THREE.CapsuleGeometry(radius, Math.max(0.001, length - radius * 2), 3, 7));
+  if (!capsules.has(key)) capsules.set(key, new THREE.CapsuleGeometry(radius, Math.max(0.001, length - radius * 2), 2, 5));
   return capsules.get(key);
 }
 // Doigts de l'auriculaire (arrière) à l'index (avant) : position sur la paume, longueur, flexion
@@ -954,7 +956,8 @@ const FINGERS = [
  */
 function Hand({ side, color, palmDown, scale = 1 }) {
   const mat = getMaterial({ color, roughness: 0.6, metalness: 0 });
-  const piece = (geometry, props) => <mesh geometry={geometry} material={mat} castShadow raycast={noRaycast} {...props} />;
+  // Sans ombre portée : à cette taille elle ne se voit pas, mais elle se redessinerait à chaque image
+  const piece = (geometry, props) => <mesh geometry={geometry} material={mat} raycast={noRaycast} {...props} />;
   // Flexion vers la paume ; doigts presque tendus au-dessus du clavier (paume vers le bas)
   const bend = (k) => -side * k * (palmDown ? 0.4 : 1);
   return (
@@ -1085,20 +1088,20 @@ export function Person({ outfit = 'worker', pose = 'stand', variant = 0, colors,
         <group scale={HEAD_GROUP}>
           <mesh geometry={HEAD_GEOMETRY} material={headMaterial(lookIndex)} position={[0, HEAD_CENTER, 0]} scale={HEAD_SCALE} raycast={noRaycast} />
           {/* Nez : arête inclinée, bout arrondi, ailes et narines */}
-          <Ball scale={[0.011, 0.03, 0.012]} position={[0, 0.093, 0.0838]} rotation={[-0.3, 0, 0]} color={shade(skin, -0.02)} rough={0.6} />
-          <Ball scale={[0.017, 0.015, 0.016]} position={[0, 0.0795, 0.0902]} color={shade(skin, -0.03)} rough={0.58} />
+          <Ball shape="low" scale={[0.011, 0.03, 0.012]} position={[0, 0.093, 0.0838]} rotation={[-0.3, 0, 0]} color={shade(skin, -0.02)} rough={0.6} />
+          <Ball shape="low" scale={[0.017, 0.015, 0.016]} position={[0, 0.0795, 0.0902]} color={shade(skin, -0.03)} rough={0.58} />
           {[-1, 1].map((s) => (
             <group key={s}>
-              <Ball scale={[0.011, 0.011, 0.012]} position={[s * 0.0088, 0.0768, 0.0856]} color={shade(skin, -0.06)} rough={0.62} />
-              <Ball scale={[0.0045, 0.002, 0.004]} position={[s * 0.0042, 0.0733, 0.0884]} color={shade(skin, -0.38)} rough={0.9} />
+              <Ball shape="low" scale={[0.011, 0.011, 0.012]} position={[s * 0.0088, 0.0768, 0.0856]} color={shade(skin, -0.06)} rough={0.62} />
+              <Ball shape="low" scale={[0.0045, 0.002, 0.004]} position={[s * 0.0042, 0.0733, 0.0884]} color={shade(skin, -0.38)} rough={0.9} />
             </group>
           ))}
           {/* Oreilles : pavillon, conque creusée (plus sombre), lobe */}
           {[-1, 1].map((s) => (
             <group key={s} position={[s * 0.075, 0.09, -0.004]} rotation={[0, s * 0.25, 0]}>
-              <Ball scale={[0.016, 0.044, 0.028]} color={shade(skin, -0.05)} rough={0.7} />
-              <Ball scale={[0.004, 0.024, 0.015]} position={[s * 0.0068, 0.002, 0.002]} color={shade(skin, -0.24)} rough={0.8} />
-              <Ball scale={[0.012, 0.013, 0.012]} position={[0, -0.02, 0.004]} color={shade(skin, -0.03)} rough={0.7} />
+              <Ball shape="low" scale={[0.016, 0.044, 0.028]} color={shade(skin, -0.05)} rough={0.7} />
+              <Ball shape="low" scale={[0.004, 0.024, 0.015]} position={[s * 0.0068, 0.002, 0.002]} color={shade(skin, -0.24)} rough={0.8} />
+              <Ball shape="low" scale={[0.012, 0.013, 0.012]} position={[0, -0.02, 0.004]} color={shade(skin, -0.03)} rough={0.7} />
             </group>
           ))}
           {limbs && (
