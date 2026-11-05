@@ -799,7 +799,7 @@ function itemMid(item) {
 export default function EditorCanvas(props) {
   return (
     <div className="editor-canvas" onContextMenu={(e) => e.preventDefault()}>
-      {/* Résolution plafonnée à 1,5 × sur les écrans haute densité (fluidité) */}
+      {/* Résolution plafonnée à 1,5 × sur les écrans haute densité, téléphones compris (fluidité) */}
       <Canvas shadows dpr={[1, 1.5]} camera={{ position: [40, 60, 90], fov: 45, near: 0.3, far: 900 }} onPointerMissed={() => {}}>
         <EditorScene {...props} />
       </Canvas>
