@@ -8,7 +8,8 @@ import { getTexture } from '../3d/models/textures';
 import { Person } from '../3d/models/people';
 import ElementModel from './ElementModel';
 import EditorNpc from './EditorNpc';
-import EditorWalk, { TOUCH_WALK } from './EditorWalk';
+import EditorWalk from './EditorWalk';
+import { isTouchDevice } from '../../services/touchControls';
 import { CustomBuilding, InteriorWall, Surface, Walkway, PrefabBuilding, Outline, Label, SELECT_COLOR, HOVER_COLOR, LOW_WALL } from './EditorStructures';
 import { elementBox, SHAPE_PRESETS, PREFAB_DEFAULT_SIZE, ELEMENT_KINDS } from '../../services/editorCatalog';
 import {
@@ -782,11 +783,13 @@ function itemMid(item) {
   return [(item.a[0] + item.b[0]) / 2, (item.a[1] + item.b[1]) / 2];
 }
 
+// Appareil tactile (téléphone, tablette, DeX) : résolution plafonnée pour garder une visite fluide
+const MAX_DPR = isTouchDevice() ? 1.5 : 2;
+
 export default function EditorCanvas(props) {
   return (
     <div className="editor-canvas" onContextMenu={(e) => e.preventDefault()}>
-      {/* Écran tactile (téléphone) : résolution plafonnée pour garder une visite fluide */}
-      <Canvas shadows dpr={TOUCH_WALK ? [1, 1.5] : [1, 2]} camera={{ position: [40, 60, 90], fov: 45, near: 0.3, far: 900 }} onPointerMissed={() => {}}>
+      <Canvas shadows dpr={[1, MAX_DPR]} camera={{ position: [40, 60, 90], fov: 45, near: 0.3, far: 900 }} onPointerMissed={() => {}}>
         <EditorScene {...props} />
       </Canvas>
     </div>
