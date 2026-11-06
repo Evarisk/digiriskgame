@@ -203,11 +203,39 @@ ramenés à 3 600, et 2,55 à 1,93 million de triangles —
 - pas d'ombre portée pour les pièces de moins de 9 cm (doigts, articulations, souris) : invisible à l'œil,
   elle coûtait un dessin de plus par image dans la carte d'ombre.
 
+**Fluidité, seconde étape — tourner sur un maximum de machines** (mesure du 6 novembre 2026, même vue,
+fenêtre 1280 × 618, GTX 1060) : 2 311 dessins par image (plus 1 314 pour la carte d'ombre) ramenés à 565 (et
+323), 1,93 à 0,74 million de triangles, temps de rendu du processeur de 28 à 8 ms par image (33 → 60 images
+par seconde, la limite de l'écran) —
+- **personnage léger de loin** (`PersonLite` dans `people.jsx`) : même squelette, mêmes couleurs de tenue, de
+  peau et de cheveux, mêmes poses, moins de 1 000 triangles et uniquement des matériaux mutualisés, donc un
+  seul maillage (un dessin) ; utilisé au-delà de 40 unités par les passants, les enfants et les personnages des
+  postes de travail (contexte `PersonDetail`) ;
+- **regroupement de la scène** (`staticBatch.js`) : les pièces fixes des objets posés, allées, bâtiments et
+  cloisons d'un même carré de 20 unités qui partagent un matériau deviennent un seul maillage (les matériaux du
+  kit, couleur reportée dans les sommets, se regroupent tous ensemble). Un objet déplacé ou modifié : son carré
+  s'affiche pièce par pièce le temps de l'édition, puis se regroupe 0,4 s après ;
+- **parties inertes ignorées** (`MergeStatic`) : les groupes qui ne contiennent plus que des pièces masquées
+  par la fusion ne sont plus parcourus à chaque image (three.js visitait les 22 000 objets de la scène) ;
+- voitures d'un seul tenant (roues à part seulement pour celles qui roulent) ; pigeons masqués et non simulés
+  au-delà de 36 unités (un ou deux pixels) ; drapeaux figés au-delà de 45 unités ;
+- **à-coups supprimés** (caméra en mouvement, survol à la souris) : les étiquettes des personnages et des objets
+  — des éléments de page repositionnés et redimensionnés à chaque image dès que la caméra bouge, par dizaines —
+  ne sont affichées qu'à distance lisible (52 unités pour un personnage, 40 pour un objet ; celles des
+  bâtiments restent) ; le survol d'un objet ne redessine plus les personnages (mémoïsés) ni ne recalcule les
+  hauteurs au sol de tous les objets. Mesure : 6 à 30 images de plus de 34 ms pendant 7 s d'orbite avant,
+  aucune après, en qualité basse comme haute ;
+- **qualité de l'affichage** (`src/components/3d/quality.js`, menu à jauge de la barre d'outils) : haute
+  (résolution jusqu'à 1,5 ×, ombres douces 4096 px), moyenne (1 ×, ombres 2048 px recalculées une image sur
+  deux), basse (0,75 ×, sans ombres portées ni anticrénelage). En mode automatique (par défaut), le niveau de
+  départ dépend de la machine (rendu logiciel : basse ; carte graphique intégrée, écran tactile ou 4 cœurs ou
+  moins : moyenne) et baisse d'un cran, avec un message, si l'image reste lente (plus de 38 ms par image sur
+  deux fois 3 s). Un choix manuel est mémorisé dans le navigateur.
+
 ## 8. Pistes suivantes (non réalisées)
 
-- Fluidité, étape suivante : instanciation des éléments répétés (fauteuils, fenêtres de façade, réverbères,
-  voitures) et vêtements des personnages réunis dans une même texture (une dizaine de dessins par personnage
-  fusionné aujourd'hui).
+- Fluidité, étape suivante : mesure sur une machine modeste (portable à carte intégrée) ; instanciation des
+  personnages lointains.
 - Textures légères sur le mobilier (veinage du bois, tissu des fauteuils) et sur les sols extérieurs (joints de pavés plus fins).
 - Heure de la journée réglable (matin, fin d'après-midi) avec lumières intérieures allumées le soir.
 - Postes du jumeau numérique (atelier, entrepôt) repris avec la même palette désaturée.
