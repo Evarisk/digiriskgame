@@ -210,7 +210,7 @@ par seconde, la limite de l'écran) —
 - **personnage léger de loin** (`PersonLite` dans `people.jsx`) : même squelette, mêmes couleurs de tenue, de
   peau et de cheveux, mêmes poses, moins de 1 000 triangles et uniquement des matériaux mutualisés, donc un
   seul maillage (un dessin) ; utilisé au-delà de 40 unités par les passants, les enfants et les personnages des
-  postes de travail (contexte `PersonDetail`) ;
+  postes de travail (contexte `PersonDetail`), et de près dans le jeu de stratégie (vu de haut) ;
 - **regroupement de la scène** (`staticBatch.js`) : les pièces fixes des objets posés, allées, bâtiments et
   cloisons d'un même carré de 20 unités qui partagent un matériau deviennent un seul maillage (les matériaux du
   kit, couleur reportée dans les sommets, se regroupent tous ensemble). Un objet déplacé ou modifié : son carré
