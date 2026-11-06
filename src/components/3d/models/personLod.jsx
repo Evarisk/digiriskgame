@@ -14,15 +14,18 @@ export const LOD_FAR = 40;
 export const LOD_NEAR = 34;
 const tmp = new THREE.Vector3();
 
-/** Vrai tant que l'objet `ref` est assez près de la caméra ; `onChange(proche)` au changement. */
-export function useDistanceLod(ref, onChange) {
+/**
+ * Vrai tant que l'objet `ref` est assez près de la caméra ; `onChange(proche)` au changement. `far` / `near` :
+ * seuils propres à une vue plus éloignée (vue plongeante du jeu de stratégie).
+ */
+export function useDistanceLod(ref, onChange, { far = LOD_FAR, near = LOD_NEAR } = {}) {
   const [close, setClose] = useState(true);
   const state = useRef(true);
   useFrame(({ camera }) => {
     const group = ref.current;
     if (!group) return;
     const d = camera.position.distanceTo(group.getWorldPosition(tmp));
-    const next = state.current ? d < LOD_FAR : d < LOD_NEAR;
+    const next = state.current ? d < far : d < near;
     if (next === state.current) return;
     state.current = next;
     onChange?.(next);
@@ -32,13 +35,16 @@ export function useDistanceLod(ref, onChange) {
 }
 
 /**
- * Personnage articulé de près (`limbs` reçoit ses membres animés), fusionné de loin. Isolé : la fusion de
- * l'élément qui le contient ne le touche pas, il refait la sienne à chaque changement de niveau de détail.
+ * Personnage articulé de près (`limbs` reçoit ses membres animés) ; de loin, version légère fusionnée en un seul
+ * maillage, gestes figés. `lite` : version légère même de près (vue de haut du jeu de stratégie, où le visage ne se
+ * voit pas). Isolé : la fusion de l'élément qui le contient ne le touche pas, il refait la sienne à chaque
+ * changement de niveau de détail.
  */
-export function LodPerson({ close, limbs, ...props }) {
+export function LodPerson({ close, limbs, lite = false, ...props }) {
+  const light = lite || !close;
   return (
-    <MergeStatic isolated key={close ? 'articule' : 'fusionne'} name={close ? 'personne:articulee' : 'personne:fusionnee'} deps={[props.outfit, props.pose, props.variant, close]}>
-      <Person {...props} limbs={close ? limbs : undefined} />
+    <MergeStatic isolated key={close ? 'articule' : 'fusionne'} name={close ? 'personne:articulee' : 'personne:fusionnee'} deps={[props.outfit, props.pose, props.variant, close, light]}>
+      <Person {...props} lite={light} limbs={close ? limbs : undefined} />
     </MergeStatic>
   );
 }

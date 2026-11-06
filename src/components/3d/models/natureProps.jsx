@@ -252,6 +252,10 @@ function Pigeon({ plumage, parts }) {
 }
 
 const _local = new THREE.Vector3();
+// Au-delà de PIGEON_FAR unités de la caméra, un pigeon ne fait qu'un ou deux pixels : la volée est masquée et
+// n'est plus simulée (réaffichée en deçà de PIGEON_NEAR)
+const PIGEON_FAR = 36;
+const PIGEON_NEAR = 32;
 
 /**
  * Groupe de pigeons sur la place (comportement : services/pigeonLogic.js) : au sol ils marchent par à-coups en
@@ -277,13 +281,27 @@ export function Pigeons({ count = 6, spread = 1.4, seed = 0 }) {
   const rootRef = useRef();
   const roots = useRef([]);
   const tick = useRef(0);
+  const far = useRef({ hidden: false, wait: 0 });
 
-  useFrame(({ clock }, delta) => {
+  useFrame(({ clock, camera }, delta) => {
     const dt = Math.min(delta, 0.05);
     const t = clock.getElapsedTime();
     tick.current += 1;
     const root0 = rootRef.current;
     if (!root0) return;
+    const lod = far.current;
+    if ((lod.wait -= delta) <= 0) {
+      lod.wait = 0.3;
+      const d = camera.position.distanceTo(root0.getWorldPosition(_local));
+      const hidden = lod.hidden ? d > PIGEON_NEAR : d > PIGEON_FAR;
+      if (hidden !== lod.hidden) {
+        lod.hidden = hidden;
+        root0.visible = !hidden;
+        // Masquée : positions non recalculées non plus
+        root0.matrixWorldAutoUpdate = !hidden;
+      }
+    }
+    if (lod.hidden) return;
     // Visiteur et passants dans le repère du groupe (rez-de-chaussée)
     let threat = null;
     if (visit.active && visit.level === 0) {

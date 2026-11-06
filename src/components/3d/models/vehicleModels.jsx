@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 /**
  * Véhicules de la ville d'après les modèles 3D du « Car Kit » de Kenney (licence CC0, public/models/vehicules/,
@@ -152,8 +153,46 @@ function paintedMaterial(model, name, color) {
   return paints.get(key);
 }
 
-/** Instance d'un modèle aux proportions réelles, repeinte ; roues mises à part (rondes, qui tournent). */
-function useVehicle(name, color) {
+/**
+ * Pièces d'un modèle réunies en un maillage (même matériau pour tout le modèle) : un dessin par image au lieu
+ * d'une dizaine. `keep` : pièces laissées à part (roues qui tournent).
+ */
+function mergeParts(root, material, keep) {
+  root.updateMatrixWorld(true);
+  const inverse = new THREE.Matrix4().copy(root.matrixWorld).invert();
+  const kept = (o) => {
+    for (let n = o; n && n !== root; n = n.parent) if (keep.has(n)) return true;
+    return false;
+  };
+  const parts = [];
+  root.traverse((o) => {
+    if (o.isMesh && !kept(o)) parts.push(o);
+  });
+  if (parts.length < 2) return null;
+  const geos = parts.map((o) => {
+    const g = (o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone()).applyMatrix4(new THREE.Matrix4().multiplyMatrices(inverse, o.matrixWorld));
+    Object.keys(g.attributes).forEach((key) => {
+      if (!['position', 'normal', 'uv'].includes(key)) g.deleteAttribute(key);
+    });
+    return g;
+  });
+  const geometry = mergeGeometries(geos, false);
+  geos.forEach((g) => g.dispose());
+  if (!geometry) return null;
+  parts.forEach((o) => o.parent.remove(o));
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  mesh.raycast = () => {};
+  root.add(mesh);
+  return geometry;
+}
+
+/**
+ * Instance d'un modèle aux proportions réelles, repeinte ; roues mises à part (rondes, qui tournent) quand le
+ * véhicule roule (`moving`), fusionnées avec la caisse pour un véhicule garé.
+ */
+function useVehicle(name, color, moving) {
   const [model, setModel] = useState(null);
   useEffect(() => {
     let alive = true;
@@ -162,7 +201,7 @@ function useVehicle(name, color) {
       alive = false;
     };
   }, [name]);
-  return useMemo(() => {
+  const vehicle = useMemo(() => {
     if (!model) return null;
     const spec = MODELS[name];
     const root = model.root.clone(true);
@@ -196,13 +235,16 @@ function useVehicle(name, color) {
         o.raycast = () => {};
       }
     });
-    return { root, wheels, radius: spec.wheel };
-  }, [model, name, color]);
+    const merged = mergeParts(root, material, new Set(moving ? wheels : []));
+    return { root, wheels, radius: spec.wheel, merged };
+  }, [model, name, color, moving]);
+  useEffect(() => () => vehicle?.merged?.dispose(), [vehicle]);
+  return vehicle;
 }
 
 /** Véhicule GLB (avant vers +X), `odometer` : objet { d } (distance parcourue) qui fait tourner les roues. */
 function VehicleModel({ name, color, odometer, ...rest }) {
-  const vehicle = useVehicle(name, color);
+  const vehicle = useVehicle(name, color, Boolean(odometer));
   const last = useRef(0);
   useFrame(() => {
     if (!vehicle || !odometer) return;

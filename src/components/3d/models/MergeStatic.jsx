@@ -1,7 +1,8 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { noRaycast } from './kit';
+import { StaticBatchContext, batchable, bakedMaterial, bakedSignature, surfaceOf, kitBakeable } from './staticBatch';
 
 /**
  * Optimisation des draw calls : après le montage, fusionne tous les maillages statiques
@@ -21,39 +22,12 @@ import { noRaycast } from './kit';
  */
 
 const SHADOW_TRIM = 0.06;
+const SKIP = () => {};
 
 const KEPT_ATTRIBUTES = ['position', 'normal', 'uv'];
 
-/** Signature d'un matériau mutualisé, hors valeurs reportées dans les sommets. */
-function bakedSignature(m) {
-  return [m.type, m.map?.uuid, m.opacity, m.transparent, m.depthWrite, m.side, m.flatShading].join('|');
-}
-
-/** Valeurs de surface d'un matériau mutualisé, reportées dans les sommets (espace linéaire). */
-function surfaceOf(m) {
-  const glow = m.emissive ? m.emissive.clone().multiplyScalar(m.emissiveIntensity) : new THREE.Color(0, 0, 0);
-  return { color: m.color, metalness: m.metalness, roughness: m.roughness, glow };
-}
-
-/** Matériau des pièces fusionnées : couleur, rugosité, aspect métallique et lueur lus par sommet. */
-function bakedMaterial(source) {
-  const material = source.clone();
-  material.vertexColors = true;
-  material.color.set('#ffffff');
-  material.emissive?.set('#000000');
-  material.onBeforeCompile = (shader) => {
-    shader.vertexShader = shader.vertexShader
-      .replace('#include <common>', '#include <common>\nattribute vec2 surface;\nattribute vec3 glow;\nvarying vec2 vSurface;\nvarying vec3 vGlow;')
-      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvSurface = surface;\nvGlow = glow;');
-    shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', '#include <common>\nvarying vec2 vSurface;\nvarying vec3 vGlow;')
-      .replace('#include <roughnessmap_fragment>', 'float roughnessFactor = vSurface.y;')
-      .replace('#include <metalnessmap_fragment>', 'float metalnessFactor = vSurface.x;')
-      .replace('vec3 totalEmissiveRadiance = emissive;', 'vec3 totalEmissiveRadiance = vGlow;');
-  };
-  material.customProgramCacheKey = () => 'merge-static-baked-surface';
-  return material;
-}
+// Signature, valeurs de surface et matériau des pièces à surface reportée : voir staticBatch.js (communs au
+// regroupement de la scène)
 
 /** Attribut constant (même valeur pour tous les sommets). */
 function constantAttribute(count, values) {
@@ -104,9 +78,14 @@ function useHmrVersion() {
   return version;
 }
 
-export default function MergeStatic({ children, deps = [], name, isolated = false }) {
+/**
+ * `batch` : les pièces fusionnées fixes (hors parties animées) rejoignent le regroupement de la scène
+ * (StaticBatchContext, voir staticBatch.js) quand il existe.
+ */
+export default function MergeStatic({ children, deps = [], name, isolated = false, batch = false }) {
   const rootRef = useRef();
   const hmrVersion = useHmrVersion();
+  const batcher = useContext(StaticBatchContext);
 
   useLayoutEffect(() => {
     const root = rootRef.current;
@@ -167,6 +146,7 @@ export default function MergeStatic({ children, deps = [], name, isolated = fals
       mesh.raycast = noRaycast;
       mesh.userData.noCollide = noCollide; // volumes sans collision du mode visite (voir collisionWorld)
       mesh.userData.dynamic = true; // ne jamais re-fusionner le résultat
+      mesh.userData.mergedOwner = true; // géométrie propre à cette fusion
       merged.push(mesh);
       scope.add(mesh);
       hidden.push(...parts);
@@ -191,7 +171,76 @@ export default function MergeStatic({ children, deps = [], name, isolated = fals
       }
     });
 
+    // Pièces fixes (portée : la racine) confiées au regroupement de la scène : les pièces fusionnées, et les pièces
+    // restées seules à matériau du kit (jamais modifié) — surveillées, car leur composant peut les déplacer
+    let token = null;
+    if (batch && batcher) {
+      const shown = (obj) => {
+        for (let node = obj; node && node !== root; node = node.parent) if (!node.visible) return false;
+        return true;
+      };
+      const singles = [];
+      buckets.forEach(({ scope, parts }) => {
+        if (parts.length === 1 && scope === root && kitBakeable(parts[0].material) && shown(parts[0]) && batchable(parts[0])) singles.push(parts[0]);
+      });
+      token = batcher.register(root, merged.filter((mesh) => mesh.parent === root && batchable(mesh)), singles);
+    }
+    // Positions figées des parties inertes : groupes qui ne contiennent plus que des pièces masquées par la fusion
+    // — three.js ne les recalcule plus à chaque image (des milliers de groupes dans une ville). Objet confié au
+    // regroupement : ses pièces fusionnées aussi (le regroupement les recalcule si l'objet est déplacé). Restent
+    // vivants : parties animées, sous-arbres isolés, pièces restées visibles (leur composant peut les animer sans
+    // marque), lumières, lignes, et leurs parents.
+    const frozen = [];
+    const live = new Set();
+    const keepUp = (node) => {
+      for (let n = node; n && n !== root && !live.has(n); n = n.parent) live.add(n);
+    };
+    root.traverse((obj) => {
+      if (obj === root || live.has(obj)) return;
+      if ((obj.userData?.dynamic && !obj.userData?.mergedOwner) || obj.userData?.noMerge) {
+        keepUp(obj);
+        obj.traverse((child) => live.add(child));
+      } else if (obj.userData?.mergedOwner) {
+        if (!token) keepUp(obj);
+      } else if ((obj.isMesh && obj.visible) || obj.isLight || obj.isLine || obj.isPoints || obj.isSprite) {
+        keepUp(obj);
+      }
+    });
+    // Groupes inertes masqués aussi : le parcours de chaque image (rendu, carte d'ombre) s'y arrête. three.js
+    // parcourt pourtant tous les descendants pour les matrices, même figés : la mise à jour des groupes inertes et
+    // des pièces masquées devient sans effet (SKIP), leur sous-arbre n'est plus visité.
+    const veiled = [];
+    const skipped = [];
+    root.traverse((obj) => {
+      if (obj === root || live.has(obj)) return;
+      if (obj.matrixWorldAutoUpdate) {
+        obj.matrixAutoUpdate = false;
+        obj.matrixWorldAutoUpdate = false;
+        frozen.push(obj);
+      }
+      if (obj.userData?.mergedOwner) return; // pièces fusionnées : recalculées si l'objet est déplacé
+      if (!Object.prototype.hasOwnProperty.call(obj, 'updateMatrixWorld')) {
+        obj.updateMatrixWorld = SKIP;
+        skipped.push(obj);
+      }
+      if (!obj.isMesh && obj.visible && (live.has(obj.parent) || obj.parent === root)) {
+        obj.visible = false;
+        veiled.push(obj);
+      }
+    });
+
     return () => {
+      batcher?.unregister(token);
+      frozen.forEach((obj) => {
+        obj.matrixAutoUpdate = true;
+        obj.matrixWorldAutoUpdate = true;
+      });
+      veiled.forEach((obj) => {
+        obj.visible = true;
+      });
+      skipped.forEach((obj) => {
+        delete obj.updateMatrixWorld;
+      });
       trimmed.forEach((obj) => {
         obj.castShadow = true;
       });
@@ -207,7 +256,7 @@ export default function MergeStatic({ children, deps = [], name, isolated = fals
       });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [...deps, hmrVersion]);
+  }, [...deps, hmrVersion, batch, batcher]);
 
   return (
     <group ref={rootRef} name={name} userData={isolated ? { noMerge: true } : undefined}>

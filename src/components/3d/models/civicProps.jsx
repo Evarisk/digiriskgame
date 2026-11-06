@@ -441,7 +441,16 @@ function WavingFlag({ map, width = 1.2, height = 0.8, seed = 0 }) {
   useEffect(() => () => geometry.dispose(), [geometry]);
   const material = useMemo(() => new THREE.MeshStandardMaterial({ map, roughness: 0.85, metalness: 0, side: THREE.DoubleSide }), [map]);
   useEffect(() => () => material.dispose(), [material]);
-  useFrame(({ clock }) => {
+  // De loin (au-delà de FLAG_FAR unités), l'ondulation ne se voit plus : toile figée, ni calcul ni envoi à la carte
+  const meshRef = useRef();
+  const lod = useRef({ near: true, wait: seed * 0.1 });
+  useFrame(({ clock, camera }, delta) => {
+    const s = lod.current;
+    if ((s.wait -= delta) <= 0 && meshRef.current) {
+      s.wait = 0.3;
+      s.near = camera.position.distanceTo(meshRef.current.getWorldPosition(flagPoint)) < FLAG_FAR;
+    }
+    if (!s.near) return;
     const t = clock.getElapsedTime() + seed * 4;
     const pos = geometry.attributes.position;
     const rest = geometry.userData.rest;
@@ -455,8 +464,10 @@ function WavingFlag({ map, width = 1.2, height = 0.8, seed = 0 }) {
     pos.needsUpdate = true;
     geometry.computeVertexNormals();
   });
-  return <mesh geometry={geometry} material={material} castShadow userData={DYNAMIC} raycast={noRaycast} />;
+  return <mesh ref={meshRef} geometry={geometry} material={material} castShadow userData={DYNAMIC} raycast={noRaycast} />;
 }
+const FLAG_FAR = 45;
+const flagPoint = new THREE.Vector3();
 
 export function Flagpole({ flag = 'fr' }) {
   return (

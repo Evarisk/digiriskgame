@@ -79,13 +79,13 @@ function rng(seed) {
 /* Géométries du corps                                                  */
 /* ------------------------------------------------------------------ */
 
-const SEGMENTS = 28;
+const SEGMENTS_FULL = 28;
 
 /**
  * Surface lissée passant par des sections superelliptiques [y, demi-largeur, demi-profondeur, décalage avant],
  * couture au dos ; coordonnées de texture : u autour (0,5 devant), v de bas en haut.
  */
-function loftGeometry(rings, { capBottom = false, capTop = false } = {}) {
+function loftGeometry(rings, { capBottom = false, capTop = false, segments: SEGMENTS = SEGMENTS_FULL } = {}) {
   const pos = [];
   const uv = [];
   const index = [];
@@ -987,10 +987,145 @@ function Hand({ side, color, palmDown, scale = 1 }) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Version légère (de loin)                                              */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Personnage vu de loin (quelques dizaines de pixels de haut) : même squelette, mêmes couleurs de tenue, de peau
+ * et de cheveux, mêmes poses, mais moins de 1 000 triangles (au lieu de ≈ 12 700) et uniquement des matériaux
+ * mutualisés sans texture — MergeStatic le réduit à un seul maillage (un dessin par image, un dans la carte
+ * d'ombre). Membres articulés conservés : `limbs` reste utilisable (jeu de stratégie, vu de haut).
+ */
+export const PersonDetail = React.createContext(false);
+
+const LITE_SEGMENTS = 9;
+const LITE_BOX = new THREE.BoxGeometry(1, 1, 1);
+const LITE_SPHERE = new THREE.SphereGeometry(0.5, 10, 7);
+const LITE_BALL = new THREE.SphereGeometry(0.5, 7, 5);
+const LITE_DOME = new THREE.SphereGeometry(0.5, 10, 4, 0, Math.PI * 2, 0, Math.PI / 2);
+const LITE_NECK = new THREE.CylinderGeometry(0.026, 0.026, 0.08, 6, 1, true);
+const liteLimb = (profile, k = 1) => new THREE.LatheGeometry([0, 2, 3, 5, 6].map((i) => new THREE.Vector2(profile[i][0] * k, profile[i][1])), 6, Math.PI);
+const liteCache = new Map();
+function liteGeometry(sex, part) {
+  const key = `${sex}|${part}`;
+  if (!liteCache.has(key)) {
+    const b = BODIES[sex];
+    const pick = (rings, idx) => idx.map((i) => rings[Math.min(i, rings.length - 1)]);
+    const vest = vestRings(b.top);
+    const make = {
+      seat: () => loftGeometry(pick(b.seat, [0, 2, 4, 6]), { capBottom: true, segments: LITE_SEGMENTS }),
+      top: () => loftGeometry(pick(b.top, [0, 2, 4, 5, 7, 9]), { capTop: true, segments: LITE_SEGMENTS }),
+      vest: () => loftGeometry(pick(vest, [0, Math.floor(vest.length / 2), vest.length - 1]), { segments: LITE_SEGMENTS }),
+      upper: () => liteLimb(UPPER_ARM, b.limbs),
+      fore: () => liteLimb(FOREARM, b.limbs),
+      thigh: () => liteLimb(THIGH, b.limbs),
+      shin: () => liteLimb(SHIN, b.limbs),
+    }[part];
+    liteCache.set(key, make());
+  }
+  return liteCache.get(key);
+}
+
+function PersonLite({ outfit, pose, variant, colors, limbs, rest }) {
+  const lookIndex = ((variant % LOOKS.length) + LOOKS.length) % LOOKS.length;
+  const look = LOOKS[lookIndex];
+  const tint = colors?.top ? {} : outfit === 'office' ? { top: SHIRTS[lookIndex], pants: TROUSERS[lookIndex] } : outfit === 'officeAlt' ? { top: JACKETS[lookIndex], pants: JACKETS[lookIndex] } : {};
+  const o = { ...(OUTFITS[outfit] || OUTFITS.worker), ...tint, ...colors };
+  const sex = look.female ? 'female' : 'male';
+  const body = BODIES[sex];
+  const skin = SKINS[look.skin];
+  const hair = HAIRS[look.color];
+  const seated = pose === 'sit' || pose === 'type' || pose === 'meet';
+  const [shoulder, elbow] = armAngles(pose);
+  const hipY = seated ? 0.33 : 0.56;
+  const neckY = hipY + 0.44;
+  const headwear = o.helmet || o.hood;
+  const setLimb = (key) => (el) => {
+    if (limbs && el) limbs[key] = el;
+  };
+  const limbData = limbs ? DYNAMIC : undefined;
+  const piece = (geometry, color, props = {}, roughness = 0.85) => (
+    <mesh geometry={geometry} material={getMaterial({ color, roughness, metalness: 0 })} castShadow receiveShadow raycast={noRaycast} {...props} />
+  );
+  const leg = (side, key) => (
+    <group ref={setLimb(key)} userData={limbData} position={[side * 0.062, hipY, 0]} rotation={[seated ? -Math.PI / 2 : 0, 0, 0]}>
+      {piece(liteGeometry(sex, 'thigh'), o.pants)}
+      <group ref={setLimb(key === 'leftLeg' ? 'leftShin' : 'rightShin')} userData={limbData} position={[0, -0.27, 0]} rotation={[seated ? Math.PI / 2 : 0, 0, 0]}>
+        {piece(liteGeometry(sex, 'shin'), o.pants)}
+        {piece(LITE_BOX, o.shoes, { position: [0, -0.255, 0.035], scale: [0.084, 0.06, 0.18] }, 0.5)}
+      </group>
+    </group>
+  );
+  const arm = (side, key) => (
+    <group ref={setLimb(key)} userData={limbData} position={[side * body.armX, hipY + 0.39, 0]} rotation={[shoulder, 0, side * 0.05]}>
+      {piece(liteGeometry(sex, 'upper'), o.top)}
+      <group ref={setLimb(`${key}Fore`)} userData={limbData} position={[0, -0.22, 0]} rotation={[elbow, 0, 0]}>
+        {piece(liteGeometry(sex, 'fore'), o.top)}
+        {piece(LITE_BOX, o.gloves || skin, { position: [0, -0.235, 0], scale: [0.03 * body.limbs, 0.07 * body.limbs, 0.05 * body.limbs] }, 0.6)}
+      </group>
+    </group>
+  );
+  return (
+    <group {...rest}>
+      {leg(-1, 'leftLeg')}
+      {leg(1, 'rightLeg')}
+      {piece(liteGeometry(sex, 'seat'), o.pants, { position: [0, hipY, 0] })}
+      {piece(liteGeometry(sex, 'top'), o.top, { position: [0, hipY, 0] })}
+      {o.vest && piece(liteGeometry(sex, 'vest'), o.vest, { position: [0, hipY, 0] }, 0.6)}
+      {arm(-1, 'leftArm')}
+      {arm(1, 'rightArm')}
+      {piece(LITE_NECK, skin, { position: [0, neckY + 0.005, 0] }, 0.62)}
+      <group ref={setLimb('head')} userData={limbData} position={[0, neckY, 0]}>
+        <group scale={HEAD_GROUP}>
+          {piece(LITE_SPHERE, skin, { position: [0, HEAD_CENTER, 0], scale: HEAD_SCALE }, 0.62)}
+          {!headwear && (
+            <>
+              {/* Chevelure : calotte inclinée vers l'arrière (front dégagé), longueurs selon la coupe */}
+              {piece(LITE_DOME, o.cap || hair, { position: [0, HEAD_CENTER + 0.004, -0.008], rotation: [-0.42, 0, 0], scale: [0.165, 0.2, 0.18] }, 0.8)}
+              {!o.cap && look.hair === 'long' && piece(LITE_BALL, hair, { position: [0, -0.02, -0.058], scale: [0.15, 0.22, 0.07] }, 0.8)}
+              {!o.cap && look.hair === 'bob' && piece(LITE_BALL, hair, { position: [0, 0.07, -0.02], scale: [0.17, 0.13, 0.16] }, 0.8)}
+              {!o.cap && look.hair === 'bun' && piece(LITE_BALL, hair, { position: [0, 0.168, -0.072], scale: [0.07, 0.07, 0.07] }, 0.8)}
+              {!o.cap && look.hair === 'ponytail' && piece(LITE_BALL, hair, { position: [0, 0.07, -0.1], scale: [0.044, 0.13, 0.044], rotation: [0.35, 0, 0] }, 0.8)}
+            </>
+          )}
+          {o.helmet && piece(LITE_DOME, o.helmet, { position: [0, 0.125, 0], scale: [0.2, 0.17, 0.21] }, 0.35)}
+          {o.hood && piece(LITE_BALL, o.hood, { position: [0, 0.1, -0.005], scale: [0.19, 0.22, 0.2] }, 0.9)}
+          {o.mask === 'welding' && piece(LITE_BOX, '#1f2937', { position: [0, 0.09, 0.075], scale: [0.17, 0.19, 0.05] }, 0.5)}
+          {o.mask === 'respirator' && piece(LITE_BOX, '#4b5563', { position: [0, 0.065, 0.082], scale: [0.08, 0.06, 0.04] }, 0.6)}
+        </group>
+      </group>
+      {pose === 'carry' &&
+        (outfit === 'gardener' ? (
+          <group position={[0, 0, 0.87]}>
+            <group position={[0, 0.13, 0.36]} rotation={[0.18, 0, 0]}>
+              <group position={[0, -0.13, -0.36]}>
+                <Wheelbarrow />
+              </group>
+            </group>
+          </group>
+        ) : (
+          <Box position={[0, hipY + 0.26, 0.24]} size={[0.26, 0.2, 0.2]} color={PALETTE.carton} rough={0.85} />
+        ))}
+    </group>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* Personnage                                                           */
 /* ------------------------------------------------------------------ */
 
-export function Person({ outfit = 'worker', pose = 'stand', variant = 0, colors, limbs, ...rest }) {
+/**
+ * `lite` : version légère (de loin). Sans `lite`, le contexte `PersonDetail` décide (un élément éloigné y passe
+ * ses personnages, voir ElementModel).
+ */
+export function Person({ lite, ...props }) {
+  const far = React.useContext(PersonDetail);
+  const { outfit = 'worker', pose = 'stand', variant = 0, colors, limbs, ...rest } = props;
+  if (lite ?? far) return <PersonLite outfit={outfit} pose={pose} variant={variant} colors={colors} limbs={limbs} rest={rest} />;
+  return <PersonFull {...props} />;
+}
+
+function PersonFull({ outfit = 'worker', pose = 'stand', variant = 0, colors, limbs, ...rest }) {
   const lookIndex = ((variant % LOOKS.length) + LOOKS.length) % LOOKS.length;
   const look = LOOKS[lookIndex];
   const base = OUTFITS[outfit] || OUTFITS.worker;
