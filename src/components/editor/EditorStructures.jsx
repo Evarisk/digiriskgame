@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { useFrame } from '@react-three/fiber';
 import { Html, Line } from '@react-three/drei';
 import { getMaterial, Cylinder, WalkwayStrip } from '../3d/models/kit';
 import { getTexture } from '../3d/models/textures';
@@ -229,12 +230,40 @@ export function Outline({ points, y, color, closed = true, width = 2.5 }) {
 }
 
 /** Étiquette HTML : taille fixe pour les bâtiments et les cotes, décroissante avec la distance sinon. */
+// Distance (unités) au-delà de laquelle une étiquette de personnage ou d'objet, rapetissée avec l'éloignement, n'est
+// plus lisible (texte sous 7 px) : elle est retirée de la page. Chaque étiquette affichée est un élément de page
+// repositionné à chaque image quand la caméra bouge — par dizaines, c'était la cause des à-coups.
+const LABEL_FAR = { npc: 52, element: 40 };
+const labelPoint = new THREE.Vector3();
+
 export function Label({ position, children, tone = 'building' }) {
   const distanceFactor = { npc: 26, element: 20 }[tone];
+  const far = LABEL_FAR[tone];
+  const ref = useRef();
+  // Vérification quelques fois par seconde, décalée d'une étiquette à l'autre, avec hystérésis
+  const lod = useRef({ near: false, wait: Math.random() * 0.25 });
+  const [near, setNear] = useState(false);
+  useFrame(({ camera }, delta) => {
+    const group = ref.current;
+    if (!far || !group) return;
+    const s = lod.current;
+    if ((s.wait -= delta) > 0) return;
+    s.wait = 0.25;
+    const d = camera.position.distanceTo(group.getWorldPosition(labelPoint));
+    const next = s.near ? d < far + 4 : d < far;
+    if (next !== s.near) {
+      s.near = next;
+      setNear(next);
+    }
+  });
   return (
-    <Html position={position} center distanceFactor={distanceFactor} zIndexRange={[20, 0]} style={{ pointerEvents: 'none' }}>
-      <div className={`editor-label ${tone}`}>{children}</div>
-    </Html>
+    <group ref={ref} position={position}>
+      {(!far || near) && (
+        <Html center distanceFactor={distanceFactor} zIndexRange={[20, 0]} style={{ pointerEvents: 'none' }}>
+          <div className={`editor-label ${tone}`}>{children}</div>
+        </Html>
+      )}
+    </group>
   );
 }
 
@@ -302,7 +331,7 @@ export function CustomBuilding({ building, bind, highlight, showRoof, lowWalls, 
   // bâtiment sinon) ; les originaux masqués restent cliquables pour la sélection
   return (
     <group>
-      <MergeStatic name="structure:batiment" deps={[JSON.stringify(building), cut, showRoof, cutLevel, openings, windows]}>
+      <MergeStatic name="structure:batiment" batch deps={[JSON.stringify(building), cut, showRoof, cutLevel, openings, windows]}>
         <mesh geometry={slab} material={floorMaterial} receiveShadow {...bind} />
         {floors.map((band) => (
           <StoreyFloor key={band.k} polygon={polygon} holes={holes[band.k] || null} y={band.y0} material={floorMaterial} bind={bind} />
@@ -355,7 +384,7 @@ export function InteriorWall({ wall, y0, base = 0, maxHeight = Infinity, cut = I
   const shown = Math.max(0, Math.min(y0 + height, cut) - y0);
   return (
     <group>
-      <MergeStatic name="structure:cloison" deps={[JSON.stringify(wall), y0, base, maxHeight, cut]}>
+      <MergeStatic name="structure:cloison" batch deps={[JSON.stringify(wall), y0, base, maxHeight, cut]}>
         <WallRun
           a={wall.a}
           b={wall.b}
@@ -435,7 +464,10 @@ export function Walkway({ walkway, y, bind, highlight }) {
   const length = segmentLength(walkway.a, walkway.b);
   return (
     <group>
-      <WalkwayStrip from={walkway.a} to={walkway.b} y={y + 0.006} width={walkway.width} zebra={walkway.zebra} />
+      {/* Bandes du passage piéton fusionnées et regroupées avec le reste de la scène */}
+      <MergeStatic name="structure:allee" batch deps={[walkway.a[0], walkway.a[1], walkway.b[0], walkway.b[1], walkway.width, walkway.zebra, y]}>
+        <WalkwayStrip from={walkway.a} to={walkway.b} y={y + 0.006} width={walkway.width} zebra={walkway.zebra} />
+      </MergeStatic>
       <Along a={walkway.a} b={walkway.b}>
         {/* Volume de sélection invisible (le raycasting ignore la visibilité) */}
         <mesh geometry={UNIT_BOX} visible={false} position={[length / 2, y + 0.03, 0]} scale={[length, 0.06, walkway.width]} {...bind} />

@@ -82,6 +82,8 @@ function seedOf(id = '') {
 }
 import { StationModel, CriticalBeacon } from '../3d/WorkstationProps';
 import MergeStatic from '../3d/models/MergeStatic';
+import { useDistanceLod } from '../3d/models/personLod';
+import { PersonDetail } from '../3d/models/people';
 import { ELEMENT_KINDS, RISK_LEVELS, defaultParams } from '../../services/editorCatalog';
 import { TRUCK } from '../../services/siteLayout';
 
@@ -346,6 +348,17 @@ function Model({ kind, color, params, level, guard, seed, label }) {
   }
 }
 
+/** Niveau de détail des personnages d'un élément : `render(loin)`, personnages légers de loin (PersonDetail). */
+function PeopleLod({ children: render }) {
+  const ref = React.useRef();
+  const close = useDistanceLod(ref);
+  return (
+    <group ref={ref}>
+      <PersonDetail.Provider value={!close}>{render(!close)}</PersonDetail.Provider>
+    </group>
+  );
+}
+
 /** `upperHidden` : le niveau supérieur n'est pas affiché (garde-corps de trémie d'un escalier masqué). */
 export default function ElementModel({ element, upperHidden = false }) {
   const def = ELEMENT_KINDS[element.kind];
@@ -355,11 +368,17 @@ export default function ElementModel({ element, upperHidden = false }) {
   const level = element.level || 0;
   const guard = !upperHidden;
   const seed = seedOf(element.id);
+  // `batch` : pièces fixes confiées au regroupement de la scène (les postes, qui changent de niveau de détail en
+  // suivant la caméra, gardent les leurs)
+  const body = (far, batch = false) => (
+    <MergeStatic name={`element:${element.kind}`} batch={batch} deps={[element.kind, color, JSON.stringify(params), level, guard, seed, element.label, far]}>
+      <Model kind={element.kind} color={color} params={params} level={level} guard={guard} seed={seed} label={element.label} />
+    </MergeStatic>
+  );
   return (
     <>
-      <MergeStatic name={`element:${element.kind}`} deps={[element.kind, color, JSON.stringify(params), level, guard, seed, element.label]}>
-        <Model kind={element.kind} color={color} params={params} level={level} guard={guard} seed={seed} label={element.label} />
-      </MergeStatic>
+      {/* Postes de travail : leurs personnages passent en version légère quand le poste est loin de la caméra */}
+      {def?.archetype ? <PeopleLod>{body}</PeopleLod> : body(false, true)}
       {/* Gyrophare à l'angle du poste, ou de la zone d'unité de travail (taille réglable) */}
       {element.risk === 'crit' && <CriticalBeacon position={def?.archetype ? [2.15, 0, -1.75] : [params.width / 2 - 0.25, 0, -params.depth / 2 + 0.25]} />}
     </>

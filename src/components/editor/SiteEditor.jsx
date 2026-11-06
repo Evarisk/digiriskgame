@@ -20,7 +20,9 @@ import {
   Landmark,
   Building2,
   Aperture,
+  Gauge,
 } from 'lucide-react';
+import { QUALITY_LEVELS, QUALITY_ORDER, guessQuality, loadQualityMode, saveQualityMode, lowerQuality } from '../3d/quality';
 import EditorCanvas from './EditorCanvas';
 import { walkControl, TOUCH_WALK } from './EditorWalk';
 import TouchControls from './TouchControls';
@@ -141,6 +143,22 @@ export default function SiteEditor() {
   const [walking, setWalking] = useState(false);
   const [walkLocked, setWalkLocked] = useState(false);
   const fileInput = useRef(null);
+  // Qualité du rendu : automatique (estimée d'après la machine, abaissée si l'image reste lente) ou choisie
+  const [qualityMode, setQualityMode] = useState(loadQualityMode);
+  const [autoQuality, setAutoQuality] = useState(guessQuality);
+  const quality = qualityMode === 'auto' ? autoQuality : qualityMode;
+  const autoRef = useRef(autoQuality);
+  autoRef.current = autoQuality;
+  const onSlow = useCallback(() => {
+    const next = lowerQuality(autoRef.current);
+    if (!next) return;
+    setAutoQuality(next);
+    setNotice({ tone: 'warning', text: `Affichage lent : qualité abaissée à « ${QUALITY_LEVELS[next].label} » pour la fluidité (réglable dans la barre d’outils).` });
+  }, []);
+  const chooseQuality = (mode) => {
+    setQualityMode(mode);
+    saveQualityMode(mode);
+  };
 
   const selected = findItem(scene, selection);
   // Sélection disparue (annulation, suppression) : on la retire
@@ -544,6 +562,17 @@ export default function SiteEditor() {
             <button type="button" className={`icon ${view.lowWalls ? 'on' : ''}`} onClick={() => toggle('lowWalls')} title="Murs arasés (vue de dessus)">
               <Layers size={15} />
             </button>
+            <label className="editor-snap editor-quality" title="Qualité de l’affichage : automatique (selon la machine et la fluidité), ou fixée">
+              <Gauge size={14} />
+              <select value={qualityMode} onChange={(e) => chooseQuality(e.target.value)} aria-label="Qualité de l’affichage">
+                <option value="auto">Auto ({QUALITY_LEVELS[autoQuality].label.toLowerCase()})</option>
+                {QUALITY_ORDER.map((level) => (
+                  <option key={level} value={level}>
+                    {QUALITY_LEVELS[level].label}
+                  </option>
+                ))}
+              </select>
+            </label>
             <button type="button" className={`icon ${view.fx ? 'on' : ''}`} onClick={() => toggle('fx')} title="Rendu réaliste : ombres de contact, halo des lumières (plus gourmand)">
               <Aperture size={15} />
             </button>
@@ -579,6 +608,8 @@ export default function SiteEditor() {
           onPreview={preview}
           onCheckpoint={checkpoint}
           onToolAction={onToolAction}
+          quality={quality}
+          onSlow={qualityMode === 'auto' ? onSlow : null}
         />
 
         {!walking && (

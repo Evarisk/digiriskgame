@@ -288,7 +288,13 @@ function resetForWalk(limbs, body) {
   if (body) body.rotation.x = 0;
 }
 
-export default function EditorNpc({ npc, animate, groundAt, bind, highlight, showLabel, showRoute, phase = 0 }) {
+/**
+ * Mémoïsé : le survol d'un objet à la souris redessine la scène de l'éditeur, mais plus les dizaines de
+ * personnages (props stables : personnage, sol du niveau, gestionnaires mis en cache).
+ */
+export default React.memo(EditorNpc);
+
+function EditorNpc({ npc, animate, groundAt, bind, highlight, showLabel, showRoute, phase = 0 }) {
   const groupRef = useRef();
   const bodyRef = useRef();
   const limbs = useRef({}).current;
@@ -308,14 +314,13 @@ export default function EditorNpc({ npc, animate, groundAt, bind, highlight, sho
     const group = groupRef.current;
     if (!group) return;
     const body = bodyRef.current;
-    if (animate) {
-      const d = camera.position.distanceTo(group.getWorldPosition(worldPos));
-      const isNear = nearRef.current ? d < LOD_FAR : d < LOD_NEAR;
-      if (isNear !== nearRef.current) {
-        nearRef.current = isNear;
-        if (!isNear) forgetLimbs(limbs);
-        setNear(isNear);
-      }
+    // Distance suivie même sans animation : de loin, version légère du personnage
+    const d = camera.position.distanceTo(group.getWorldPosition(worldPos));
+    const isNear = nearRef.current ? d < LOD_FAR : d < LOD_NEAR;
+    if (isNear !== nearRef.current) {
+      nearRef.current = isNear;
+      if (!isNear) forgetLimbs(limbs);
+      setNear(isNear);
     }
     if (!walking) {
       const [x, z] = npc.position;
@@ -415,9 +420,10 @@ export default function EditorNpc({ npc, animate, groundAt, bind, highlight, sho
     <>
       <group ref={groupRef}>
         <group ref={bodyRef}>
-          {/* Animé (marche ou travail) : bras, avant-bras, jambes et tête restent mobiles ; sinon tout est fusionné */}
-          <MergeStatic key={animated ? 'anim' : 'still'} name={animated ? 'npc:anime' : 'npc:fixe'} deps={[npc.outfit, npc.variant, pose, animated]}>
-            <Person outfit={npc.outfit} pose={pose} variant={npc.variant} limbs={animated ? limbs : undefined} />
+          {/* Animé (marche ou travail) : bras, avant-bras, jambes et tête restent mobiles ; sinon tout est fusionné.
+              De loin : version légère, un seul maillage */}
+          <MergeStatic key={animated ? 'anim' : near ? 'still' : 'far'} name={animated ? 'npc:anime' : near ? 'npc:fixe' : 'npc:loin'} deps={[npc.outfit, npc.variant, pose, animated, near]}>
+            <Person outfit={npc.outfit} pose={pose} variant={npc.variant} lite={!near} limbs={animated ? limbs : undefined} />
           </MergeStatic>
         </group>
         <mesh geometry={PICK_GEOMETRY} position={[0, 0.62, 0]} visible={false} {...bind} />
