@@ -8,6 +8,10 @@
   RewriteRule ^edit/?$ dist/index.html [L]
   RewriteRule ^edit/(.+)$ dist/$1 [L,QSA]
 
+  # Cité Prévention, jeu de stratégie : même application, page /aoe
+  RewriteRule ^aoe/?$ dist/index.html [L]
+  RewriteRule ^aoe/(.+)$ dist/$1 [L,QSA]
+
   # Redirige tous les appels (assets JS/CSS, images, api-proxy.php) vers dist/
   RewriteCond $1 !^dist/
   RewriteRule ^(.*)$ dist/$1 [L,QSA]
