@@ -4,12 +4,15 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { CollisionWorld } from './collisionWorld';
 import { explorerStore, useExplorer } from './explorerStore';
 import { equipmentStore, findAimedEquipment } from '../equipment/equipment';
+import { touchInput, resetTouchInput, consumeTouchLook } from '../../../services/touchControls';
 import InspectorTablet from './InspectorTablet';
 
 /**
  * Mode visite en première personne : un préventeur parcourt le site à hauteur d'homme.
  * Souris capturée (Pointer Lock) pour regarder, ZQSD / WASD / flèches pour marcher, Maj pour courir,
  * Espace pour sauter, E ou clic pour inspecter l'élément visé (UT, groupement, entité mère).
+ * Commandes tactiles (téléphone, tablette, Samsung DeX, ou au choix) : joysticks à l'écran
+ * (components/ui/TouchControls.jsx, affichés par le HUD) et boutons Inspecter / Sauter ; le clavier reste actif.
  * Collisions contre la géométrie réelle des modèles (voir collisionWorld).
  *
  * Échelle de la scène : 1 unité ≈ 1,5 m.
@@ -164,8 +167,14 @@ export default function FirstPersonExplorer({ data, cameraTarget, onInspect, cot
       s.yaw -= e.movementX * SENSITIVITY;
       s.pitch = THREE.MathUtils.clamp(s.pitch - e.movementY * SENSITIVITY, -1.45, 1.45);
     };
+    // Clavier : visite en cours, souris capturée ou joysticks (clavier branché : téléphone sur DeX, tablette)
     const onKeyDown = (e) => {
-      if (!isLocked()) return;
+      if (!explorerStore.get().locked) return;
+      // Échap : pause (souris capturée : le navigateur libère lui-même la souris)
+      if (e.code === 'Escape') {
+        explorerStore.releaseLock();
+        return;
+      }
       s.keys.add(e.code);
       if (e.code === 'Space') {
         e.preventDefault();
@@ -178,11 +187,22 @@ export default function FirstPersonExplorer({ data, cameraTarget, onInspect, cot
     const onMouseDown = (e) => {
       if (isLocked() && e.button === 0) inspect();
     };
+    // Visite à la souris : un toucher de l'écran passe aux joysticks (avant le clic qui suit)
+    const onCanvasPointerDown = (e) => {
+      if (e.pointerType === 'touch' && !explorerStore.get().touch) explorerStore.setTouch(true);
+    };
     // Clic dans la vue 3D en pause : reprise de la visite
     const onCanvasClick = () => {
-      if (!isLocked()) explorerStore.requestLock();
+      if (!explorerStore.get().locked) explorerStore.requestLock();
     };
     const clearKeys = () => s.keys.clear();
+    // Boutons tactiles du HUD
+    explorerStore.actions = {
+      inspect,
+      jump: () => {
+        s.jump = true;
+      },
+    };
 
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('keydown', onKeyDown);
@@ -190,8 +210,11 @@ export default function FirstPersonExplorer({ data, cameraTarget, onInspect, cot
     window.addEventListener('mousedown', onMouseDown);
     window.addEventListener('blur', clearKeys);
     document.addEventListener('pointerlockchange', clearKeys);
+    canvas.addEventListener('pointerdown', onCanvasPointerDown);
     canvas.addEventListener('click', onCanvasClick);
-    explorerStore.set({ locked: isLocked() });
+    // Joysticks : la visite démarre sans capture (requestLock) ; souris : état réel de la capture
+    if (!explorerStore.get().touch) explorerStore.set({ locked: isLocked() });
+    resetTouchInput();
     return () => {
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('keydown', onKeyDown);
@@ -199,7 +222,10 @@ export default function FirstPersonExplorer({ data, cameraTarget, onInspect, cot
       window.removeEventListener('mousedown', onMouseDown);
       window.removeEventListener('blur', clearKeys);
       document.removeEventListener('pointerlockchange', clearKeys);
+      canvas.removeEventListener('pointerdown', onCanvasPointerDown);
       canvas.removeEventListener('click', onCanvasClick);
+      explorerStore.actions = null;
+      resetTouchInput();
     };
   }, [gl, s]);
 
@@ -303,10 +329,20 @@ export default function FirstPersonExplorer({ data, cameraTarget, onInspect, cot
       return;
     }
 
-    const locked = explorerStore.get().locked;
-    const forward = locked ? Number(pressed('forward')) - Number(pressed('back')) : 0;
-    const strafe = locked ? Number(pressed('right')) - Number(pressed('left')) : 0;
-    const speed = pressed('run') ? RUN : WALK;
+    // Visite en cours : clavier, joystick gauche (pousser vers le haut de l'écran : avancer ; vitesse selon la
+    // poussée), regard au joystick droit et au glissé du doigt
+    const { locked, touch } = explorerStore.get();
+    let forward = 0;
+    let strafe = 0;
+    if (locked) {
+      const [mx, my] = touchInput.move;
+      forward = Number(pressed('forward')) - Number(pressed('back')) - my;
+      strafe = Number(pressed('right')) - Number(pressed('left')) + mx;
+      const [turn, tilt] = consumeTouchLook(dt);
+      s.yaw += turn;
+      s.pitch = THREE.MathUtils.clamp(s.pitch + tilt, -1.45, 1.45);
+    }
+    const speed = (pressed('run') ? RUN : WALK) * Math.min(1, Math.hypot(forward, strafe));
     const sin = Math.sin(s.yaw);
     const cos = Math.cos(s.yaw);
     tmp.wish.set(-sin * forward + cos * strafe, 0, -cos * forward - sin * strafe);
@@ -368,7 +404,9 @@ export default function FirstPersonExplorer({ data, cameraTarget, onInspect, cot
     camera.rotation.set(s.pitch, s.yaw, 0);
     camera.updateMatrixWorld();
     if (tabletRef.current) {
-      tabletRef.current.visible = locked;
+      // Joysticks : la tablette (en bas à droite) laisserait peu de place aux commandes ; le bandeau de mission
+      // du HUD porte les mêmes informations
+      tabletRef.current.visible = locked && !touch;
       tabletRef.current.position.copy(camera.position);
       tabletRef.current.quaternion.copy(camera.quaternion);
     }
