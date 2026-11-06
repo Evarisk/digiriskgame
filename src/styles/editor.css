@@ -900,7 +900,7 @@
   border-color: var(--accent-blue);
 }
 
-/* Visite sur écran tactile : joysticks, glissé du doigt pour regarder, barre d'outils masquée */
+/* Visite aux joysticks (commandes : touch-controls.css) : barre d'outils masquée, consigne en haut */
 .walk-touch-mode .editor-topbar {
   display: none;
 }
@@ -912,73 +912,6 @@
   width: calc(100% - 24px);
   max-width: 560px;
   font-size: 11.5px;
-}
-
-.walk-touch,
-.walk-touch-look,
-.walk-stick {
-  touch-action: none;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
-}
-
-.walk-touch-look {
-  position: absolute;
-  inset: 0;
-  z-index: 30;
-}
-
-.walk-stick {
-  position: absolute;
-  bottom: calc(26px + env(safe-area-inset-bottom));
-  z-index: 34;
-  width: 128px;
-  height: 128px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(15, 23, 42, 0.35) 0%, rgba(15, 23, 42, 0.6) 70%);
-  border: 2px solid rgba(148, 163, 184, 0.45);
-  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35);
-}
-
-.walk-stick.left {
-  left: calc(22px + env(safe-area-inset-left));
-}
-
-.walk-stick.right {
-  right: calc(22px + env(safe-area-inset-right));
-}
-
-.walk-stick-knob {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 56px;
-  height: 56px;
-  margin: -28px 0 0 -28px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #e0f2fe, #38bdf8 70%);
-  border: 2px solid rgba(255, 255, 255, 0.85);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
-  pointer-events: none;
-}
-
-.walk-stick-label {
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% + 6px);
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
-  transform: translateX(-50%);
-  font-size: 10.5px;
-  font-weight: 700;
-  white-space: nowrap;
-  color: #e2e8f0;
-  background: rgba(2, 6, 23, 0.7);
-  border-radius: 999px;
-  pointer-events: none;
 }
 
 /* Étiquettes 3D */

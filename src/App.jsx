@@ -8,7 +8,7 @@ import TopHudBar from './components/ui/TopHudBar';
 import HierarchyNavigator from './components/ui/HierarchyNavigator';
 import RiskSidebar from './components/ui/RiskSidebar';
 import ExplorerHud from './components/ui/ExplorerHud';
-import { explorerStore, useExplorer, EXPLORER_SUPPORTED } from './components/3d/explorer/explorerStore';
+import { explorerStore, useExplorer } from './components/3d/explorer/explorerStore';
 
 // Entité Dolibarr choisie dans les Paramètres (multisociété), mémorisée dans ce navigateur
 const ENTITY_STORAGE_KEY = 'digiriskgame.entity';
@@ -178,7 +178,8 @@ export default function App() {
       return;
     }
     setExplorerMode(true);
-    // Capture immédiate de la souris (le clic sur le bouton est le geste utilisateur requis)
+    // Départ immédiat : capture de la souris (le clic sur le bouton est le geste utilisateur requis),
+    // ou joysticks à l'écran
     explorerStore.requestLock();
   };
 
@@ -205,7 +206,6 @@ export default function App() {
         treeCollapsed={treeCollapsed}
         setTreeCollapsed={setTreeCollapsed}
         explorerMode={explorerMode}
-        explorerSupported={EXPLORER_SUPPORTED}
         onToggleExplorer={handleToggleExplorer}
         settingsOpen={settingsOpen}
         onToggleSettings={() => setSettingsOpen((open) => !open)}
