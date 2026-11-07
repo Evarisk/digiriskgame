@@ -21,11 +21,14 @@ import {
   Building2,
   Aperture,
   Gauge,
+  Gamepad2,
+  Mouse,
 } from 'lucide-react';
 import { QUALITY_LEVELS, QUALITY_ORDER, guessQuality, loadQualityMode, saveQualityMode, lowerQuality } from '../3d/quality';
 import EditorCanvas from './EditorCanvas';
-import { walkControl, TOUCH_WALK } from './EditorWalk';
-import TouchControls from './TouchControls';
+import { walkControl } from './EditorWalk';
+import TouchControls from '../ui/TouchControls';
+import { prefersTouchControls, saveTouchPreference, canUseMouse } from '../../services/touchControls';
 import { LibraryPanel, OutlinerPanel, InspectorPanel, HelpPanel } from './EditorPanels';
 import { buildDemoScene } from '../../services/editorDemo';
 import { buildMairieScene } from '../../services/editorMairie';
@@ -142,6 +145,8 @@ export default function SiteEditor() {
   const [notice, setNotice] = useState(null);
   const [walking, setWalking] = useState(false);
   const [walkLocked, setWalkLocked] = useState(false);
+  // Commandes de la visite : joysticks à l'écran (appareil tactile, DeX) ou souris capturée et clavier
+  const [walkTouch, setWalkTouchState] = useState(prefersTouchControls);
   const fileInput = useRef(null);
   // Qualité du rendu : automatique (estimée d'après la machine, abaissée si l'image reste lente) ou choisie
   const [qualityMode, setQualityMode] = useState(loadQualityMode);
@@ -187,12 +192,22 @@ export default function SiteEditor() {
     return () => clearTimeout(timer);
   }, [notice]);
 
+  // Choix des commandes, mémorisé ; `walkControl.touch` est mis à jour aussitôt pour la visite en cours
+  const setWalkTouch = useCallback((on) => {
+    walkControl.touch = on;
+    setWalkTouchState(on);
+    saveTouchPreference(on);
+    if (on && document.pointerLockElement) document.exitPointerLock?.();
+  }, []);
+
   useEffect(() => {
     walkControl.onLockChange = setWalkLocked;
+    walkControl.onTouch = setWalkTouch;
     return () => {
       walkControl.onLockChange = null;
+      walkControl.onTouch = null;
     };
-  }, []);
+  }, [setWalkTouch]);
 
   const select = useCallback((ref) => setSelection(ref), []);
   const focusOn = (ref) => {
@@ -357,6 +372,7 @@ export default function SiteEditor() {
 
   /* ---------- Visite en première personne ---------- */
   const startWalk = () => {
+    walkControl.touch = walkTouch;
     setTool({ mode: 'select' });
     setWalking(true);
   };
@@ -364,6 +380,12 @@ export default function SiteEditor() {
     if (document.pointerLockElement) document.exitPointerLock?.();
     setWalking(false);
     setWalkLocked(false);
+  };
+  // Passage à la souris : capture demandée dans le geste (clic sur le bouton) ; refusée, la carte de pause
+  // propose de reprendre ou de revenir aux joysticks
+  const walkWithMouse = () => {
+    setWalkTouch(false);
+    walkControl.canvas?.requestPointerLock?.()?.catch?.(() => {});
   };
 
   /* ---------- Clavier ---------- */
@@ -471,7 +493,7 @@ export default function SiteEditor() {
   const counts = Object.keys(LIST_LABELS).reduce((n, list) => n + scene[list].length, 0);
 
   return (
-    <div className={`editor-shell ${walking && TOUCH_WALK ? 'walk-touch-mode' : ''}`} {...dropHandlers}>
+    <div className={`editor-shell ${walking && walkTouch ? 'walk-touch-mode' : ''}`} {...dropHandlers}>
       <header className="editor-topbar">
         <div className="editor-brand">
           <a className="editor-back" href="./" title="Retour au jumeau numérique">
@@ -665,18 +687,32 @@ export default function SiteEditor() {
           </>
         )}
 
-        {/* Visite sur écran tactile : joysticks à l'écran */}
-        {walking && TOUCH_WALK && <TouchControls />}
+        {/* Visite aux joysticks (appareil tactile, DeX, ou au choix) */}
+        {walking && walkTouch && <TouchControls />}
 
-        <ToolHint tool={tool} scene={scene} selected={selected} walking={walking} level={view.level} onExitWalk={stopWalk} onFinish={() => (tool.mode === 'polygon' ? finishPolygon(tool.points) : setTool({ mode: 'select' }))} onCancel={cancelTool} />
+        <ToolHint
+          tool={tool}
+          scene={scene}
+          selected={selected}
+          walking={walking}
+          walkTouch={walkTouch}
+          level={view.level}
+          onExitWalk={stopWalk}
+          onWalkWithMouse={canUseMouse() ? walkWithMouse : null}
+          onFinish={() => (tool.mode === 'polygon' ? finishPolygon(tool.points) : setTool({ mode: 'select' }))}
+          onCancel={cancelTool}
+        />
 
-        {walking && !walkLocked && !TOUCH_WALK && (
+        {walking && !walkLocked && !walkTouch && (
           <div className="editor-walk-pause">
             <h3>Visite en pause</h3>
             <p>ZQSD / WASD ou flèches pour marcher, Maj pour courir, souris pour regarder.</p>
             <div>
-              <button type="button" className="primary" onClick={() => walkControl.canvas?.requestPointerLock?.()}>
+              <button type="button" className="primary" onClick={() => walkControl.canvas?.requestPointerLock?.()?.catch?.(() => {})}>
                 Reprendre la visite
+              </button>
+              <button type="button" onClick={() => setWalkTouch(true)} title="Se déplacer et regarder avec des joysticks à l'écran">
+                <Gamepad2 size={14} /> Joysticks
               </button>
               <button type="button" onClick={stopWalk}>
                 Quitter la visite
@@ -722,14 +758,19 @@ const TOOL_LABEL = (tool, scene) => {
 };
 
 /** Consigne de l'outil en cours (bas de l'écran). */
-function ToolHint({ tool, scene, selected, walking, level, onFinish, onCancel, onExitWalk }) {
-  if (walking && TOUCH_WALK) {
-    // Écran tactile : la barre d'outils est masquée, la consigne porte la sortie de la visite
+function ToolHint({ tool, scene, selected, walking, walkTouch, level, onFinish, onCancel, onExitWalk, onWalkWithMouse }) {
+  if (walking && walkTouch) {
+    // Joysticks : la barre d'outils est masquée, la consigne porte le passage à la souris et la sortie
     return (
       <div className="editor-hint">
         <span>
           Joystick gauche : <strong>se déplacer</strong> · joystick droit ou glisser : <strong>regarder</strong> · escaliers : avancer dessus
         </span>
+        {onWalkWithMouse && (
+          <button type="button" onClick={onWalkWithMouse} title="Regarder à la souris (capturée), marcher au clavier">
+            <Mouse size={13} /> Souris
+          </button>
+        )}
         <button type="button" onClick={onExitWalk}>
           Quitter
         </button>
