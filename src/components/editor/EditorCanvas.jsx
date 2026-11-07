@@ -9,7 +9,9 @@ import { Person } from '../3d/models/people';
 import ElementModel from './ElementModel';
 import EditorNpc from './EditorNpc';
 import EditorWalk from './EditorWalk';
-import { isTouchDevice } from '../../services/touchControls';
+import EditorPostFx from './EditorPostFx';
+import { QUALITY_LEVELS, SETTLE_MS, SLOW_MS, WINDOW_MS } from '../3d/quality';
+import { StaticBatcher, StaticBatchContext } from '../3d/models/staticBatch';
 import { CustomBuilding, InteriorWall, Surface, Walkway, PrefabBuilding, Outline, Label, SELECT_COLOR, HOVER_COLOR, LOW_WALL } from './EditorStructures';
 import { elementBox, SHAPE_PRESETS, PREFAB_DEFAULT_SIZE, ELEMENT_KINDS } from '../../services/editorCatalog';
 import {
@@ -359,7 +361,7 @@ function CameraRig({ focus, enabled }) {
   );
 }
 
-function SunLight({ center, radius }) {
+function SunLight({ center, radius, shadowSize }) {
   const ref = useRef();
   useEffect(() => {
     const light = ref.current;
@@ -370,14 +372,105 @@ function SunLight({ center, radius }) {
     Object.assign(light.shadow.camera, { left: -r, right: r, top: r, bottom: -r, far: 400 });
     light.shadow.camera.updateProjectionMatrix();
   }, [center, radius]);
-  return <directionalLight ref={ref} castShadow position={[center[0] + 40, 70, center[1] + 34]} intensity={1.5} shadow-mapSize={[4096, 4096]} shadow-bias={-0.0004} />;
+  // Changement de qualité : carte d'ombre recréée à la nouvelle taille
+  useEffect(() => {
+    const shadow = ref.current?.shadow;
+    if (!shadow) return;
+    shadow.mapSize.set(shadowSize, shadowSize);
+    shadow.map?.dispose();
+    shadow.map = null;
+  }, [shadowSize]);
+  return (
+    <directionalLight
+      ref={ref}
+      castShadow
+      color="#fff2df"
+      position={[center[0] + 40, 70, center[1] + 34]}
+      intensity={1.65}
+      shadow-bias={-0.0004}
+      shadow-normalBias={0.02}
+    />
+  );
+}
+
+/** Regroupement des pièces fixes des objets posés, par carré de carte et par matériau (voir staticBatch.js). */
+function StaticBatchRoot({ version, children }) {
+  const batcher = useMemo(() => new StaticBatcher(null), []);
+  useEffect(() => () => batcher.dispose(), [batcher]);
+  // Scène modifiée : le regroupement surveille les déplacements des objets
+  useEffect(() => batcher.touch(), [batcher, version]);
+  useFrame(() => {
+    if (batcher.group) batcher.update();
+  });
+  return (
+    <>
+      <group
+        name="regroupement"
+        ref={(group) => {
+          batcher.group = group;
+        }}
+      />
+      <StaticBatchContext.Provider value={batcher}>{children}</StaticBatchContext.Provider>
+    </>
+  );
+}
+
+/** Ombres recalculées une image sur `every` (le décor ne bouge pas ; seuls les passants et voitures décalent). */
+function ShadowRate({ every }) {
+  const { gl } = useThree();
+  const frame = useRef(0);
+  useEffect(() => {
+    gl.shadowMap.autoUpdate = every <= 1;
+    gl.shadowMap.needsUpdate = true;
+    return () => {
+      gl.shadowMap.autoUpdate = true;
+    };
+  }, [gl, every]);
+  useFrame(() => {
+    if (every <= 1) return;
+    frame.current = (frame.current + 1) % every;
+    if (frame.current === 0) gl.shadowMap.needsUpdate = true;
+  });
+  return null;
+}
+
+/**
+ * Mode de qualité automatique : si l'image médiane dépasse SLOW_MS sur deux fenêtres consécutives (hors chargement,
+ * onglet masqué et pauses), `onSlow` abaisse la qualité d'un cran.
+ */
+function QualityMonitor({ level, onSlow }) {
+  const state = useRef(null);
+  useEffect(() => {
+    state.current = { start: performance.now(), samples: [], from: 0, slow: 0 };
+  }, [level]);
+  useFrame((_, delta) => {
+    const s = state.current;
+    if (!s || !onSlow) return;
+    const now = performance.now();
+    const ms = delta * 1000;
+    if (now - s.start < SETTLE_MS || ms > 250 || document.hidden) return;
+    if (!s.from) s.from = now;
+    s.samples.push(ms);
+    if (now - s.from < WINDOW_MS) return;
+    s.samples.sort((a, b) => a - b);
+    const median = s.samples[s.samples.length >> 1];
+    s.samples = [];
+    s.from = now;
+    s.slow = median > SLOW_MS ? s.slow + 1 : 0;
+    if (s.slow >= 2) {
+      s.slow = 0;
+      s.start = now;
+      onSlow();
+    }
+  });
+  return null;
 }
 
 /* ------------------------------------------------------------------ */
 /* Scène                                                                */
 /* ------------------------------------------------------------------ */
 
-function EditorScene({ scene, selection, tool, view, walking, onSelect, onCommit, onPreview, onCheckpoint, onToolAction, focus }) {
+function EditorScene({ scene, selection, tool, view, walking, onSelect, onCommit, onPreview, onCheckpoint, onToolAction, focus, quality, onSlow }) {
   const { camera, gl, controls } = useThree();
   const [hovered, setHovered] = useState(null);
   const latest = useRef({});
@@ -399,6 +492,20 @@ function EditorScene({ scene, selection, tool, view, walking, onSelect, onCommit
   const groundSize = 2 * (fogFar + 120);
 
   const groundAt = useMemo(() => (x, z) => groundHeightAt(scene, x, z), [scene]);
+  // Hauteurs au sol des objets, allées et cloisons, calculées une fois par modification de la scène (le survol
+  // d'un objet à la souris redessine la scène : sans cela, des milliers de tests de contours à chaque survol)
+  const heights = useMemo(() => {
+    const elements = new Map(scene.elements.map((el) => [el.id, groundAt(el.position[0], el.position[1]) + levelOffset(el.level)]));
+    const walkways = new Map(scene.walkways.map((w) => [w.id, groundAt(...itemMid(w)) + levelOffset(w.level)]));
+    const walls = new Map(
+      scene.walls.map((w) => {
+        const level = levelOf(w);
+        const mid = itemMid(w);
+        return [w.id, [groundAt(...mid) + levelOffset(level), storeyHeightAt(scene, mid, level)]];
+      })
+    );
+    return { elements, walkways, walls };
+  }, [scene, groundAt]);
   // Sol de chaque niveau (personnages : une fonction stable par niveau tant que la scène ne change pas)
   const groundOfLevel = useMemo(
     () => Array.from({ length: MAX_LEVELS }, (_, level) => (x, z) => groundHeightAt(scene, x, z) + levelOffset(level)),
@@ -655,9 +762,13 @@ function EditorScene({ scene, selection, tool, view, walking, onSelect, onCommit
       <color attach="background" args={[SKY_HORIZON]} />
       <fog attach="fog" args={[SKY_HORIZON, fogNear, fogFar]} />
       <SkyDome site={skySite} scale={Math.max(1, radius / 45)} />
-      <ambientLight intensity={0.5} />
-      <hemisphereLight args={['#dbeafe', '#3f5f2a', 0.55]} />
-      <SunLight center={center} radius={radius} />
+      {/* Lumière naturelle : ciel clair, sol ocre (rebond chaud), soleil légèrement doré */}
+      <ambientLight intensity={0.42} />
+      <hemisphereLight args={['#e8eef6', '#6e5c45', 0.6]} />
+      <SunLight center={center} radius={radius} shadowSize={QUALITY_LEVELS[quality].shadowSize} />
+      <ShadowRate every={QUALITY_LEVELS[quality].shadowEvery} />
+      <QualityMonitor level={quality} onSlow={onSlow} />
+      {view.fx && <EditorPostFx />}
       <StudioEnvironment />
       <CameraRig focus={focus} enabled={!walking} />
 
@@ -697,58 +808,61 @@ function EditorScene({ scene, selection, tool, view, walking, onSelect, onCommit
       {scene.surfaces.map((s, i) => (
         <MemoSurface key={s.id} surface={s} level={i} bind={bindFor('surfaces', s.id, s)} highlight={highlightOf('surfaces', s.id)} />
       ))}
-      {scene.walkways.filter(shownLevel).map((w) => (
-        <MemoWalkway key={w.id} walkway={w} y={groundAt(...itemMid(w)) + levelOffset(w.level)} bind={bindFor('walkways', w.id, w)} highlight={highlightOf('walkways', w.id)} />
-      ))}
-      {scene.buildings.map((b) => (
-        <MemoBuilding
-          key={b.id}
-          building={b}
-          bind={bindFor('buildings', b.id, b)}
-          highlight={highlightOf('buildings', b.id)}
-          showRoof={view.roofs}
-          lowWalls={lowWalls}
-          cutLevel={cutLevel}
-          openings={openings[b.id] || ''}
-          windows={windowBays[b.id] || ''}
-          showLabel={labels}
-        />
-      ))}
-      {scene.prefabs.map((p) => (
-        <MemoPrefab key={p.id} prefab={p} bind={bindFor('prefabs', p.id, p)} highlight={highlightOf('prefabs', p.id)} showRoof={view.roofs && cutLevel == null} showLabel={labels} />
-      ))}
-      {scene.walls.filter(shownLevel).map((w) => {
-        const level = levelOf(w);
-        const y0 = groundAt(...itemMid(w)) + levelOffset(level);
-        return (
-          <MemoWall
-            key={w.id}
-            wall={w}
-            y0={y0}
-            // En étage, la cloison part du plancher (noyée de 5 cm) ; au rez-de-chaussée, du terrain
-            base={level ? y0 - 0.05 : 0}
-            maxHeight={storeyHeightAt(scene, itemMid(w), level)}
-            cut={wallCut}
-            bind={bindFor('walls', w.id, w)}
-            highlight={highlightOf('walls', w.id)}
-          />
-        );
-      })}
-      {/* Murs arasés (vue de dessus) : les éléments posés en partie haute (toitures, fenêtres, fronton, lustres,
-          tableaux) sont masqués ; un niveau choisi masque les niveaux supérieurs et les toitures */}
-      {scene.elements
-        .filter((el) => shownLevel(el) && !(lowWalls && ELEMENT_KINDS[el.kind]?.upper) && !(cutLevel != null && ELEMENT_KINDS[el.kind]?.roof))
-        .map((el) => (
-          <PlacedElement
-            key={el.id}
-            element={el}
-            y={groundAt(el.position[0], el.position[1]) + levelOffset(el.level)}
-            bind={bindFor('elements', el.id, el)}
-            highlight={highlightOf('elements', el.id)}
+      {/* Pièces fixes des allées, bâtiments, cloisons et objets posés regroupées par carré (voir staticBatch.js) */}
+      <StaticBatchRoot version={scene}>
+        {scene.walkways.filter(shownLevel).map((w) => (
+          <MemoWalkway key={w.id} walkway={w} y={heights.walkways.get(w.id)} bind={bindFor('walkways', w.id, w)} highlight={highlightOf('walkways', w.id)} />
+        ))}
+        {scene.buildings.map((b) => (
+          <MemoBuilding
+            key={b.id}
+            building={b}
+            bind={bindFor('buildings', b.id, b)}
+            highlight={highlightOf('buildings', b.id)}
+            showRoof={view.roofs}
+            lowWalls={lowWalls}
+            cutLevel={cutLevel}
+            openings={openings[b.id] || ''}
+            windows={windowBays[b.id] || ''}
             showLabel={labels}
-            upperHidden={cutLevel != null && levelOf(el) >= cutLevel}
           />
         ))}
+        {scene.prefabs.map((p) => (
+          <MemoPrefab key={p.id} prefab={p} bind={bindFor('prefabs', p.id, p)} highlight={highlightOf('prefabs', p.id)} showRoof={view.roofs && cutLevel == null} showLabel={labels} />
+        ))}
+        {scene.walls.filter(shownLevel).map((w) => {
+          const level = levelOf(w);
+          const [y0, maxHeight] = heights.walls.get(w.id);
+          return (
+            <MemoWall
+              key={w.id}
+              wall={w}
+              y0={y0}
+              // En étage, la cloison part du plancher (noyée de 5 cm) ; au rez-de-chaussée, du terrain
+              base={level ? y0 - 0.05 : 0}
+              maxHeight={maxHeight}
+              cut={wallCut}
+              bind={bindFor('walls', w.id, w)}
+              highlight={highlightOf('walls', w.id)}
+            />
+          );
+        })}
+        {/* Murs arasés (vue de dessus) : les éléments posés en partie haute (toitures, fenêtres, fronton, lustres,
+            tableaux) sont masqués ; un niveau choisi masque les niveaux supérieurs et les toitures */}
+        {scene.elements
+          .filter((el) => shownLevel(el) && !(lowWalls && ELEMENT_KINDS[el.kind]?.upper) && !(cutLevel != null && ELEMENT_KINDS[el.kind]?.roof))
+          .map((el) => (
+            <PlacedElement
+              key={el.id}
+              element={el}
+              y={heights.elements.get(el.id)}
+              bind={bindFor('elements', el.id, el)}
+              highlight={highlightOf('elements', el.id)}
+              showLabel={labels}
+              upperHidden={cutLevel != null && levelOf(el) >= cutLevel}
+            />
+          ))}
+      </StaticBatchRoot>
       {scene.npcs.map((n, i) =>
         shownLevel(n) ? (
           <EditorNpc
@@ -783,14 +897,15 @@ function itemMid(item) {
   return [(item.a[0] + item.b[0]) / 2, (item.a[1] + item.b[1]) / 2];
 }
 
-// Appareil tactile (téléphone, tablette, DeX) : résolution plafonnée pour garder une visite fluide
-const MAX_DPR = isTouchDevice() ? 1.5 : 2;
-
-export default function EditorCanvas(props) {
+export default function EditorCanvas({ quality = 'haute', ...props }) {
+  const q = QUALITY_LEVELS[quality] || QUALITY_LEVELS.haute;
+  // Anticrénelage fixé à la création du contexte WebGL (niveau de départ)
+  const [antialias] = useState(q.antialias);
   return (
     <div className="editor-canvas" onContextMenu={(e) => e.preventDefault()}>
-      <Canvas shadows dpr={[1, MAX_DPR]} camera={{ position: [40, 60, 90], fov: 45, near: 0.3, far: 900 }} onPointerMissed={() => {}}>
-        <EditorScene {...props} />
+      {/* Résolution et ombres selon la qualité (voir 3d/quality.js) : 1,5 × au plus, même en haute qualité */}
+      <Canvas shadows={q.shadows} dpr={q.dpr} gl={{ antialias }} camera={{ position: [40, 60, 90], fov: 45, near: 0.3, far: 900 }} onPointerMissed={() => {}}>
+        <EditorScene {...props} quality={QUALITY_LEVELS[quality] ? quality : 'haute'} />
       </Canvas>
     </div>
   );

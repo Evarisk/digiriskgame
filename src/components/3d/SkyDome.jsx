@@ -1,13 +1,12 @@
 import React, { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
-import MergeStatic from './models/MergeStatic';
-import { Ball, seeded, DYNAMIC } from './models/kit';
 
 /**
  * Ciel de jour : dégradé du bleu du zénith à la brume claire de l'horizon (couleur du brouillard, pour
- * que le terrain lointain s'y fonde), halo du soleil dans la direction de l'éclairage, et nuages
- * low-poly qui dérivent lentement autour du site, hors de la vue plongeante sur les bâtiments.
+ * que le terrain lointain s'y fonde), halo du soleil dans la direction de l'éclairage, et nuages doux peints
+ * dans le dôme (bruit fractal projeté sur une couche nuageuse : bords vaporeux, sommets éclairés côté soleil,
+ * bases grisées), qui dérivent lentement et s'estompent vers l'horizon.
  */
 
 export const SKY_HORIZON = '#d4e3ef';
@@ -29,38 +28,53 @@ const fragmentShader = /* glsl */ `
   uniform vec3 zenith;
   uniform vec3 sunColor;
   uniform vec3 sunDirection;
+  uniform float time;
   varying vec3 vWorld;
+  float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+  float noise(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    vec2 u = f * f * (3.0 - 2.0 * f);
+    return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
+  }
+  float fbm(vec2 p) {
+    float v = 0.0;
+    float a = 0.5;
+    for (int k = 0; k < 6; k++) {
+      v += a * noise(p);
+      p = p * 2.03 + vec2(1.7, 9.2);
+      a *= 0.5;
+    }
+    return v;
+  }
   void main() {
     vec3 dir = normalize(vWorld - cameraPosition);
     float h = max(dir.y, 0.0);
     vec3 color = mix(horizon, zenith, pow(h, 0.55));
     float sun = max(dot(dir, sunDirection), 0.0);
+    // Couche nuageuse : direction projetée sur un plan haut, dérive lente avec le vent
+    if (dir.y > 0.0) {
+      vec2 uv = dir.xz / (dir.y + 0.18) * 1.3 + vec2(time * 0.006, time * 0.0025);
+      float n = fbm(uv);
+      float detail = fbm(uv * 3.1 + 7.3);
+      float cover = smoothstep(0.5, 0.74, n + 0.18 * detail);
+      // Ombre propre : épaisseur relevée un peu vers le soleil (sommets clairs, bases grises)
+      vec2 toSun = normalize(sunDirection.xz + vec2(1e-4)) * 0.09;
+      float lit = clamp(0.7 + (n - fbm(uv + toSun)) * 3.0, 0.42, 1.08);
+      vec3 cloud = mix(vec3(0.66, 0.71, 0.78), vec3(1.0, 0.985, 0.96), lit);
+      cloud += sunColor * pow(sun, 8.0) * 0.25 * (1.0 - cover);
+      float fade = smoothstep(0.03, 0.28, dir.y);
+      color = mix(color, cloud, cover * fade * 0.94);
+    }
     color += sunColor * (pow(sun, 900.0) * 1.2 + pow(sun, 24.0) * 0.18);
     gl_FragColor = vec4(color, 1.0);
     #include <colorspace_fragment>
   }
 `;
 
-/** Nuages : grappes de boules facettées aplaties, en couronne autour du site (positions stables). */
-function cloudLayout(site, scale) {
-  const [cx, cz] = site?.center || [0, 0];
-  const inner = (site?.radius || 45) + 30 * scale;
-  return Array.from({ length: 16 }, (_, i) => {
-    const angle = (i / 16) * Math.PI * 2 + seeded(i * 3.7) * 0.3;
-    const distance = inner + seeded(i * 5.3) * 60 * scale;
-    const puffs = 3 + Math.floor(seeded(i * 7.1) * 3);
-    return {
-      position: [cx + Math.cos(angle) * distance, (34 + seeded(i * 2.9) * 22) * scale, cz + Math.sin(angle) * distance],
-      rotation: seeded(i * 1.3) * Math.PI,
-      size: (2.6 + seeded(i * 9.1) * 2.4) * scale,
-      puffs: Array.from({ length: puffs }, (__, k) => [(k - (puffs - 1) / 2) * 1.5, seeded(i * 11 + k) * 0.5, (seeded(i * 13 + k) - 0.5) * 1.6]),
-    };
-  });
-}
-
+// eslint-disable-next-line no-unused-vars
 export default function SkyDome({ site, scale = 1, sunDirection = [28, 42, 24] }) {
   const domeRef = useRef();
-  const cloudsRef = useRef();
   const material = useMemo(
     () =>
       new THREE.ShaderMaterial({
@@ -69,6 +83,7 @@ export default function SkyDome({ site, scale = 1, sunDirection = [28, 42, 24] }
           zenith: { value: new THREE.Color(SKY_ZENITH) },
           sunColor: { value: new THREE.Color(SUN_GLOW) },
           sunDirection: { value: new THREE.Vector3(...sunDirection).normalize() },
+          time: { value: 0 },
         },
         vertexShader,
         fragmentShader,
@@ -78,12 +93,9 @@ export default function SkyDome({ site, scale = 1, sunDirection = [28, 42, 24] }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
-  const clouds = useMemo(() => cloudLayout(site, scale), [site, scale]);
-  const [cx, cz] = site?.center || [0, 0];
-
   useFrame(({ camera, clock }) => {
     domeRef.current?.position.copy(camera.position);
-    if (cloudsRef.current) cloudsRef.current.rotation.y = clock.getElapsedTime() * 0.004;
+    material.uniforms.time.value = clock.getElapsedTime();
   });
 
   return (
@@ -91,21 +103,6 @@ export default function SkyDome({ site, scale = 1, sunDirection = [28, 42, 24] }
       <mesh ref={domeRef} material={material} frustumCulled={false} renderOrder={-1} raycast={() => null} userData={{ noCollide: true }}>
         <sphereGeometry args={[100, 32, 16]} />
       </mesh>
-      {/* Nuages en rotation lente autour du centre du site */}
-      <group position={[cx, 0, cz]}>
-        <group ref={cloudsRef} userData={{ ...DYNAMIC, noCollide: true }}>
-          <MergeStatic deps={[clouds]}>
-            {clouds.map((c, i) => (
-              <group key={i} position={[c.position[0] - cx, c.position[1], c.position[2] - cz]} rotation={[0, c.rotation, 0]} scale={c.size}>
-                {c.puffs.map(([x, y, z], k) => {
-                  const d = 1.8 + seeded(i + k * 3) * 1.0; // diamètre de la boule
-                  return <Ball key={k} position={[x, y, z]} scale={[d, d * 0.55, d * 0.8]} shape="icosa" color="#f8fafc" rough={1} flat shadow={false} />;
-                })}
-              </group>
-            ))}
-          </MergeStatic>
-        </group>
-      </group>
     </>
   );
 }

@@ -42,6 +42,8 @@ export const PALETTE = {
 
 const UNIT_BOX = new THREE.BoxGeometry(1, 1, 1);
 const UNIT_SPHERE = new THREE.SphereGeometry(0.5, 16, 12);
+// Sphère basse définition pour les petits reliefs (nez, oreilles, boutons) : 120 triangles au lieu de 352
+const UNIT_SPHERE_LOW = new THREE.SphereGeometry(0.5, 10, 7);
 const UNIT_ICOSA = new THREE.IcosahedronGeometry(0.5, 0);
 const UNIT_DODECA = new THREE.DodecahedronGeometry(0.5, 0);
 const UNIT_TORUS = new THREE.TorusGeometry(0.5, 0.14, 8, 28);
@@ -172,7 +174,7 @@ export function Cylinder({ radius = 0.5, height = 1, top = 1, segments = 16, ope
 }
 
 export function Ball({ radius = 0.5, scale, shape = 'sphere', color, metal, rough, glow, glowColor, opacity, flat, shadow = true, ...rest }) {
-  const geometry = shape === 'icosa' ? UNIT_ICOSA : shape === 'dodeca' ? UNIT_DODECA : UNIT_SPHERE;
+  const geometry = shape === 'icosa' ? UNIT_ICOSA : shape === 'dodeca' ? UNIT_DODECA : shape === 'low' ? UNIT_SPHERE_LOW : UNIT_SPHERE;
   const s = scale || [radius * 2, radius * 2, radius * 2];
   return (
     <mesh
@@ -314,6 +316,18 @@ export function WalkwayStrip({
 
   // Marquages ≈ 1 cm au-dessus de la bande verte : sans scintillement, même vus de loin
   const paint = 0.012;
+  if (zebra) {
+    // Passage piéton de voirie : bandes blanches de 50 cm espacées de 50 cm, peintes sur l'enrobé (pas d'allée verte)
+    const bands = Math.max(2, Math.floor((len + 0.33) / 0.66));
+    const start = -((bands - 1) * 0.66) / 2;
+    return (
+      <group position={[cx, y, cz]} rotation={[0, angle, 0]} userData={{ noCollide: true }}>
+        {Array.from({ length: bands }, (_, i) => (
+          <Box key={i} position={[start + i * 0.66, paint * 0.5, 0]} size={[0.33, 0.008, width]} color="#eef0f0" rough={0.7} shadow={false} />
+        ))}
+      </group>
+    );
+  }
   return (
     <group position={[cx, y, cz]} rotation={[0, angle, 0]} userData={{ noCollide: true }}>
       {/* Bande de roulement piétonne verte */}
@@ -561,12 +575,94 @@ export function Monitor({ width = 0.38, height = 0.22, screen = '#38bdf8', glow 
   );
 }
 
-/** Clavier + souris posés sur le plan de travail. */
+let keyboardMaterial = null;
+/**
+ * Dessus du clavier : touches dessinées une par une (rangée de fonctions, bloc alphanumérique décalé, barre
+ * d'espace, flèches en T, pavé numérique), dégradé et liseré de chaque touche, légendes claires.
+ */
+function keyboardTop() {
+  if (!keyboardMaterial) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1024;
+    canvas.height = 320;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#16181b';
+    ctx.fillRect(0, 0, 1024, 320);
+    const u = 42; // pas d'une touche (px)
+    const key = (x, y, w, legend = '') => {
+      const g = ctx.createLinearGradient(0, y, 0, y + u - 6);
+      g.addColorStop(0, '#3b3f46');
+      g.addColorStop(1, '#2a2d32');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.roundRect(x + 3, y + 3, w * u - 6, u - 6, 6);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      if (legend) {
+        ctx.fillStyle = 'rgba(230,232,236,0.75)';
+        ctx.font = '600 14px Arial, sans-serif';
+        ctx.fillText(legend, x + 10, y + 22);
+      }
+    };
+    const x0 = 18;
+    const rows = [
+      [['Échap', 1.25], ...'F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12'.split(' ').map((k) => [k, 1])],
+      ['²&é"\'(-è_çà)='.split('').map((k) => [k, 1]), [['⌫', 2]]].flat(),
+      [['↹', 1.5], ...'AZERTYUIOP^$'.split('').map((k) => [k, 1]), ['', 1.5]],
+      [['⇪', 1.8], ...'QSDFGHJKLMù*'.split('').map((k) => [k, 1]), ['↵', 1.2]],
+      [['⇧', 1.3], ...'<WXCVBN,;:!'.split('').map((k) => [k, 1]), ['⇧', 2.7]],
+      [['Ctrl', 1.5], ['', 1.2], ['Alt', 1.2], ['', 6.3], ['Alt Gr', 1.2], ['', 1.2], ['Ctrl', 1.4]],
+    ];
+    rows.forEach((row, r) => {
+      let x = x0;
+      const y = 12 + r * u + (r > 0 ? 8 : 0);
+      row.forEach(([legend, w]) => {
+        key(x, y, w, legend);
+        x += w * u;
+      });
+    });
+    // Flèches en T et pavé numérique
+    const ax = x0 + 15.2 * u;
+    key(ax + u, 12 + 4 * u + 8, 1, '↑');
+    [0, 1, 2].forEach((i) => key(ax + i * u, 12 + 5 * u + 8, 1, ['←', '↓', '→'][i]));
+    const nx = ax + 3.4 * u;
+    [['Vn', '/', '*', '-'], ['7', '8', '9', '+'], ['4', '5', '6', ''], ['1', '2', '3', '↵'], ['0', '', '.', '']].forEach((row, r) =>
+      row.forEach((legend, c) => {
+        if ((r === 2 || r === 4) && c === 3) return;
+        if (r === 4 && c === 1) return;
+        key(nx + c * u, 12 + (r + 1) * u + 8, r === 4 && c === 0 ? 2 : 1, legend);
+      })
+    );
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.anisotropy = 8;
+    keyboardMaterial = new THREE.MeshStandardMaterial({ map: texture, roughness: 0.6, metalness: 0.05 });
+  }
+  return keyboardMaterial;
+}
+const KEYBOARD_TOP = new THREE.PlaneGeometry(0.285, 0.089);
+
+/**
+ * Clavier bureautique (44 × 13 cm, profil incliné, touches dessinées) et souris galbée à molette sur son tapis,
+ * posés sur le plan de travail (origine au plan, clavier face à +Z).
+ */
 export function Keyboard(props) {
   return (
-    <group {...props}>
-      <Box size={[0.26, 0.012, 0.08]} color={PALETTE.graphite} shadow={false} />
-      <Box position={[0.19, 0, 0.01]} size={[0.035, 0.014, 0.055]} color={PALETTE.graphite} shadow={false} />
+    <group {...props} position={[(props.position?.[0] ?? 0), (props.position?.[1] ?? 0) - 0.006, props.position?.[2] ?? 0]}>
+      {/* Coque : plus haute à l'arrière (pieds), bord avant arrondi */}
+      <group rotation={[0.07, 0, 0]}>
+        <Box size={[0.292, 0.012, 0.094]} position={[0, 0.006, 0]} color="#1b1d21" rough={0.5} shadow={false} />
+        <mesh geometry={KEYBOARD_TOP} material={keyboardTop()} position={[0, 0.0122, 0]} rotation={[-Math.PI / 2, 0, 0]} raycast={noRaycast} />
+      </group>
+      {/* Tapis de souris et souris : coque galbée, séparation des boutons, molette */}
+      <Box size={[0.15, 0.002, 0.125]} position={[0.235, 0.001, 0.01]} color="#262a31" rough={0.9} shadow={false} />
+      <group position={[0.235, 0.002, 0.018]} rotation={[0, -0.12, 0]}>
+        <Ball scale={[0.04, 0.034, 0.072]} position={[0, 0, 0]} color="#202226" rough={0.35} metal={0.15} shadow={false} />
+        <Box size={[0.0012, 0.004, 0.026]} position={[0, 0.0158, -0.022]} color="#0b0c0e" shadow={false} />
+        <Cylinder position={[0, 0.016, -0.02]} rotation={[0, 0, Math.PI / 2]} radius={0.0045} height={0.004} segments={10} color="#555b63" rough={0.6} shadow={false} />
+      </group>
     </group>
   );
 }
@@ -820,60 +916,8 @@ export function Wheel({ radius = 0.2, width = 0.14, hub = PALETTE.steel, ...rest
   );
 }
 
-/** Voiture de société (avant vers +X). */
-export function Car({ color = '#2563eb', ...rest }) {
-  return (
-    <group {...rest}>
-      <Profile
-        points={[[-1.3, 0.16], [1.3, 0.16], [1.32, 0.42], [1.2, 0.56], [0.55, 0.62], [-1.12, 0.66], [-1.3, 0.56]]}
-        depth={1.05}
-        bevel={0.03}
-        color={color}
-        metal={0.55}
-        rough={0.3}
-      />
-      <Profile points={[[0.6, 0.6], [0.16, 0.95], [-0.72, 0.97], [-1.15, 0.64]]} depth={0.98} color="#0b1220" metal={0.85} rough={0.12} />
-      <Box position={[-0.27, 0.985, 0]} size={[0.92, 0.03, 0.98]} color={color} metal={0.55} rough={0.3} />
-      <Box position={[-0.22, 0.8, 0]} size={[0.05, 0.32, 1.0]} color={color} metal={0.55} rough={0.3} />
-      {[[0.85, 0.5], [0.85, -0.5], [-0.82, 0.5], [-0.82, -0.5]].map(([x, z]) => (
-        <Wheel key={`${x}${z}`} position={[x, 0.2, z]} radius={0.2} width={0.12} />
-      ))}
-      <Box position={[1.33, 0.44, 0.36]} size={[0.02, 0.06, 0.18]} color="#fef9c3" glow={1.4} shadow={false} />
-      <Box position={[1.33, 0.44, -0.36]} size={[0.02, 0.06, 0.18]} color="#fef9c3" glow={1.4} shadow={false} />
-      <Box position={[-1.31, 0.5, 0.38]} size={[0.02, 0.06, 0.16]} color="#ef4444" glow={1.2} shadow={false} />
-      <Box position={[-1.31, 0.5, -0.38]} size={[0.02, 0.06, 0.16]} color="#ef4444" glow={1.2} shadow={false} />
-    </group>
-  );
-}
-
-/** Fourgon utilitaire (avant vers +X). */
-export function Van({ color = '#f8fafc', stripe = '#2563eb', ...rest }) {
-  return (
-    <group {...rest}>
-      <Profile
-        points={[[-1.6, 0.18], [1.6, 0.18], [1.62, 0.6], [1.45, 0.74], [1.02, 0.8], [0.7, 1.32], [-1.6, 1.36]]}
-        depth={1.2}
-        bevel={0.03}
-        color={color}
-        metal={0.35}
-        rough={0.4}
-      />
-      <Box position={[0.87, 1.066, 0]} rotation={[0, 0, -1.02]} size={[0.56, 0.02, 1.12]} color="#0b1220" metal={0.85} rough={0.12} />
-      <Box position={[0.62, 0.98, 0.615]} size={[0.44, 0.3, 0.01]} color="#0b1220" metal={0.85} rough={0.12} />
-      <Box position={[0.62, 0.98, -0.615]} size={[0.44, 0.3, 0.01]} color="#0b1220" metal={0.85} rough={0.12} />
-      <Box position={[-0.4, 0.62, 0.616]} size={[2.2, 0.12, 0.01]} color={stripe} glow={0.15} shadow={false} />
-      <Box position={[-0.4, 0.62, -0.616]} size={[2.2, 0.12, 0.01]} color={stripe} glow={0.15} shadow={false} />
-      <Box position={[0.05, 0.75, 0.616]} size={[0.015, 0.95, 0.01]} color="#94a3b8" shadow={false} />
-      {[[1.0, 0.56], [1.0, -0.56], [-1.05, 0.56], [-1.05, -0.56]].map(([x, z]) => (
-        <Wheel key={`${x}${z}`} position={[x, 0.22, z]} radius={0.22} width={0.14} />
-      ))}
-      <Box position={[1.63, 0.5, 0.42]} size={[0.02, 0.07, 0.2]} color="#fef9c3" glow={1.4} shadow={false} />
-      <Box position={[1.63, 0.5, -0.42]} size={[0.02, 0.07, 0.2]} color="#fef9c3" glow={1.4} shadow={false} />
-      <Box position={[-1.61, 0.55, 0.5]} size={[0.02, 0.18, 0.08]} color="#ef4444" glow={1.2} shadow={false} />
-      <Box position={[-1.61, 0.55, -0.5]} size={[0.02, 0.18, 0.08]} color="#ef4444" glow={1.2} shadow={false} />
-    </group>
-  );
-}
+/* Voitures et fourgons : modèles 3D du Car Kit de Kenney (CC0), voir vehicleModels.jsx */
+export { Car, Van, Truck } from './vehicleModels';
 
 const SIGNAL_AMBER = '#fbbf24';
 const LENS_AMBER = '#b45309';

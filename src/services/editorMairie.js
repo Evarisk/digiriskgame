@@ -38,8 +38,8 @@ const door = (edge, t, kind = 'porte', width, level = 0) => ({
  * Rangée de fenêtres plaquée sur une façade (rotation : 0 sud, 90 est, 180 nord, 270 ouest), une par niveau :
  * vitrages tous les 1,8 (centrés sur la rangée), la façade est percée derrière chacun.
  */
-const windows = (x, z, rotation, length, level = 0) =>
-  el('facade_windows', x, z, rotation, { params: { length, floors: 1, firstLevel: 0 }, ...(level ? { level } : {}) });
+const windows = (x, z, rotation, length, level = 0, extra = {}) =>
+  el('facade_windows', x, z, rotation, { params: { length, floors: 1, firstLevel: 0, balconnet: 1, ...extra }, ...(level ? { level } : {}) });
 const armchair = (x, z, rotation = 0) => el('style_armchair', x, z, rotation);
 /** Lustre suspendu à 2,2 m du sol, tige jusqu'au plafond (plancher de l'étage ou corniche du toit). */
 const chandelier = (x, z, rod = ROD_GROUND) => el('chandelier', x, z, 0, { params: { elevation: 1.45, rod } });
@@ -97,15 +97,18 @@ const STAIR = { x: 0, z: -2.8, width: 1.6, length: 4.4 };
 
 export function buildMairieScene() {
   const scene = emptyScene('Mairie de démo — Salon des maires');
-  // Visite : départ sur la place, au passage piéton, regard vers la façade (nord)
-  scene.spawn = { position: [0, 16.4], rotation: 180 };
+  // Visite : départ sur le trottoir d'en face, au bout du passage piéton, regard vers la façade (nord)
+  scene.spawn = { position: [0.6, 19.7], rotation: 180 };
 
   /* ---------- Sols (dans l'ordre d'empilement : les suivants passent devant) ---------- */
   scene.surfaces = [
-    createSurface([[-44, -44], [41, -44], [41, 4.1], [-44, 4.1]], 'gazon', { name: 'Espaces verts et jardin public' }),
-    createSurface([[-44, 14], [50, 14], [50, 19], [-44, 19]], 'asphalte', { name: 'Rue de la Mairie' }),
+    createSurface([[-70, -60], [76, -60], [76, 44], [-70, 44]], 'gazon', { name: 'Espaces verts, jardin public et jardins' }),
+    createSurface([[-70, 13], [76, 13], [76, 14], [-70, 14]], 'beton', { name: 'Trottoir côté mairie' }),
+    createSurface([[-70, 14], [76, 14], [76, 19], [-70, 19]], 'asphalte', { name: 'Rue de la Mairie' }),
+    createSurface([[-70, 19], [76, 19], [76, 22], [-70, 22]], 'beton', { name: 'Trottoir des commerces' }),
+    createSurface([[-44, 22], [50, 22], [50, 32], [-44, 32]], 'gazon', { name: 'Jardins des maisons' }),
     createSurface([[-20, 4.1], [18, 4.1], [18, 14], [-20, 14]], 'paves', { name: 'Place de la Mairie' }),
-    createSurface([[-40, 4.1], [-20, 4.1], [-20, 13.8], [-40, 13.8]], 'beton', { name: 'Cour de l’ALP' }),
+    createSurface([[-40, 4.1], [-20, 4.1], [-20, 13], [-40, 13]], 'beton', { name: 'Cour de l’ALP' }),
     createSurface([[41, -44], [46, -44], [46, 14], [41, 14]], 'asphalte', { name: 'Voie des services techniques' }),
     createSurface([[18, -2], [41, -2], [41, 5], [18, 5]], 'beton', { name: 'Cour du CTM' }),
     createSurface([[18, 5], [36, 5], [36, 13.6], [18, 13.6]], 'asphalte', { name: 'Parking' }),
@@ -138,7 +141,7 @@ export function buildMairieScene() {
     wallThickness: WALL,
     floor: 'parquet',
     floorColor: '#ffffff',
-    doors: [door(0, 0.5, 'passage', 7.4), door(0, 0.5, 'passage', 7.4, 1), door(2, 0.5, 'porte', 1.5)],
+    doors: [door(0, 0.5, 'passage', 7.4), door(0, 0.5, 'passage', 7.4, 1), door(2, 0.5, 'passage', 1.6)],
   });
   // GP4 Centre Technique Municipal. Arêtes : 0 nord · 1 est · 2 sud (portails) · 3 ouest
   const ctm = createBuilding([[18, -18], [38, -18], [38, -2], [18, -2]], {
@@ -181,14 +184,16 @@ export function buildMairieScene() {
     createWall([9, -5.85], [9, -1.57], 'plein', { ...PARTITION, door: { kind: 'porte', t: 0.6, width: 0.9 } }), // secrétariat ↔ archives
     // Local de la baie de brassage (angle sud-est du bureau des finances)
     createWall([9.8, 2.27], [9.8, 3.85], 'plein', PARTITION),
-    createWall([9.87, 2.2], [11.86, 2.2], 'plein', { ...PARTITION, door: { kind: 'porte', t: 0.45, width: 0.8 } }),
+    // Local de la baie de brassage : porte côté ouest, la baie contre le mur est (pas en face de la porte)
+    createWall([9.87, 2.2], [11.86, 2.2], 'plein', { ...PARTITION, door: { kind: 'porte', t: 0.3, width: 0.8 } }),
     // Hôtel de ville, étage noble : galerie autour de la trémie, salle du conseil au sud, ailes est et ouest
     ...upstairs([
       createWall([-4, -5.85], [-4, 3.85], 'plein', { ...PARTITION, door: { kind: 'porte', t: 0.25, width: 1.1 } }), // galerie ↔ bureau de la maire
       createWall([4, -5.85], [4, 3.85], 'plein', { ...PARTITION, door: { kind: 'porte', t: 0.25, width: 1.1 } }), // galerie ↔ bureau des adjoints
       // Galerie ↔ salle du conseil : porte à deux battants dans l'axe de l'escalier, passage derrière la trémie
       createWall([-3.93, 0.4], [3.93, 0.4], 'plein', { ...PARTITION, door: { kind: 'porte', t: 0.5, width: 1.4 } }),
-      createWall([-11.86, 0.4], [-4.07, 0.4], 'plein', { ...PARTITION, door: { kind: 'porte', t: 0.7, width: 0.9 } }), // bureau ↔ salle de réunion
+      // bureau ↔ salle de réunion : porte au-delà du bout de la table (aucun fauteuil devant)
+      createWall([-11.86, 0.4], [-4.07, 0.4], 'plein', { ...PARTITION, door: { kind: 'porte', t: 0.87, width: 0.9 } }),
       createWall([4.07, -1.5], [11.86, -1.5], 'plein', { ...PARTITION, door: { kind: 'porte', t: 0.25, width: 0.9 } }), // adjoints ↔ commissions
     ]),
     // CTM : bureaux technique et analyse (angle sud-ouest)
@@ -202,9 +207,9 @@ export function buildMairieScene() {
     createWall([-23, -7.88], [-23, -1.57], 'plein', { height: 3, color: '#f5f0e6', door: { kind: 'porte', t: 0.6, width: 0.9 } }),
     createWall([-23, -1.43], [-23, 3.88], 'plein', { height: 3, color: '#f5f0e6', door: { kind: 'porte', t: 0.4, width: 0.9 } }),
     // Clôtures : cour de l'ALP, station d'épuration (extrémités décalées : pas de poteaux confondus)
-    createWall([-40, 13.7], [-20, 13.7], 'grillage', { door: { kind: 'porte', t: 0.5, width: 2 } }),
-    createWall([-20, 4.16], [-20, 13.64], 'grillage'),
-    createWall([-40, 4.16], [-40, 13.64], 'grillage'),
+    createWall([-40, 12.9], [-20, 12.9], 'grillage', { door: { kind: 'porte', t: 0.5, width: 2 } }),
+    createWall([-20, 4.16], [-20, 12.84], 'grillage'),
+    createWall([-40, 4.16], [-40, 12.84], 'grillage'),
     createWall([22, -27], [34, -27], 'grillage'),
     createWall([34, -26.94], [34, -20.06], 'grillage'),
     createWall([34, -20], [22, -20], 'grillage', { door: { kind: 'porte', t: 0.5, width: 2.4 } }),
@@ -233,7 +238,20 @@ export function buildMairieScene() {
       windows(4 + OUT, 4.9, 90, 1.6, lv),
       windows(-4 - OUT, 4.9, 270, 1.6, lv),
     ]),
-    windows(0, 5.8 + OUT, 0, 7.4, 1),
+    // Étage de l'avant-corps : les deux fenêtres du milieu donnent sur le balcon d'honneur (sans balconnet)
+    windows(-2.75, 5.8 + OUT, 0, 1.9, 1),
+    windows(0, 5.8 + OUT, 0, 3.6, 1, { balconnet: 0 }),
+    windows(2.75, 5.8 + OUT, 0, 1.9, 1),
+    // Rez-de-chaussée de l'avant-corps : une fenêtre de part et d'autre du portail (dans l'axe de celles de l'étage)
+    windows(-2.75, 5.8 + OUT, 0, 1.6),
+    windows(2.75, 5.8 + OUT, 0, 1.6),
+    // Portail d'honneur : encadrement à bossages, imposte, vantaux ouverts, balcon d'honneur, attique décoré
+    el('entrance_portal', 0, 5.8 + OUT, 0, { params: { width: 8 } }),
+    // Pavoisement : drapeaux français et occitan croisés au balcon d'honneur, drapeaux français aux balcons des ailes
+    el('balcony_flag', -1.45, 5.8 + OUT + 0.5, 340, { params: { flag: 0, elevation: 3.42, side: 1 } }),
+    el('balcony_flag', 1.45, 5.8 + OUT + 0.5, 20, { params: { flag: 2, elevation: 3.42, side: 0 } }),
+    el('balcony_flag', -8.9, 4 + OUT + 0.19, 345, { params: { flag: 0, elevation: 3.36, side: 1 } }),
+    el('balcony_flag', 8.9, 4 + OUT + 0.19, 15, { params: { flag: 0, elevation: 3.36, side: 0 } }),
     // Façade nord : au rez-de-chaussée, ni derrière l'escalier ni au droit de la porte de service (x = 6,3)
     windows(-7.2, -6 - OUT, 180, 7.2),
     windows(-2.7, -6 - OUT, 180, 1.6),
@@ -250,8 +268,8 @@ export function buildMairieScene() {
     ]),
     windows(12 + OUT, -1, 90, 1.6, 1),
     windows(-12 - OUT, -1, 270, 1.6, 1),
-    // Fronton devant le bandeau de l'étage de l'avant-corps (10 cm en avant : pas de faces confondues)
-    el('sign_mairie', 0, 5.8 + OUT + 0.1, 0, { params: { elevation: 1.98 } }),
+    // Inscription « MAIRIE » à l'attique de l'avant-corps, au-dessus de la corniche (10 cm en avant de la façade)
+    el('sign_mairie', 0, 5.8 + OUT + 0.1, 0, { params: { elevation: 4.86 } }),
     el('roof_mansard', 0, -1, 0, { params: { width: 24, depth: 10, height: 2.4, elevation: HEIGHT + ROOF_GAP } }),
     el('roof_mansard', 0, 4.75, 0, { params: { width: 8, depth: 2.1, height: 1.6, elevation: PAVILION + ROOF_GAP } }),
     // Campanile posé sur le terrasson de zinc (corniche 0,22 + toiture 2,4 + zinc 0,07)
@@ -269,8 +287,8 @@ export function buildMairieScene() {
   const administratif = [
     // Vestibule (avant-corps)
     el('carpet', 0, 4.8, 0, { params: { width: 2.2, depth: 1.4 } }),
-    el('plant', -3.2, 5.3),
-    el('plant', 3.2, 5.3),
+    el('plant', -3.5, 5.4),
+    el('plant', 3.5, 5.4),
 
     // WU1 Accueil du public : hall sur toute la profondeur, guichet sur le côté, escalier d'honneur au fond
     ut(WU.accueil, 0, -1, 7.2, 9.2),
@@ -283,7 +301,7 @@ export function buildMairieScene() {
     armchair(-2.9, 3.3, 90),
     el('grandfather_clock', -3.75, 0.1, 90),
     chandelier(0, 1.6),
-    el('extinguisher', -3.8, 3.2, 90),
+    el('extinguisher', -3.77, 3.2, 90),
     el('firstaid', 3.82, -5.4, 270),
     el('plant', -3.4, -5.3),
 
@@ -295,10 +313,10 @@ export function buildMairieScene() {
     el('copier', -4.36, 0.2, 270),
     el('register_shelf', -4.28, -4.6, 270),
     el('register_shelf', -4.28, -1.2, 270),
-    el('fireplace', -8.6, 0.74, 180),
+    el('fireplace', -8.6, 0.62, 180),
     el('portrait', -11.84, -4, 90, { params: { elevation: 1.25 } }),
     chandelier(-8, -2.4),
-    el('extinguisher', -11.82, -0.2, 90),
+    el('extinguisher', -11.68, -0.2, 90),
 
     // WU5 Salle de pause
     ut(WU.pause, -8, 2.45, 7.2, 2.4),
@@ -316,7 +334,7 @@ export function buildMairieScene() {
     el('copier', 5.35, -5.56),
     el('register_shelf', 7.9, -1.78, 180),
     chandelier(6.5, -3.7),
-    el('extinguisher', 4.18, -5.3, 90),
+    el('extinguisher', 4.23, -5.3, 90),
 
     // WU18 Salle d'archives : registres, coffre-fort
     ut(WU.archives, 10.45, -3.7, 2.6, 3.8),
@@ -334,7 +352,7 @@ export function buildMairieScene() {
 
     // WU20 Baie de brassage (local fermé)
     ut(WU.baie, 10.8, 3.05, 1.9, 1.5),
-    el('server_rack', 11.15, 3.52, 180),
+    el('server_rack', 11.5, 3.52, 180),
   ];
 
   /* ---------- GP3 Service administratif, étage noble ---------- */
@@ -353,11 +371,13 @@ export function buildMairieScene() {
     // entrée par la porte dans l'axe de l'escalier, table en retrait pour dégager le passage
     el('carpet', 0, 2.1, 0, { params: { width: 6, depth: 3 } }),
     el('council_table', 0, 2.1, 0, { params: { length: 4.8 }, label: 'Salle du conseil et des mariages' }),
-    ...[-1.8, -0.6, 0.6, 1.8].flatMap((x) => [armchair(x, 1.35), armchair(x, 2.85, 180)]),
+    // Côté porte, allée centrale laissée libre dans l'axe de l'entrée
+    ...[-1.8, 1.8].map((x) => armchair(x, 1.35)),
+    ...[-1.8, -0.6, 0.6, 1.8].map((x) => armchair(x, 2.85, 180)),
     armchair(-2.95, 2.1, 90),
     el('marianne_bust', -3.55, 2.1, 90),
     el('portrait', -3.92, 2.1, 90, { params: { elevation: 1.4 } }),
-    el('fireplace', 3.74, 2.1, 270),
+    el('fireplace', 3.62, 2.1, 270),
     ...[-2.6, -1.8, -1, 1, 1.8, 2.6].flatMap((x) => [armchair(x, 4.5, 180), armchair(x, 5.2, 180)]),
     chandelier(-1.5, 2.1, ROD_NOBLE),
     chandelier(1.5, 2.1, ROD_NOBLE),
@@ -367,17 +387,17 @@ export function buildMairieScene() {
     ut(WU.reunion, -8, -1, 7.2, 9.2),
     el('antique_desk', -8, -3, 180, { label: 'Bureau de la maire', params: { screens: 1 } }),
     // Jeu de cartes sécurité DigiRisk sur le sous-main, à côté de l'écran, présenté aux visiteurs
-    el('card_game', -8.345, -3, 0, { params: { elevation: 0.52 } }),
+    el('card_game', -8.42, -3, 0, { params: { elevation: 0.52 } }),
     armchair(-8.55, -2.1, 180),
     armchair(-7.45, -2.1, 180),
-    el('fireplace', -8.8, 0.14, 180),
+    el('fireplace', -8.8, 0.02, 180),
     el('portrait', -11.84, -4, 90, { params: { elevation: 1.4 } }),
     el('register_shelf', -4.28, -1.4, 270),
     chandelier(-8, -2.6, ROD_NOBLE),
     el('council_table', -8, 2.15, 0, { params: { length: 3.6 }, label: 'Salle de réunion' }),
     ...[-9.2, -8, -6.8].flatMap((x) => [armchair(x, 1.4), armchair(x, 2.9, 180)]),
     chandelier(-8, 2.15, ROD_NOBLE),
-    el('extinguisher', -11.82, 2.1, 90),
+    el('extinguisher', -11.68, 2.1, 90),
 
     // Aile est de l'étage : bureau des adjoints, salle des commissions
     el('antique_desk', 6.6, -3.8, 0, { label: 'Bureau des adjoints', params: { screens: 1 } }),
@@ -414,7 +434,7 @@ export function buildMairieScene() {
     ut(WU.stockage, 35.9, -9.75, 3.6, 5.2),
     el('rack', 37.5, -9.75, 90, { params: { bays: 5, levels: 3 } }),
     el('loaded_pallet', 35.2, -8.2),
-    el('loaded_pallet', 35.2, -11.2, 0, { color: '#2563eb' }),
+    el('loaded_pallet', 35.2, -11.2, 0, { color: '#4a5f7a' }),
     el('palletjack', 34.6, -9.7, 90),
     // WU9 Fosse VL (devant le portail ouest)
     ut(WU.fosse, 26, -5.5, 4, 6),
@@ -430,12 +450,19 @@ export function buildMairieScene() {
     el('extinguisher', 37.7, -4, 270),
     el('firstaid', 18.3, -13.5, 90),
     el('sign_mandatory', 28.5, -12.6, 0, { label: 'EPI obligatoires' }),
+    // Atelier vivant : établi et panneau à outils contre le mur ouest, vestiaires, pneus, stock de signalisation, coin café
+    el('tool_wall', 18.52, -16.0, 90, { params: { length: 2.4 } }),
+    el('lockers', 22.95, -10.0, 90, { params: { count: 4 } }),
+    el('tire_stack', 23.35, -3.0, 180),
+    el('cones_stock', 37.35, -5.6, 270),
+    // Coin café contre la cloison des bureaux, à côté des vestiaires : hors des travées et des portails des véhicules
+    el('coffee_corner', 23.1, -5.775, 90),
     // WU15 Station d'épuration (dehors, au nord du CTM)
     utStation(WU.epuration, 'wastewater', 31.4, -23.6),
     el('ibc', 23.2, -26.2),
     el('ibc', 24.3, -26.2),
-    el('barrel', 33.2, -21, 0, { color: '#16a34a' }),
-    el('sign_warning', 29.4, -20.3, 0, { label: 'Produits chimiques' }),
+    el('barrel', 33.2, -21, 0, { color: '#3f6b46' }),
+    el('sign_warning', 29.75, -20.3, 0, { label: 'Produits chimiques' }),
   ];
 
   /* ---------- GP5 Centre Technique Environnement ---------- */
@@ -447,21 +474,29 @@ export function buildMairieScene() {
     el('gas', 31.6, -33.6),
     el('sign_mandatory', 29.4, -31.5, 0, { label: 'EPI tronçonnage' }),
     el('extinguisher', 18.3, -32.5, 90),
+    // Matériel des espaces verts : tondeuse autoportée, râtelier d'outils, sacs de terreau
+    el('riding_mower', 19.6, -37.6),
+    el('garden_tools_rack', 21.5, -39.4, 0, { params: { length: 2.6 } }),
+    el('compost_bags', 30.9, -38.9),
   ];
 
   /* ---------- GP7 ALP : cantine, cuisines, plonge, stockage, bureau de direction ---------- */
   const alpElements = [
     // WU24 Cantine
     ut(WU.cantine, -35, -2, 9.4, 11.4),
-    ...[-37.8, -35.6, -31.6].flatMap((x) => [-5.5, -2.5, 0.5].map((z) => el('canteen_table', x, z))),
-    el('extinguisher', -39.82, 2, 90),
+    ...[-37.8, -35.6, -32.2].flatMap((x) => [-5.5, -2.5, 0.5].map((z) => el('canteen_table', x, z))),
+    el('extinguisher', -39.72, 2, 90),
+    // Déjeuner : des enfants à trois tables de la cantine
+    el('kids_lunch', -37.8, -2.5),
+    el('kids_lunch', -35.6, -2.5),
+    el('kids_lunch', -37.8, 0.5),
     // WU21 Cuisines
     ut(WU.cuisines, -26.5, -4.7, 6.6, 6.0),
     el('kitchen_range', -28, -7.28),
     el('kitchen_range', -25.6, -7.28),
     el('inox_worktable', -27.4, -4.3),
     el('inox_worktable', -25.2, -4.3),
-    el('extinguisher', -29.82, -6.2, 90),
+    el('extinguisher', -29.75, -6.2, 90),
     // WU22 Plonge
     ut(WU.plonge, -21.5, -4.7, 2.6, 6.0),
     el('dish_station', -21.5, -7.5),
@@ -487,57 +522,194 @@ export function buildMairieScene() {
     el('flag_fr', -5.6, 7.4),
     el('flag_eu', 5.6, 7.4, 180),
     el('fountain', 0, 10.6),
+    // Pigeons qui picorent sur la place (près des bancs et du perron)
+    el('pigeons', -9.2, 10.2),
+    el('pigeons', 7.4, 9.9),
     el('bench', -3.4, 10.6, 90),
     el('bench', 3.4, 10.6, 270),
     el('bench', 0, 13.2, 180),
     el('planter', -8, 5),
     el('planter', 8, 5),
-    el('planter', -3.4, 8.2),
-    el('planter', 3.4, 8.2),
+    // Outils des jardiniers au travail devant les jardinières
+    el('watering_can', -7.45, 5.75, 90),
+    el('wheelbarrow', 9.6, 6.2, 200),
+    el('planter', -4.3, 8.5),
+    el('planter', 4.3, 8.5),
     ...[[-7.5, 12.8], [7.5, 12.8], [-14.6, 5.2], [14.6, 5.2], [16.6, 4.6], [-14.6, 13], [-18.4, 9]].map(([x, z]) => el('townlamp', x, z)),
     ...[-12, -8, -4, 4, 8, 12].map((x) => el('bollard', x, 13.75)),
     // Alignements d'arbres de la place et jardin public
     ...[[-14.6, 8], [-14.6, 10.8], [14.6, 8], [14.6, 10.8]].map(([x, z]) => el('tree', x, z)),
-    ...[[-12.5, -10], [-7, -12.8], [-1, -10.4], [9.5, -12.4], [14.5, -8.5], [-14.5, -13.6], [-30, -14], [-36, -18], [10, -22], [0, -28]].map(([x, z], i) =>
+    ...[[-12.5, -10], [-7, -12.8], [-1, -10.4], [9.5, -12.4], [13.3, -8.5], [-14.5, -13.6], [-30, -14], [-36, -18], [10, -22], [0, -28]].map(([x, z], i) =>
       el(i % 2 ? 'conifer' : 'tree', x, z)
     ),
     el('bench', -4, -9.4),
     el('bench', 2, -9.4),
-    el('planter', 6, -13.4, 90),
-    ...[[19.5, 8.4, '#2563eb'], [21.7, 8.4, '#f8fafc'], [23.9, 8.4, '#dc2626'], [28.3, 8.4, '#111827'], [30.5, 8.4, '#eab308'], [19.5, 11.6, '#64748b'], [23.9, 11.6, '#16a34a'], [26.1, 11.6, '#f8fafc'], [32.7, 11.6, '#1d4ed8']].map(([x, z, color]) =>
+    el('planter', 2, -11.2),
+    // Voitures aux teintes courantes (gris, argent, blanc, noir, bleu nuit, bordeaux)
+    ...[[19.5, 7, '#eef0f1'], [21.7, 7, '#4a4f55'], [23.9, 7, '#d9d2c3'], [28.3, 7, '#2b3f66'], [30.5, 7, '#8a2f36'], [19.5, 12, '#b03a2e'], [23.9, 12, '#6c7a5c'], [26.1, 12, '#3d6ea8'], [32.7, 12, '#c8b89a']].map(([x, z, color]) =>
       el('car', x, z, 90, { color })
     ),
   ];
 
-  scene.elements = [...facades, ...administratif, ...etageNoble, ...ctmElements, ...cteElements, ...alpElements, ...outdoors];
+
+  /* ---------- La ville : rue commerçante en face de la mairie, circulation, mobilier urbain ---------- */
+  const town = [
+    // Maisons de ville à commerces (boucherie, fleuriste, tabac-presse, café, boulangerie, pharmacie, fleuriste)
+    el('townhouse', -40.5, 22, 180, { params: { width: 7, floors: 3, shop: 0, facade: 1, slate: 0 } }),
+    el('townhouse', -34, 22, 180, { params: { width: 6, floors: 4, shop: 6, facade: 3, slate: 0 } }),
+    el('townhouse', -28.5, 22, 180, { params: { width: 5, floors: 3, shop: 7, facade: 2, slate: 0 } }),
+    el('townhouse', -22.75, 22, 180, { params: { width: 6.5, floors: 3, shop: 5, facade: 0, slate: 0 } }),
+    el('townhouse', -16.5, 22, 180, { params: { width: 6, floors: 2, shop: 0, facade: 4, slate: 0 } }),
+    el('townhouse', -10, 22, 180, { params: { width: 7, floors: 3, shop: 4, facade: 5, slate: 0 } }),
+    el('townhouse', -3, 22, 180, { params: { width: 7, floors: 4, shop: 2, facade: 2, slate: 0 } }),
+    el('townhouse', 3.5, 22, 180, { params: { width: 6, floors: 3, shop: 1, facade: 1, slate: 0 } }),
+    el('townhouse', 9.25, 22, 180, { params: { width: 5.5, floors: 3, shop: 8, facade: 3, slate: 1 } }),
+    el('townhouse', 15.25, 22, 180, { params: { width: 6.5, floors: 3, shop: 3, facade: 0, slate: 0 } }),
+    el('townhouse', 21.5, 22, 180, { params: { width: 6, floors: 2, shop: 0, facade: 5, slate: 1 } }),
+    el('townhouse', 28, 22, 180, { params: { width: 7, floors: 4, shop: 0, facade: 4, slate: 1 } }),
+    el('townhouse', 34.5, 22, 180, { params: { width: 6, floors: 3, shop: 0, facade: 1, slate: 0 } }),
+    el('townhouse', 40.75, 22, 180, { params: { width: 6.5, floors: 3, shop: 9, facade: 3, slate: 0 } }),
+    el('townhouse', 47, 22, 180, { params: { width: 6, floors: 2, shop: 0, facade: 0, slate: 1 } }),
+    // Terrasse du Café de la Mairie, abribus (affiche DigiRisk), réverbères, corbeilles, boîte aux lettres
+    // Terrasse et abribus décalés : l'entrée des commerces reste dégagée jusqu'au bord du trottoir
+    el('cafe_terrace', -2.65, 20.4, 0, { params: { tables: 4 } }),
+    el('bus_shelter', -15.7, 19.95, 180),
+    ...[-34, -22, -10, 10, 22, 34].map((x) => el('townlamp', x, 19.45)),
+    el('litter_bin', -8.2, 19.4, 180),
+    el('litter_bin', 9.2, 19.4, 180),
+    el('litter_bin', 2.4, 13.35),
+    el('litter_bin', -10.6, 13.35),
+    el('post_box', 5.6, 19.45, 180),
+    el('bike_rack', 15.8, 20.1, 180),
+    // Voitures garées le long du trottoir nord, circulation animée (ralentit aux deux passages piétons)
+    ...[[-37, '#b03a2e'], [-26.5, '#c8b89a'], [13.5, '#1c1e21'], [26, '#d9d2c3'], [41, '#b03a2e']].map(([x, color]) => el('car', x, 18.45, 0, { color })),
+    el('traffic', 3, 16.5, 0, { params: { length: 146, count: 14, crossA: -3, crossB: -33 } }),
+    // Marquage : axe discontinu, ligne de rive, ligne de stationnement côté commerces ; voie des services techniques
+    el('road_markings', 3, 16.5, 0, { params: { length: 146, width: 5, crossA: -3, crossB: -33, parking: 1, junction: 40.5 } }),
+    ...[-66, -58, -50, 56, 64, 72].flatMap((x) => [el('tree', x, 20.6), el('tree', x + 3, 12.6)]),
+    ...[-62, -54, 60, 68].map((x) => el('townlamp', x, 19.45)),
+    el('road_markings', 43.5, -15, 90, { params: { length: 58, width: 5, parking: 0 } }),
+    // Place de la Mairie : panneau d'affichage municipal, arceaux à vélos
+    el('notice_board', -12.6, 6.3),
+    el('bike_rack', 12.4, 5.8),
+
+    // Services techniques : toitures à deux pans, enseignes, bandeaux vitrés, cour (alvéoles, benne, fourgon)
+    el('roof_gable', 28, -10, 0, { color: '#6b7480', params: { width: 20, depth: 16, height: 2.4, elevation: 4.42, gable: 0, skylights: 1 } }),
+    el('wall_sign', 26.5, -1.86, 0, { label: 'Centre technique municipal', params: { width: 6, style: 0, elevation: 3.0 } }),
+    el('ribbon_windows', 18 - 0.14, -4.3, 270, { params: { length: 3, height: 1.0, elevation: 1.0 } }),
+    el('ribbon_windows', 18 - 0.14, -8.75, 270, { params: { length: 3, height: 1.0, elevation: 1.0 } }),
+    el('ribbon_windows', 28, -18 - 0.14, 180, { params: { length: 18, height: 0.7, elevation: 3.1 } }),
+    el('ribbon_windows', 38 + 0.14, -10, 90, { params: { length: 13, height: 0.7, elevation: 3.1 } }),
+    // Cases à matériaux au bout est de la cour, ouvertes vers la cour (rien devant la porte des bureaux ni les portails)
+    el('material_bays', 39.3, 1.5, 270),
+    el('skip', 25.5, 3.4),
+    el('van', 29.5, 2.8, 0, { color: '#f8fafc' }),
+    el('roof_gable', 25, -35.5, 0, { color: '#55616b', params: { width: 14, depth: 9, height: 1.6, elevation: 4.02, gable: 1, skylights: 1 } }),
+    el('wall_sign', 21, -30.86, 0, { label: 'Centre technique environnement', params: { width: 5, style: 0, elevation: 2.6 } }),
+    el('ribbon_windows', 32 + 0.14, -35.5, 90, { params: { length: 6, height: 0.7, elevation: 2.8 } }),
+    // Déchets verts entre la porte et le portail du CTE (aucun des deux encombré)
+    el('green_waste', 21.2, -29.3, 90),
+    el('skip', 36.5, -29.6),
+    el('recycling_point', 34.8, 6.4),
+
+    // École (ALP) : enseigne gravée, préau devant la porte, structure de jeux, marelle, enfants qui jouent, haies
+    el('wall_sign', -30, 4.12, 0, { label: 'Accueil de loisirs', params: { width: 5, style: 1, elevation: 3.1 } }),
+    el('preau', -35, 6.6, 0, { params: { length: 8 } }),
+    el('play_structure', -24.5, 7.4),
+    el('hopscotch', -29.6, 10.2, 90),
+    el('playing_children', -28.6, 7.6, 0, { params: { count: 7, spread: 3 } }),
+    el('hedge', -35.5, 12.5, 0, { params: { length: 8.6 } }),
+    el('hedge', -24.5, 12.5, 0, { params: { length: 8.6 } }),
+
+    // Jardin public derrière l'hôtel de ville : haies le long de l'allée
+    el('hedge', 5.4, -9.6, 90, { params: { length: 4 } }),
+    el('hedge', 7.2, -9.6, 90, { params: { length: 4 } }),
+  ];
+
+  scene.elements = [...facades, ...administratif, ...etageNoble, ...ctmElements, ...cteElements, ...alpElements, ...outdoors, ...town];
 
   /* ---------- Personnages ---------- */
   scene.npcs = [
     // Hôtel de ville : rez-de-chaussée
-    createNpc('office', [3.55, -0.2], { name: 'Sophie — accueil du public', rotation: 270, variant: 1 }),
-    createNpc('office', [-9.6, -3.1], { name: 'Paul — état civil', pose: 'type', rotation: 180, variant: 5 }),
-    createNpc('office', [7.2, -3.4], { name: 'Nicolas — secrétaire général', pose: 'type', rotation: 180, variant: 3 }),
-    createNpc('office', [7, 0.8], { name: 'Fatima — finances', pose: 'type', rotation: 180, variant: 6 }),
-    createNpc('officeAlt', [9.2, 0.8], { name: 'Camille — comptabilité', pose: 'type', rotation: 180, variant: 3 }),
-    createNpc('officeAlt', [-6.4, -3.1], { name: 'Thomas — urbanisme', pose: 'type', rotation: 180, variant: 6 }),
-    createNpc('officeAlt', [-1.8, 13.4], { name: 'Marc — administré', variant: 4, route: [[-1.8, 8.4], [0, 7.3], [0, 4.8], [1.9, 0.5]], routeMode: 'pingpong', speed: 0.8 }),
-    createNpc('office', [16.6, 12.6], { name: 'Lucie — habitante', variant: 7, route: [[2.4, 12.6], [2.4, 8.4], [0.6, 7.3], [0.6, 4.8], [1.9, -0.9]], routeMode: 'pingpong', speed: 0.85 }),
+    // Apparences accordées aux prénoms (variantes 1, 3, 5, 7 : femmes ; 0, 2, 4, 6 : hommes)
+    createNpc('office', [3.55, -0.2], { name: 'Sophie — accueil du public', rotation: 270, variant: 7 }),
+    createNpc('office', [-9.6, -3.1], { name: 'Paul — état civil', pose: 'type', rotation: 180, variant: 0 }),
+    createNpc('officeAlt', [7.2, -3.4], { name: 'Nicolas — secrétaire général', pose: 'type', rotation: 180, variant: 2 }),
+    createNpc('office', [7, 0.8], { name: 'Fatima — finances', pose: 'type', rotation: 180, variant: 3 }),
+    createNpc('office', [9.2, 0.8], { name: 'Camille — comptabilité', pose: 'type', rotation: 180, variant: 5 }),
+    createNpc('officeAlt', [-6.4, -3.1], { name: 'Thomas — urbanisme', pose: 'type', rotation: 180, variant: 4 }),
+    createNpc('officeAlt', [-1.8, 13.4], { name: 'Marc — administré', variant: 6, route: [[-1.8, 8.4], [0, 7.3], [0, 4.8], [1.9, 0.5]], routeMode: 'pingpong', speed: 0.8 }),
+    createNpc('office', [16.6, 12.0], { name: 'Lucie — habitante', variant: 1, route: [[2.4, 12.0], [2.4, 8.4], [0.35, 7.3], [0.35, 4.8], [1.9, -0.9]], routeMode: 'pingpong', speed: 0.85 }),
+    // Vie de la place : deux habitants qui discutent près de la fontaine, un retraité sur le banc
+    createNpc('officeAlt', [-5, 9.3], { name: 'Bertrand — habitant', rotation: 58, variant: 4 }),
+    createNpc('office', [-4.2, 9.8], { name: 'Nathalie — habitante', rotation: 238, variant: 5 }),
+    createNpc('officeAlt', [3.32, 10.6], { name: 'Jean — retraité', pose: 'sit', rotation: 270, variant: 2 }),
+    // Hall : administrés qui attendent leur tour ; salle de pause ; photocopieur ; archiviste
+    createNpc('officeAlt', [-2.86, 2.5], { name: 'Gérard — administré en attente', pose: 'sit', rotation: 90, variant: 0 }),
+    createNpc('officeAlt', [-2.86, 3.3], { name: 'Martine — administrée en attente', pose: 'sit', rotation: 90, variant: 3 }),
+    createNpc('officeAlt', [-9.3, 1.8], { name: 'Karine — pause café', pose: 'meet', rotation: 0, variant: 1 }),
+    createNpc('office', [-7.9, 3.1], { name: 'Olivier — pause café', pose: 'meet', rotation: 180, variant: 6 }),
+    createNpc('officeAlt', [-10.85, 2.45], { name: 'Sandrine — machine à café', pose: 'work', rotation: 270, variant: 7 }),
+    createNpc('office', [-4.95, 0.2], { name: 'Julien — photocopies', pose: 'work', rotation: 90, variant: 2 }),
+    createNpc('office', [5.6, -2.4], { name: 'Pascal — archiviste', pose: 'carry', variant: 4, route: [[8.3, -2.6], [8.7, -3.28], [9.9, -3.28], [10.4, -2.7]], routeMode: 'pingpong', speed: 0.6 }),
+    // Place : promeneuse autour du square aux pigeons, deux voisins qui bavardent
+    createNpc('officeAlt', [-6.2, 7.6], { name: 'Odile — promeneuse', variant: 5, route: [[-12.2, 7.6], [-12.2, 12.3], [-6.2, 12.3]], routeMode: 'loop', speed: 0.6 }),
+    createNpc('office', [9.1, 10.7], { name: 'Yves — habitant', rotation: 55, variant: 6 }),
+    createNpc('office', [9.8, 11.2], { name: 'Monique — habitante', rotation: 235, variant: 3 }),
+    // Jardiniers : soin des jardinières de la façade, brouette devant l'hôtel de ville
+    createNpc('gardener', [-8.2, 5.62], { name: 'Gaël — jardinier', pose: 'work', rotation: 180, variant: 0 }),
+    createNpc('gardener', [8.3, 5.62], { name: 'Aurélie — jardinière', pose: 'work', rotation: 180, variant: 5 }),
+    createNpc('gardener', [-9.6, 6.7], { name: 'Rémi — jardinier', pose: 'carry', variant: 4, route: [[-3, 6.7]], routeMode: 'pingpong', speed: 0.55 }),
     // Hôtel de ville : étage noble
-    createNpc('officeAlt', [-8, -3.5], { name: 'Claire — maire', pose: 'sit', rotation: 0, variant: 2, level: 1 }),
-    createNpc('officeAlt', [6.6, -3.3], { name: 'Bernard — adjoint', pose: 'type', rotation: 180, variant: 0, level: 1 }),
-    createNpc('office', [9.6, -3.3], { name: 'Hélène — adjointe', pose: 'type', rotation: 180, variant: 2, level: 1 }),
+    createNpc('mayor', [-8, -3.5], { name: 'Claire — maire', pose: 'type', rotation: 0, variant: 1, level: 1 }),
+    createNpc('officeAlt', [6.6, -3.3], { name: 'Bernard — adjoint', pose: 'type', rotation: 180, variant: 6, level: 1 }),
+    createNpc('office', [9.6, -3.3], { name: 'Hélène — adjointe', pose: 'type', rotation: 180, variant: 7, level: 1 }),
+    // Rendez-vous dans le bureau de la maire, préparation du conseil, directrice des services dans la galerie
+    createNpc('officeAlt', [-7.45, -2.15], { name: 'Denis — chef d’entreprise reçu par la maire', pose: 'sit', rotation: 180, variant: 4, level: 1 }),
+    createNpc('office', [-1.8, 1.4], { name: 'Anne — conseillère municipale', pose: 'meet', rotation: 0, variant: 5, level: 1 }),
+    createNpc('officeAlt', [0.6, 2.8], { name: 'Michel — conseiller municipal', pose: 'meet', rotation: 180, variant: 2, level: 1 }),
+    createNpc('office', [-6, -4.4], { name: 'Agnès — directrice générale des services', variant: 1, level: 1, route: [[-4.6, -3.43], [-2.6, -3.43], [-1.7, -5.35], [1.7, -5.35], [2.6, -3.43], [4.6, -3.43], [5.6, -2.6]], routeMode: 'pingpong', speed: 0.65 }),
     // CTM, CTE, station d'épuration
-    createNpc('worker', [17.6, -10], { name: 'Hugo — agent technique', variant: 0, route: [[15, -10], [15, -1], [11, -0.6]], routeMode: 'pingpong', speed: 0.9 }),
-    createNpc('worker', [25.2, -13.3], { name: 'Karim — mécanicien', pose: 'work', rotation: 180, variant: 2 }),
+    createNpc('worker', [17.6, -10], { name: 'Hugo — agent technique', variant: 0, route: [[15, -10], [15, -1], [11.2, -1.0]], routeMode: 'pingpong', speed: 0.9 }),
+    createNpc('worker', [25.2, -13.3], { name: 'Karim — mécanicien', pose: 'work', rotation: 180, variant: 4 }),
     createNpc('worker', [27.2, -5.5], { name: 'Yanis — fosse VL', pose: 'work', rotation: 270, variant: 6 }),
-    createNpc('driver', [33, -1.4], { name: 'Julie — entretien voirie', variant: 3, route: [[33, 3], [39, 3]], routeMode: 'pingpong', speed: 0.8 }),
-    createNpc('worker', [27, -21.2], { name: 'Mathis — station d’épuration', variant: 5, route: [[27, -25.6]], routeMode: 'pingpong', speed: 0.6 }),
-    createNpc('worker', [25.8, -30], { name: 'Inès — espaces verts', pose: 'carry', variant: 4, route: [[25.8, -27.2], [12, -27.2], [12, -16]], routeMode: 'pingpong', speed: 0.7 }),
+    createNpc('driver', [33, -1.4], { name: 'Julie — entretien voirie', variant: 3, route: [[33, 3], [37.3, 3]], routeMode: 'pingpong', speed: 0.8 }),
+    createNpc('worker', [27, -21.2], { name: 'Mathis — station d’épuration', variant: 0, route: [[27, -25.6]], routeMode: 'pingpong', speed: 0.6 }),
+    createNpc('gardener', [25.8, -30], { name: 'Inès — espaces verts', pose: 'carry', variant: 7, route: [[25.8, -27.2], [12, -27.2], [12, -16]], routeMode: 'pingpong', speed: 0.6 }),
+    // La ville : clients en terrasse, serveur, passants, cliente de la boulangerie, voyageur à l'abribus
+    createNpc('officeAlt', [-4.105, 20.4], { name: 'Hervé — client du café', pose: 'meet', rotation: 270, variant: 0 }),
+    createNpc('office', [-4.945, 20.4], { name: 'Sylvie — cliente du café', pose: 'meet', rotation: 90, variant: 5 }),
+    createNpc('office', [-1.195, 20.4], { name: 'Lucas — client du café', pose: 'meet', rotation: 90, variant: 2 }),
+    createNpc('office', [-6.3, 21.35], { name: 'Antoine — serveur', variant: 4, route: [[0.6, 21.35], [0.75, 20.7]], routeMode: 'pingpong', speed: 0.7 }),
+    createNpc('officeAlt', [-31, 21.4], { name: 'Jacqueline — passante', variant: 7, route: [[-12, 21.4]], routeMode: 'pingpong', speed: 0.55 }),
+    createNpc('office', [8, 21.3], { name: 'Théo — passant', variant: 6, route: [[33, 21.3]], routeMode: 'pingpong', speed: 0.8 }),
+    createNpc('officeAlt', [-41, 13.5], { name: 'Bernadette — passante', variant: 3, route: [[-21, 13.5]], routeMode: 'pingpong', speed: 0.5 }),
+    createNpc('office', [3.6, 21.3], { name: 'Brigitte — cliente de la boulangerie', rotation: 0, variant: 1 }),
+    createNpc('officeAlt', [-15.6, 20.2], { name: 'Étienne — attend le bus', pose: 'sit', rotation: 180, variant: 2 }),
+    createNpc('office', [-29.6, 11.8], { name: 'Nadine — vient chercher son fils', variant: 5, route: [[-29.6, 19.3], [-24, 21.5]], routeMode: 'pingpong', speed: 0.7 }),
+    createNpc('worker', [37.3, 0.4], { name: 'Fabien — agent de voirie', pose: 'carry', variant: 2, route: [[31.6, 1.8]], routeMode: 'pingpong', speed: 0.6 }),
+    // Jardin public : lectrice sur un banc, promeneur
+    createNpc('office', [-4, -9.32], { name: 'Lucienne — lit sur un banc', pose: 'sit', rotation: 0, variant: 7 }),
+    createNpc('officeAlt', [4, -8.4], { name: 'Albert — promeneur', variant: 6, route: [[-8, -8.4], [-8, -15.6], [4, -15.6]], routeMode: 'loop', speed: 0.5 }),
+    // CTM : techniciens au bureau, mécanicien à l'établi, magasinier, agents de voirie en pause
+    createNpc('officeAlt', [20, -5.15], { name: 'Sébastien — technicien bureau d’études', pose: 'type', rotation: 180, variant: 2 }),
+    createNpc('office', [20.3, -7.15], { name: 'Élodie — technicienne analyses', pose: 'type', rotation: 180, variant: 3 }),
+    createNpc('worker', [19.45, -16.0], { name: 'Christophe — mécanicien', pose: 'work', rotation: 270, variant: 6 }),
+    createNpc('logistics', [33.6, -12.2], { name: 'Franck — magasinier', pose: 'carry', variant: 4, route: [[33.6, -7.8]], routeMode: 'pingpong', speed: 0.55 }),
+    createNpc('driver', [23.45, -5.225], { name: 'Patrick — agent de voirie en pause', pose: 'meet', rotation: 180, variant: 0 }),
+    createNpc('worker', [23.45, -6.325], { name: 'Nathan — agent de voirie en pause', pose: 'meet', rotation: 0, variant: 2 }),
+    // CTE : mécanicien au tracteur, agente des espaces verts
+    createNpc('gardener', [24.1, -35.2], { name: 'Kévin — mécanicien espaces verts', pose: 'work', rotation: 270, variant: 6 }),
+    createNpc('gardener', [21.6, -38.5], { name: 'Laura — agente espaces verts', pose: 'carry', variant: 5, route: [[25.0, -38.3], [25.0, -32.0]], routeMode: 'pingpong', speed: 0.5 }),
+    // ALP : cuisinière aux fourneaux, service à la cantine, animatrice qui surveille le déjeuner
+    createNpc('officeAlt', [-25.6, -6.4], { name: 'Fatou — cuisinière', pose: 'work', rotation: 180, variant: 3 }),
+    createNpc('office', [-28.9, -3.4], { name: 'Christine — agente de restauration', pose: 'carry', variant: 7, route: [[-30.8, -3.76], [-33.6, -3.76], [-33.6, 1.6]], routeMode: 'pingpong', speed: 0.5 }),
+    createNpc('office', [-33.6, -6.6], { name: 'Sarah — animatrice', rotation: 0, variant: 1 }),
     // ALP
-    createNpc('officeAlt', [-26.4, -5.1], { name: 'Sami — cuisinier', pose: 'work', rotation: 180, variant: 1 }),
-    createNpc('logistics', [-21.5, -6.7], { name: 'Nadia — plonge', pose: 'work', rotation: 180, variant: 7 }),
+    createNpc('officeAlt', [-26.4, -5.1], { name: 'Sami — cuisinier', pose: 'work', rotation: 180, variant: 6 }),
+    createNpc('logistics', [-21.5, -6.7], { name: 'Nadia — plonge', pose: 'work', rotation: 180, variant: 3 }),
     createNpc('office', [-27.5, 1.05], { name: 'Léa — direction ALP', pose: 'type', rotation: 180, variant: 5 }),
-    createNpc('office', [-34, 5.6], { name: 'Emma — animatrice', variant: 0, route: [[-34, 3.2], [-33.6, -1], [-31, -1]], routeMode: 'pingpong', speed: 0.7 }),
+    createNpc('office', [-34, 5.6], { name: 'Emma — animatrice', variant: 1, route: [[-34, 3.2], [-33.6, -1], [-31, -1]], routeMode: 'pingpong', speed: 0.7 }),
   ];
 
   return scene;
