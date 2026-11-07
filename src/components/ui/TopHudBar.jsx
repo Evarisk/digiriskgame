@@ -28,7 +28,6 @@ export default function TopHudBar({
   treeCollapsed,
   setTreeCollapsed,
   explorerMode,
-  explorerSupported,
   onToggleExplorer,
   settingsOpen,
   onToggleSettings,
@@ -105,17 +104,15 @@ export default function TopHudBar({
           <span>Flux</span>
         </button>
 
-        {explorerSupported && (
-          <button
-            type="button"
-            className={`hud-btn icon-toggle ${explorerMode ? 'active' : ''}`}
-            onClick={onToggleExplorer}
-            title="Parcourir le site en première personne (ZQSD / WASD + souris)"
-          >
-            <Footprints size={14} />
-            <span>{explorerMode ? 'Quitter la visite' : 'Visite 1re pers.'}</span>
-          </button>
-        )}
+        <button
+          type="button"
+          className={`hud-btn icon-toggle ${explorerMode ? 'active' : ''}`}
+          onClick={onToggleExplorer}
+          title="Parcourir le site en première personne (ZQSD / WASD + souris, ou joysticks à l'écran)"
+        >
+          <Footprints size={14} />
+          <span>{explorerMode ? 'Quitter la visite' : 'Visite 1re pers.'}</span>
+        </button>
 
         <button
           type="button"

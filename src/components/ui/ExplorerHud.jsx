@@ -1,21 +1,32 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { CheckCircle2, Circle, ClipboardCheck, LogOut, MapPin, Navigation2, Play, ShieldAlert } from 'lucide-react';
+import { ArrowBigUp, CheckCircle2, Circle, ClipboardCheck, Gamepad2, LogOut, MapPin, Mouse, Navigation2, Pause, Play, ShieldAlert } from 'lucide-react';
 import { explorerStore, guideTo, useExplorer } from '../3d/explorer/explorerStore';
+import { canUseMouse } from '../../services/touchControls';
 import ExplorerMinimap from './ExplorerMinimap';
+import TouchControls from './TouchControls';
 
 /**
  * Interface du mode visite en première personne : viseur et élément visé, localisation, mission guidée
  * (prochain poste à inspecter avec direction et distance, consigne du moment), briefing de départ,
  * minicarte, alertes de zone, confirmation des inspections et carte de pause avec la liste des postes.
+ * Commandes tactiles : joysticks à l'écran et boutons Inspecter / Sauter / Pause.
  */
 
-const CONTROLS = [
+const KEY_CONTROLS = [
   ['Z Q S D / W A S D', 'Se déplacer'],
   ['Souris', 'Regarder'],
   ['Maj', 'Courir'],
   ['Espace', 'Sauter'],
   ['E / Clic', 'Inspecter l’élément visé'],
   ['Échap', 'Pause'],
+];
+
+const TOUCH_CONTROLS = [
+  ['Joystick gauche', 'Se déplacer'],
+  ['Joystick droit / glisser', 'Regarder'],
+  ['Inspecter', 'Inspecter l’élément visé'],
+  ['Sauter', 'Sauter'],
+  ['Pause', 'Pause'],
 ];
 
 const BRIEFING_SECONDS = 14;
@@ -30,9 +41,9 @@ function scoreOf(element, cotationMode) {
 }
 
 /** Consigne du moment, selon ce que vise le joueur et la distance au prochain poste. */
-function currentStep({ target, inspectedIds, nextUt, guide, total }) {
+function currentStep({ target, inspectedIds, nextUt, guide, total, touch }) {
   if (target?.elementType === 'workunit' && !inspectedIds.has(target.id)) {
-    return { tone: 'action', text: 'Appuyez sur E pour inspecter ce poste' };
+    return { tone: 'action', text: touch ? 'Touchez Inspecter pour inspecter ce poste' : 'Appuyez sur E pour inspecter ce poste' };
   }
   if (!nextUt) {
     if (total && inspectedIds.size >= total) return { tone: 'done', text: 'Tous les postes sont inspectés : vous pouvez quitter la visite.' };
@@ -78,6 +89,7 @@ function Checklist({ data, inspectedIds }) {
 
 export default function ExplorerHud({ data, cotationMode, inspectedIds, hasSelection, onExit }) {
   const locked = useExplorer((s) => s.locked);
+  const touch = useExplorer((s) => s.touch);
   const target = useExplorer((s) => s.target);
   const zoneUt = useExplorer((s) => s.zoneUt);
   const zoneBuilding = useExplorer((s) => s.zoneBuilding);
@@ -132,10 +144,12 @@ export default function ExplorerHud({ data, cotationMode, inspectedIds, hasSelec
   const targetScale = scaleOf(target, cotationMode);
   const zoneScale = scaleOf(zoneUt || zoneBuilding, cotationMode);
   const progress = total ? Math.round((done / total) * 100) : 0;
-  const step = currentStep({ target, inspectedIds, nextUt, guide, total });
+  const step = currentStep({ target, inspectedIds, nextUt, guide, total, touch });
+  const controls = touch ? TOUCH_CONTROLS : KEY_CONTROLS;
+  const inspectKey = touch ? 'Inspecter' : 'E';
 
   return (
-    <div className="explorer-hud">
+    <div className={`explorer-hud ${touch ? 'touch' : ''}`}>
       {locked && (
         <>
           <div
@@ -156,10 +170,12 @@ export default function ExplorerHud({ data, cotationMode, inspectedIds, hasSelec
               </span>
               <span className={`explorer-target-action ${target.elementType === 'workunit' && inspectedIds.has(target.id) ? 'done' : ''}`}>
                 {target.elementType !== 'workunit'
-                  ? 'E · voir la fiche'
+                  ? `${inspectKey} · voir la fiche`
                   : inspectedIds.has(target.id)
-                    ? '✓ Déjà inspecté · E pour revoir'
-                    : 'Appuyez sur E pour inspecter'}
+                    ? `✓ Déjà inspecté · ${inspectKey} pour revoir`
+                    : touch
+                      ? 'Touchez Inspecter'
+                      : 'Appuyez sur E pour inspecter'}
               </span>
             </div>
           )}
@@ -234,7 +250,7 @@ export default function ExplorerHud({ data, cotationMode, inspectedIds, hasSelec
                   Pointez le poste avec le <strong>viseur</strong> (le rond au centre de l’écran).
                 </li>
                 <li>
-                  Appuyez sur <kbd>E</kbd> : sa fiche de risques s’ouvre et le poste est coché.
+                  {touch ? 'Touchez' : 'Appuyez sur'} <kbd>{inspectKey}</kbd> : sa fiche de risques s’ouvre et le poste est coché.
                 </li>
               </ol>
               <div className="explorer-briefing-foot">Inspectez les {total} postes pour terminer la visite.</div>
@@ -243,13 +259,36 @@ export default function ExplorerHud({ data, cotationMode, inspectedIds, hasSelec
 
           <ExplorerMinimap data={data} cotationMode={cotationMode} inspectedIds={inspectedIds} />
 
-          <div className="explorer-hints">
-            {CONTROLS.map(([keys, action]) => (
-              <span key={keys}>
-                <kbd>{keys}</kbd> {action}
-              </span>
-            ))}
-          </div>
+          {touch ? (
+            <TouchControls>
+              <button type="button" className="walk-touch-btn primary" disabled={!target} onClick={() => explorerStore.actions?.inspect()}>
+                <ClipboardCheck size={20} />
+                Inspecter
+              </button>
+              <button
+                type="button"
+                className="walk-touch-btn"
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  explorerStore.actions?.jump();
+                }}
+              >
+                <ArrowBigUp size={20} />
+                Sauter
+              </button>
+              <button type="button" className="walk-touch-btn small" onClick={() => explorerStore.releaseLock()} aria-label="Pause">
+                <Pause size={18} />
+              </button>
+            </TouchControls>
+          ) : (
+            <div className="explorer-hints">
+              {controls.map(([keys, action]) => (
+                <span key={keys}>
+                  <kbd>{keys}</kbd> {action}
+                </span>
+              ))}
+            </div>
+          )}
         </>
       )}
 
@@ -271,15 +310,15 @@ export default function ExplorerHud({ data, cotationMode, inspectedIds, hasSelec
               <div className="explorer-pause-title">Visite de sécurité en première personne</div>
               <p className="explorer-pause-text">
                 Votre mission : inspecter chaque poste de travail (UT) du site. Suivez la flèche et la balise bleue
-                jusqu’au poste indiqué, pointez-le avec le viseur puis appuyez sur <kbd>E</kbd> : sa fiche de risques
-                s’ouvre et le poste est coché ci-dessous.
+                jusqu’au poste indiqué, pointez-le avec le viseur puis {touch ? 'touchez' : 'appuyez sur'} <kbd>{inspectKey}</kbd> : sa
+                fiche de risques s’ouvre et le poste est coché ci-dessous.
               </p>
               <div className="explorer-pause-progress">
                 <ClipboardCheck size={14} /> {done}/{total} postes inspectés
               </div>
               <Checklist data={data} inspectedIds={inspectedIds} />
               <ul className="explorer-controls">
-                {CONTROLS.map(([keys, action]) => (
+                {controls.map(([keys, action]) => (
                   <li key={keys}>
                     <kbd>{keys}</kbd>
                     <span>{action}</span>
@@ -293,6 +332,17 @@ export default function ExplorerHud({ data, cotationMode, inspectedIds, hasSelec
               <Play size={14} />
               <span>{hasSelection ? 'Reprendre la visite' : 'Jouer'}</span>
             </button>
+            {canUseMouse() && (
+              <button
+                type="button"
+                className="hud-btn icon-toggle"
+                onClick={() => explorerStore.setTouch(!touch)}
+                title={touch ? 'Regarder à la souris (capturée), marcher au clavier' : 'Se déplacer et regarder avec des joysticks à l’écran'}
+              >
+                {touch ? <Mouse size={14} /> : <Gamepad2 size={14} />}
+                <span>{touch ? 'Souris' : 'Joysticks'}</span>
+              </button>
+            )}
             <button type="button" className="hud-btn icon-toggle" onClick={onExit}>
               <LogOut size={14} />
               <span>{hasSelection ? 'Quitter' : 'Quitter la visite'}</span>
