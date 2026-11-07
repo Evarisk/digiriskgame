@@ -111,6 +111,16 @@ Deuxième page, indépendante des données Dolibarr : `http://localhost:5173/edi
 - Rendu sans scintillement : sols extérieurs ordonnés par décalage de profondeur (et terrain en dessous), angles de murs sans faces confondues, éléments espacés d'au moins quelques millimètres.
 - Sur Apache, `.htaccess` sert `edit` avec le même `dist/index.html`.
 
+## Cité Prévention, jeu de stratégie (`/aoe`)
+
+Jeu de stratégie en temps réel DigiRisk (page `/aoe` ou `?aoe`, chargée à part). Il reprend les principes du genre — agents qui travaillent sur les sites et rapportent au dépôt leurs heures d'équipe ou le budget des chantiers, temps préventeur à ménager, constructions, logements, unités et améliorations produites dans les bâtiments, quatre paliers, carte à explorer — avec pour fil rouge **quatre indicateurs standard** : *document unique fait ?* (UT évaluées par le préventeur), *salariés sensibilisés* (salle de formation), *accidents sur les sites* (dangers non traités près des agents ; 12 accidents = défaite), *registres remontés* (signalements des agents sensibilisés). Ils conditionnent les paliers (Réactif → Conforme → Proactif → Culture de prévention = victoire) et font le score sur 1 000.
+
+- **Bâtiments préfaits** tirés de l'éditeur : l'hôtel de ville est l'extérieur de la mairie de démonstration ; maisons, commerces et infirmerie (pharmacie) sont les maisons de ville ; dépôt (CTE), centre technique (CTM), salle de formation (ALP), cantine, service prévention, entrepôt des EPI, point sécurité, potagers (`src/components/aoe/aoePrefabs.js`).
+- **Didacticiel** de 5 minutes (une vraie partie guidée pas à pas : flèche dans la 3D, bouton à cliquer entouré, partie en pause pendant les explications, ni danger aléatoire ni calendrier tant qu'il dure), aide « Comment jouer » (bouton ?), panneau « Prochaine étape » (un clic sur « Faire ») pour les débutants, **démo automatique** pour un stand, durées affichées en jours de jeu (un mois = une minute), brouillard d'exploration, pastilles « DU ? / DU ✓ » au-dessus de chaque unité de travail, minicarte, raccourcis clavier.
+- Moteur pur dans `src/game/aoe/` (testable sous Node) ; interface dans `src/components/aoe/`. Règles : [`docs/jeu-aoe/regles.md`](docs/jeu-aoe/regles.md).
+- **Tests avec des personas** (maire débutante, responsable prévention, DGS, joueur confirmé, agent « production d'abord », démo du stand) : `node scripts/simulate-aoe.mjs --seeds 30 --check` joue des années complètes avec un robot par profil et vérifie 18 objectifs d'intérêt de jeu ; résultats et enseignements dans [`docs/jeu-aoe/personas.md`](docs/jeu-aoe/personas.md).
+- Sur Apache, `.htaccess` sert `aoe` avec le même `dist/index.html`.
+
 ## Commandes de développement local (Node.js)
 
 ```bash

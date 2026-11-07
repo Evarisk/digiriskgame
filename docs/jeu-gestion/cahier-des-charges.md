@@ -12,8 +12,12 @@ Contexte des idées et alternatives écartées : [`idees.md`](idees.md). Ce cahi
   dimensions : **l'argent**, **l'envie des salariés**, **les risques** et les **niveaux de maîtrise**.
 - **Jeu original** : on reprend des mécaniques de genre (affecter des travailleurs, poser des constructions,
   rechercher, franchir des paliers). On ne reprend aucun nom, visuel, son, unité ou interface d'un jeu existant.
-- **État** : une V1 a été prototypée sur `/aoe` puis retirée du dépôt (novembre 2026, à la demande de l'équipe) ; rien
-  n'est en place dans le code. Les valeurs chiffrées ci-dessous sont celles réglées pendant ce prototype.
+- **État** : une V1 a été prototypée sur `/aoe` puis retirée du dépôt (novembre 2026, à la demande de l'équipe). Une
+  nouvelle version, **Cité Prévention**, occupe désormais `/aoe` : elle reprend d'abord les principes du genre avec les
+  bâtiments de l'éditeur et quatre indicateurs standard (DU fait, salariés sensibilisés, accidents, registres
+  remontés), testée avec des personas — voir [`../jeu-aoe/regles.md`](../jeu-aoe/regles.md) et
+  [`../jeu-aoe/personas.md`](../jeu-aoe/personas.md). Le présent cahier (DUER réel, envie, cotations) reste la cible
+  des lots suivants ; ses valeurs chiffrées sont celles du premier prototype.
 - **Livraison par lots** (§ 7). Chaque lot se termine par ses critères d'acceptation, une page jouable, le README mis à
   jour, `npm run build` réussi et le dossier `dist/` reconstruit (convention du dépôt).
 - **Conventions du dépôt** à respecter :

@@ -11,6 +11,7 @@ import {
   Footprints,
   Settings,
   PenTool,
+  Gamepad2,
 } from 'lucide-react';
 import { API_BASE_URL, API_HOST_LABEL } from '../../services/digiriskApi';
 
@@ -138,6 +139,12 @@ export default function TopHudBar({
         <a className="hud-btn icon-toggle" href="edit" title="Éditeur de site : dessiner ses bâtiments, poser éléments et personnages">
           <PenTool size={14} />
           <span>Éditeur</span>
+        </a>
+
+        {/* Cité Prévention : jeu de stratégie autour des quatre indicateurs de prévention */}
+        <a className="hud-btn icon-toggle" href="aoe" title="Cité Prévention : jeu de stratégie DigiRisk (document unique, sensibilisation, accidents, registres)">
+          <Gamepad2 size={14} />
+          <span>Jouer</span>
         </a>
 
         {/* Configuration Clé API & Synchronisation */}
