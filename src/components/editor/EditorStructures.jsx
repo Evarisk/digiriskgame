@@ -1,9 +1,11 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { useFrame } from '@react-three/fiber';
 import { Html, Line } from '@react-three/drei';
 import { getMaterial, Cylinder, WalkwayStrip } from '../3d/models/kit';
 import { getTexture } from '../3d/models/textures';
 import BuildingShell from '../3d/models/buildingShells';
+import MergeStatic from '../3d/models/MergeStatic';
 import { BUILDING_STYLES, FLOOR_STYLES, DOOR_KINDS, SURFACE_MATERIALS, PREFAB_THEME } from '../../services/editorCatalog';
 import {
   FLOOR_Y,
@@ -228,12 +230,40 @@ export function Outline({ points, y, color, closed = true, width = 2.5 }) {
 }
 
 /** Étiquette HTML : taille fixe pour les bâtiments et les cotes, décroissante avec la distance sinon. */
+// Distance (unités) au-delà de laquelle une étiquette de personnage ou d'objet, rapetissée avec l'éloignement, n'est
+// plus lisible (texte sous 7 px) : elle est retirée de la page. Chaque étiquette affichée est un élément de page
+// repositionné à chaque image quand la caméra bouge — par dizaines, c'était la cause des à-coups.
+const LABEL_FAR = { npc: 52, element: 40 };
+const labelPoint = new THREE.Vector3();
+
 export function Label({ position, children, tone = 'building' }) {
   const distanceFactor = { npc: 26, element: 20 }[tone];
+  const far = LABEL_FAR[tone];
+  const ref = useRef();
+  // Vérification quelques fois par seconde, décalée d'une étiquette à l'autre, avec hystérésis
+  const lod = useRef({ near: false, wait: Math.random() * 0.25 });
+  const [near, setNear] = useState(false);
+  useFrame(({ camera }, delta) => {
+    const group = ref.current;
+    if (!far || !group) return;
+    const s = lod.current;
+    if ((s.wait -= delta) > 0) return;
+    s.wait = 0.25;
+    const d = camera.position.distanceTo(group.getWorldPosition(labelPoint));
+    const next = s.near ? d < far + 4 : d < far;
+    if (next !== s.near) {
+      s.near = next;
+      setNear(next);
+    }
+  });
   return (
-    <Html position={position} center distanceFactor={distanceFactor} zIndexRange={[20, 0]} style={{ pointerEvents: 'none' }}>
-      <div className={`editor-label ${tone}`}>{children}</div>
-    </Html>
+    <group ref={ref} position={position}>
+      {(!far || near) && (
+        <Html center distanceFactor={distanceFactor} zIndexRange={[20, 0]} style={{ pointerEvents: 'none' }}>
+          <div className={`editor-label ${tone}`}>{children}</div>
+        </Html>
+      )}
+    </group>
   );
 }
 
@@ -297,33 +327,37 @@ export function CustomBuilding({ building, bind, highlight, showRoof, lowWalls, 
   }).filter((band) => band.height > 0.05);
   const floors = bands.filter((band) => band.k > 0 && band.y0 < roofTop - 0.3 && (cutLevel == null || band.k <= cutLevel));
 
+  // Pans de murs, linteaux, encadrements, planchers et toit fusionnés par matériau (une centaine de dessins par
+  // bâtiment sinon) ; les originaux masqués restent cliquables pour la sélection
   return (
     <group>
-      <mesh geometry={slab} material={floorMaterial} receiveShadow {...bind} />
-      {floors.map((band) => (
-        <StoreyFloor key={band.k} polygon={polygon} holes={holes[band.k] || null} y={band.y0} material={floorMaterial} bind={bind} />
-      ))}
-      {polygonEdges(polygon).map(([a, b], i) =>
-        bands.map((band) => (
-          <WallRun
-            key={`${i}:${band.k}`}
-            a={a}
-            b={b}
-            base={band.base}
-            y0={band.y0}
-            height={band.height}
-            top={cut}
-            thickness={t - 2 * inset(i)}
-            doors={[...(doorsByBand[`${i}:${band.k}`] || []), ...(bays[`${i}:${band.k}`] || [])]}
-            style={style}
-            bind={bind}
-            extend={t / 2 - inset(i)}
-          />
-        ))
-      )}
-      {showRoof && cutLevel == null && (
-        <mesh geometry={roof} position={[0, roofTop, 0]} material={getMaterial({ color: styleDef.roof, roughness: 0.7, metalness: 0.3 })} castShadow receiveShadow {...bind} />
-      )}
+      <MergeStatic name="structure:batiment" batch deps={[JSON.stringify(building), cut, showRoof, cutLevel, openings, windows]}>
+        <mesh geometry={slab} material={floorMaterial} receiveShadow {...bind} />
+        {floors.map((band) => (
+          <StoreyFloor key={band.k} polygon={polygon} holes={holes[band.k] || null} y={band.y0} material={floorMaterial} bind={bind} />
+        ))}
+        {polygonEdges(polygon).map(([a, b], i) =>
+          bands.map((band) => (
+            <WallRun
+              key={`${i}:${band.k}`}
+              a={a}
+              b={b}
+              base={band.base}
+              y0={band.y0}
+              height={band.height}
+              top={cut}
+              thickness={t - 2 * inset(i)}
+              doors={[...(doorsByBand[`${i}:${band.k}`] || []), ...(bays[`${i}:${band.k}`] || [])]}
+              style={style}
+              bind={bind}
+              extend={t / 2 - inset(i)}
+            />
+          ))
+        )}
+        {showRoof && cutLevel == null && (
+          <mesh geometry={roof} position={[0, roofTop, 0]} material={getMaterial({ color: styleDef.roof, roughness: 0.7, metalness: 0.3 })} castShadow receiveShadow {...bind} />
+        )}
+      </MergeStatic>
       {highlight && <Outline points={polygon} y={FLOOR_Y + 0.03} color={highlight} />}
       {showLabel && <Label position={[cx, Math.min(roofTop, cut) + 1.1, cz]}>{building.name}</Label>}
     </group>
@@ -350,19 +384,21 @@ export function InteriorWall({ wall, y0, base = 0, maxHeight = Infinity, cut = I
   const shown = Math.max(0, Math.min(y0 + height, cut) - y0);
   return (
     <group>
-      <WallRun
-        a={wall.a}
-        b={wall.b}
-        base={base}
-        y0={y0}
-        height={height}
-        top={cut}
-        thickness={wall.thickness}
-        doors={wall.door ? [wall.door] : []}
-        style={style}
-        bind={bind}
-        extend={wall.type === 'grillage' ? 0 : wall.thickness / 2}
-      />
+      <MergeStatic name="structure:cloison" batch deps={[JSON.stringify(wall), y0, base, maxHeight, cut]}>
+        <WallRun
+          a={wall.a}
+          b={wall.b}
+          base={base}
+          y0={y0}
+          height={height}
+          top={cut}
+          thickness={wall.thickness}
+          doors={wall.door ? [wall.door] : []}
+          style={style}
+          bind={bind}
+          extend={wall.type === 'grillage' ? 0 : wall.thickness / 2}
+        />
+      </MergeStatic>
       {highlight && (
         <Along a={wall.a} b={wall.b}>
           <Outline
@@ -428,7 +464,10 @@ export function Walkway({ walkway, y, bind, highlight }) {
   const length = segmentLength(walkway.a, walkway.b);
   return (
     <group>
-      <WalkwayStrip from={walkway.a} to={walkway.b} y={y + 0.006} width={walkway.width} zebra={walkway.zebra} />
+      {/* Bandes du passage piéton fusionnées et regroupées avec le reste de la scène */}
+      <MergeStatic name="structure:allee" batch deps={[walkway.a[0], walkway.a[1], walkway.b[0], walkway.b[1], walkway.width, walkway.zebra, y]}>
+        <WalkwayStrip from={walkway.a} to={walkway.b} y={y + 0.006} width={walkway.width} zebra={walkway.zebra} />
+      </MergeStatic>
       <Along a={walkway.a} b={walkway.b}>
         {/* Volume de sélection invisible (le raycasting ignore la visibilité) */}
         <mesh geometry={UNIT_BOX} visible={false} position={[length / 2, y + 0.03, 0]} scale={[length, 0.06, walkway.width]} {...bind} />
