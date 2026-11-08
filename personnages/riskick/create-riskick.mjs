@@ -1,397 +1,493 @@
 import * as T from 'three';
-import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { mkdir, writeFile, copyFile } from 'node:fs/promises';
-
-// Node implementation of the browser API used by Three's binary exporter.
-globalThis.FileReader = class {
-  readAsArrayBuffer(blob) {
-    blob.arrayBuffer().then((value) => {
-      this.result = value;
-      this.onloadend?.();
-    });
-  }
-};
-
-const root = new T.Group();
-root.name = 'Riskick';
-
-const mat = (color, roughness = 0.65) => new T.MeshStandardMaterial({ color, roughness });
-const orange = mat('#ed501b', 0.78);
-const dark = mat('#302b31', 0.72);
-const yellow = mat('#ffbb08', 0.54);
-const white = mat('#fff2d2');
-const mouth = mat('#391b20');
-const iris = mat('#a94410');
-
-function ball(parent, name, material, position, scale) {
-  const mesh = new T.Mesh(new T.SphereGeometry(1, 24, 16), material);
-  mesh.name = name;
-  mesh.position.set(...position);
-  mesh.scale.set(...scale);
-  parent.add(mesh);
-  return mesh;
-}
-
-function tube(parent, name, points, radii, material) {
-  const curve = new T.CatmullRomCurve3(points.map((p) => new T.Vector3(...p)));
-  const geo = new T.TubeGeometry(curve, 24, 1, 12, false);
-  const pos = geo.attributes.position;
-  for (let i = 0; i <= 24; i++) {
-    const t = i / 24;
-    const center = curve.getPointAt(t);
-    const f = t * (radii.length - 1);
-    const r = T.MathUtils.lerp(radii[Math.floor(f)], radii[Math.min(Math.floor(f) + 1, radii.length - 1)], f % 1);
-    for (let j = 0; j <= 12; j++) {
-      const k = i * 13 + j;
-      const v = new T.Vector3().fromBufferAttribute(pos, k).sub(center).multiplyScalar(r).add(center);
-      pos.setXYZ(k, v.x, v.y, v.z);
-    }
-  }
-  geo.computeVertexNormals();
-  const mesh = new T.Mesh(geo, material);
-  mesh.name = name;
-  parent.add(mesh);
-  return mesh;
-}
-
-// Sculpted outlines replace the old stacked oval eyes and round teeth.
-function relief(parent, name, material, shape, position, depth = 0.025, bevel = 0.018) {
-  const geo = new T.ExtrudeGeometry(shape, {
-    depth,
-    bevelEnabled: true,
-    bevelThickness: bevel,
-    bevelSize: bevel,
-    bevelSegments: 4,
-    curveSegments: 24,
-    steps: 1,
-  });
-  const mesh = new T.Mesh(geo, material);
-  mesh.name = name;
-  mesh.position.set(...position);
-  parent.add(mesh);
-  return mesh;
-}
-
-// Torse articulé portant le corps et le badge de danger (!)
-const torso = new T.Group();
-torso.name = 'Torso';
-torso.position.set(0, 0.79, 0);
-root.add(torso);
-
-ball(torso, 'Body', orange, [0, 0, 0], [0.39, 0.39, 0.29]);
-
-const triangle = new T.Shape();
-triangle.moveTo(0, 0.2);
-triangle.lineTo(-0.195, -0.14);
-triangle.quadraticCurveTo(-0.22, -0.18, -0.17, -0.18);
-triangle.lineTo(0.17, -0.18);
-triangle.quadraticCurveTo(0.22, -0.18, 0.195, -0.14);
-triangle.lineTo(0, 0.2);
-const badge = new T.Mesh(
-  new T.ExtrudeGeometry(triangle, { depth: 0.025, bevelEnabled: true, bevelThickness: 0.012, bevelSize: 0.012, bevelSegments: 2, steps: 1 }),
-  yellow
-);
-badge.name = 'WarningBadge';
-badge.position.set(0, 0.01, 0.286);
-torso.add(badge);
-ball(torso, 'BadgeRivet_L', dark, [-0.145, -0.125, 0.326], [0.012, 0.012, 0.008]);
-ball(torso, 'BadgeRivet_R', dark, [0.145, -0.125, 0.326], [0.012, 0.012, 0.008]);
-ball(torso, 'ExclamationBar', dark, [0, 0.05, 0.332], [0.023, 0.074, 0.012]);
-ball(torso, 'ExclamationDot', dark, [0, -0.06, 0.332], [0.025, 0.025, 0.012]);
-
-const head = new T.Group();
-head.name = 'Head';
-head.position.set(0, 1.43, 0);
-root.add(head);
-ball(head, 'Face', orange, [0, 0, 0], [0.62, 0.43, 0.39]);
-ball(head, 'Jaw', orange, [0, -0.21, 0.15], [0.46, 0.22, 0.24]);
-
-// A curved grin, rising at both corners, with teeth hung from its upper lip.
-const grin = new T.Shape();
-grin.moveTo(-0.365, -0.13);
-grin.bezierCurveTo(-0.18, -0.2, 0.19, -0.2, 0.365, -0.1);
-grin.bezierCurveTo(0.29, -0.39, -0.27, -0.39, -0.365, -0.13);
-relief(head, 'Smile', mouth, grin, [0, 0, 0.388], 0.018, 0.012);
-
-const lip = new T.Shape();
-lip.moveTo(-0.37, -0.115);
-lip.bezierCurveTo(-0.16, -0.185, 0.19, -0.185, 0.37, -0.09);
-lip.bezierCurveTo(0.21, -0.155, -0.15, -0.15, -0.37, -0.115);
-relief(head, 'UpperLip', orange, lip, [0, 0, 0.418], 0.006, 0.008);
-
-for (let i = 0; i < 7; i++) {
-  const x = (i - 3) * 0.083;
-  const y = -0.171 + 0.047 * (x / 0.28) ** 2;
-  const tooth = new T.Shape();
-  tooth.moveTo(-0.032, 0);
-  tooth.lineTo(0.032, 0);
-  tooth.quadraticCurveTo(0.03, -0.044, 0.012, -0.052);
-  tooth.quadraticCurveTo(-0.022, -0.058, -0.032, -0.025);
-  tooth.closePath();
-  relief(head, `Tooth_${i}`, white, tooth, [x, y, 0.423], 0.009, 0.005);
-}
-
-for (const side of [-1, 1]) {
-  const s = side;
-  const tag = s < 0 ? 'L' : 'R';
-  const eye = new T.Shape();
-  eye.moveTo(s * 0.075, 0.045);
-  eye.bezierCurveTo(s * 0.17, 0.06, s * 0.34, 0.13, s * 0.435, 0.16);
-  eye.bezierCurveTo(s * 0.48, -0.115, s * 0.17, -0.18, s * 0.075, 0.045);
-  relief(head, `Eye_${s}`, yellow, eye, [0, 0, 0.346], 0.038, 0.016);
-  ball(head, `Iris_${s}`, iris, [s * 0.245, -0.015, 0.406], [0.063, 0.086, 0.02]);
-  ball(head, `Pupil_${s}`, dark, [s * 0.245, -0.015, 0.424], [0.031, 0.065, 0.012]);
-  ball(head, `EyeShine_${s}`, white, [s * 0.245 - 0.012, 0.012, 0.437], [0.014, 0.02, 0.007]);
-
-  const brow = new T.Shape();
-  brow.moveTo(s * 0.06, 0.055);
-  brow.bezierCurveTo(s * 0.12, 0.11, s * 0.36, 0.23, s * 0.46, 0.2);
-  brow.bezierCurveTo(s * 0.5, 0.12, s * 0.29, 0.08, s * 0.105, 0.015);
-  brow.quadraticCurveTo(s * 0.065, 0.015, s * 0.06, 0.055);
-  relief(head, `Brow_${s}`, dark, brow, [0, 0, 0.392], 0.04, 0.018);
-
-  const hornPoints = [
-    [s * 0.4, 0.25, -0.045],
-    [s * 0.59, 0.4, -0.07],
-    [s * 0.63, 0.59, -0.09],
-    [s * 0.57, 0.72, -0.075],
-  ];
-  const horn = tube(head, `Horn_${s}`, hornPoints, [0.195, 0.16, 0.085, 0.002], dark);
-  // Stripes share the horn's surface, eliminating the detached yellow tabs.
-  const colors = [];
-  const base = dark.color;
-  const stripe = yellow.color;
-  for (let ring = 0; ring <= 24; ring++) {
-    for (let j = 0; j <= 12; j++) {
-      const t = ring / 24;
-      const band = (t > 0.48 && t < 0.57) || (t > 0.71 && t < 0.78);
-      const c = band ? stripe : base;
-      colors.push(c.r, c.g, c.b);
-    }
-  }
-  horn.geometry.setAttribute('color', new T.Float32BufferAttribute(colors, 3));
-  horn.material = new T.MeshStandardMaterial({ vertexColors: true, roughness: 0.7 });
-
-  tube(head, `CheekSpike_${s}`, [[s * 0.48, -0.04, -0.03], [s * 0.76, 0.035, -0.04]], [0.14, 0.001], orange);
-  tube(head, `LowerCheekSpike_${s}`, [[s * 0.48, -0.16, -0.035], [s * 0.67, -0.15, -0.04]], [0.09, 0.001], orange);
-
-  const arm = new T.Group();
-  arm.name = `Arm_${tag}`;
-  arm.position.set(s * 0.32, 0.99, 0);
-  root.add(arm);
-  tube(arm, `UpperArm_${s}`, [[0, 0, 0], [s * 0.2, -0.12, 0], [s * 0.23, -0.25, 0.105]], [0.135, 0.13, 0.11], orange);
-  ball(arm, `Cuff_${s}`, dark, [s * 0.23, -0.26, 0.105], [0.14, 0.085, 0.135]);
-  ball(arm, `Glove_${s}`, dark, [s * 0.24, -0.34, 0.15], [0.16, 0.155, 0.145]);
-  for (let i = 0; i < 3; i++) {
-    ball(arm, `Finger_${s}_${i}`, dark, [s * 0.24 + (i - 1) * 0.077, -0.395, 0.23], [0.05, 0.073, 0.055]);
-  }
-  ball(arm, `Thumb_${s}`, dark, [s * 0.115, -0.3, 0.225], [0.075, 0.095, 0.065]);
-
-  const leg = new T.Group();
-  leg.name = `Leg_${tag}`;
-  leg.position.set(s * 0.21, 0.48, 0);
-  root.add(leg);
-  ball(leg, `LegMesh_${s}`, orange, [s * 0.015, -0.115, 0], [0.15, 0.2, 0.15]);
-
-  // Cheville articulée pour dérouler le pied (attaque du talon, appui, poussée, levé d'orteils)
-  const ankle = new T.Group();
-  ankle.name = `Ankle_${tag}`;
-  ankle.position.set(s * 0.035, -0.26, 0.02);
-  leg.add(ankle);
-  ball(ankle, `Foot_${s}`, dark, [0, -0.04, 0.085], [0.195, 0.13, 0.25]);
-}
-
-for (let i = -1; i <= 1; i++) {
-  tube(head, `CrownSpike_${i}`, [[i * 0.17, 0.33, -0.08], [i * 0.18 + 0.06, 0.54 - Math.abs(i) * 0.05, -0.1]], [0.105, 0.001], orange);
-}
+import { readFile, writeFile, mkdir, copyFile } from 'node:fs/promises';
 
 /**
- * Échantillonne une animation fluide (positions, rotations complètes en quaternions, échelles)
- * compatible avec GLTFExporter.
+ * Prépare et anime le vrai modèle 3D de Riskick (Riskick-grand-10cm.glb) :
+ * - Mise à l'échelle à 1/3 de la taille de Guy / d'un humain (1,75 m / 3 = 0,5833 m, soit ×5,8333 par rapport aux 10 cm d'origine)
+ * - Rigging squelettique glTF 2.0 (SkinnedMesh : Root, Torso, Head, Arm_R, Arm_L, Leg_R, Ankle_R, Leg_L, Ankle_L)
+ *   avec lissage Laplacien des poids sur le graphe de maillage (0 couture, textures originales intactes)
+ * - Animations embarquées : Idle (Au repos), Taunt (Provocation), Walk (Marche), Run (Course)
  */
-function sampleClip(name, duration, steps, poseFn) {
-  const times = [];
-  for (let i = 0; i <= steps; i++) times.push((i / steps) * duration);
-  const channels = new Map();
 
+const HUMAN_HEIGHT = 1.75; // Guy / humain dans le jeu = 1,75 m
+const TARGET_HEIGHT = HUMAN_HEIGHT / 3; // Riskick = 1/3 de la taille de Guy (≈ 0,5833 m)
+
+const srcBuf = await readFile('personnages/riskick/Riskick-grand-10cm.glb');
+const jsonLen = srcBuf.readUInt32LE(12);
+const json = JSON.parse(srcBuf.subarray(20, 20 + jsonLen).toString('utf8'));
+const binChunkHeader = 20 + jsonLen;
+const binLen = srcBuf.readUInt32LE(binChunkHeader);
+const origBin = Buffer.from(srcBuf.subarray(binChunkHeader + 8, binChunkHeader + 8 + binLen));
+
+const prim = json.meshes[0].primitives[0];
+const posAcc = json.accessors[prim.attributes.POSITION];
+const posBv = json.bufferViews[posAcc.bufferView];
+const posByteOffset = (posBv.byteOffset || 0) + (posAcc.byteOffset || 0);
+const vertexCount = posAcc.count;
+
+const indAcc = json.accessors[prim.indices];
+const indBv = json.bufferViews[indAcc.bufferView];
+const indByteOffset = (indBv.byteOffset || 0) + (indAcc.byteOffset || 0);
+const indexCount = indAcc.count;
+
+// Lecture des positions (en coordonnées d'origine 0..0.10 m pour le calcul anatomique)
+const rawPos = new Float32Array(origBin.buffer, origBin.byteOffset + posByteOffset, vertexCount * 3);
+const indices = new Uint32Array(origBin.buffer, origBin.byteOffset + indByteOffset, indexCount);
+
+const origHeight = posAcc.max[1] - posAcc.min[1];
+const S = TARGET_HEIGHT / origHeight; // ≈ 5.833333
+
+// ==================== 1. SOUDURE SPATIALE & GRAPHE DE VOISINAGE ====================
+// Regroupe les sommets co-localisés (coutures UV) pour garantir des poids 100 % identiques sur les coutures
+const quantKey = (x, y, z) => `${Math.round(x * 1e5)}_${Math.round(y * 1e5)}_${Math.round(z * 1e5)}`;
+const uniqueMap = new Map();
+const vertToUnique = new Int32Array(vertexCount);
+const uniqueCoords = [];
+
+for (let i = 0; i < vertexCount; i++) {
+  const x = rawPos[i * 3];
+  const y = rawPos[i * 3 + 1];
+  const z = rawPos[i * 3 + 2];
+  const k = quantKey(x, y, z);
+  let u = uniqueMap.get(k);
+  if (u === undefined) {
+    u = uniqueCoords.length;
+    uniqueMap.set(k, u);
+    uniqueCoords.push([x, y, z]);
+  }
+  vertToUnique[i] = u;
+}
+
+const uniqueCount = uniqueCoords.length;
+const neighbors = Array.from({ length: uniqueCount }, () => []);
+const addEdge = (a, b) => {
+  if (a === b) return;
+  const listA = neighbors[a];
+  if (!listA.includes(b)) listA.push(b);
+  const listB = neighbors[b];
+  if (!listB.includes(a)) listB.push(a);
+};
+
+for (let t = 0; t < indexCount; t += 3) {
+  const u0 = vertToUnique[indices[t]];
+  const u1 = vertToUnique[indices[t + 1]];
+  const u2 = vertToUnique[indices[t + 2]];
+  addEdge(u0, u1);
+  addEdge(u1, u2);
+  addEdge(u2, u0);
+}
+
+// ==================== 2. DÉFINITION DU SQUELETTE (9 OS) ====================
+// Indices des os dans skin.joints :
+// 0: Root, 1: Torso, 2: Head, 3: Arm_R, 4: Arm_L, 5: Leg_R, 6: Ankle_R, 7: Leg_L, 8: Ankle_L
+const BONES = [
+  { name: 'Root', parent: -1, world: [0, 0, 0], local: [0, 0, 0], children: [1, 5, 7] },
+  { name: 'Torso', parent: 0, world: [0, 0.0215 * S, 0], local: [0, 0.0215 * S, 0], children: [2, 3, 4] },
+  { name: 'Head', parent: 1, world: [-0.002 * S, 0.0455 * S, 0.002 * S], local: [-0.002 * S, 0.024 * S, 0.002 * S], children: [] },
+  { name: 'Arm_R', parent: 1, world: [-0.0145 * S, 0.0365 * S, 0.004 * S], local: [-0.0145 * S, 0.015 * S, 0.004 * S], children: [] },
+  { name: 'Arm_L', parent: 1, world: [0.0125 * S, 0.0375 * S, -0.005 * S], local: [0.0125 * S, 0.016 * S, -0.005 * S], children: [] },
+  { name: 'Leg_R', parent: 0, world: [-0.0145 * S, 0.0205 * S, 0.003 * S], local: [-0.0145 * S, 0.0205 * S, 0.003 * S], children: [6] },
+  { name: 'Ankle_R', parent: 5, world: [-0.0225 * S, 0.0055 * S, 0.008 * S], local: [-0.008 * S, -0.015 * S, 0.005 * S], children: [] },
+  { name: 'Leg_L', parent: 0, world: [0.0105 * S, 0.0205 * S, -0.006 * S], local: [0.0105 * S, 0.0205 * S, -0.006 * S], children: [8] },
+  { name: 'Ankle_L', parent: 7, world: [0.01 * S, 0.0055 * S, -0.009 * S], local: [-0.0005 * S, -0.015 * S, -0.003 * S], children: [] },
+];
+
+const numBones = BONES.length;
+
+function smoothstep(edge0, edge1, x) {
+  const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
+  return t * t * (3 - 2 * t);
+}
+
+// Poids initiaux par sommet unique (9 composantes par sommet)
+let weights = new Float32Array(uniqueCount * numBones);
+
+for (let u = 0; u < uniqueCount; u++) {
+  const [x, y, z] = uniqueCoords[u];
+  const base = u * numBones;
+
+  // Séparation anatomique
+  const isRightHand = x < -0.0165 && y >= 0.0235 && y < 0.0535 && (y < 0.0435 || z > 0.0045);
+  const isLeftArm = x > 0.0135 && y >= 0.0225 && y < 0.0435;
+
+  if (y < 0.0225 && !isRightHand && !isLeftArm) {
+    // Jambes et pieds (fusion douce avec le torse entre y = 0.0185 et y = 0.0225)
+    const wTorso = smoothstep(0.0185, 0.0225, y);
+    const wLegTotal = 1 - wTorso;
+    const isLeft = x >= -0.0052;
+    const wAnkle = 1 - smoothstep(0.0055, 0.0105, y);
+    const wHip = 1 - wAnkle;
+
+    weights[base + 1] = wTorso;
+    if (isLeft) {
+      weights[base + 7] = wLegTotal * wHip;
+      weights[base + 8] = wLegTotal * wAnkle;
+    } else {
+      weights[base + 5] = wLegTotal * wHip;
+      weights[base + 6] = wLegTotal * wAnkle;
+    }
+  } else if (isRightHand) {
+    const wArm = smoothstep(-0.015, -0.019, x);
+    weights[base + 3] = wArm;
+    weights[base + 1] = 1 - wArm;
+  } else if (isLeftArm) {
+    const wArm = smoothstep(0.0125, 0.0165, x);
+    weights[base + 4] = wArm;
+    weights[base + 1] = 1 - wArm;
+  } else if (y >= 0.044) {
+    const wHead = smoothstep(0.044, 0.0485, y);
+    weights[base + 2] = wHead;
+    weights[base + 1] = 1 - wHead;
+  } else {
+    weights[base + 1] = 1;
+  }
+}
+
+// Lissage Laplacien sur le graphe de maillage (les parties non connectées comme les 2 jambes ou main/joue restent isolées)
+let nextWeights = new Float32Array(uniqueCount * numBones);
+for (let iter = 0; iter < 8; iter++) {
+  for (let u = 0; u < uniqueCount; u++) {
+    const nb = neighbors[u];
+    const base = u * numBones;
+    if (!nb.length) {
+      for (let b = 0; b < numBones; b++) nextWeights[base + b] = weights[base + b];
+      continue;
+    }
+    for (let b = 0; b < numBones; b++) {
+      let sum = 0;
+      for (let k = 0; k < nb.length; k++) sum += weights[nb[k] * numBones + b];
+      nextWeights[base + b] = 0.55 * weights[base + b] + 0.45 * (sum / nb.length);
+    }
+  }
+  const tmp = weights;
+  weights = nextWeights;
+  nextWeights = tmp;
+}
+
+// Extraction des 4 meilleurs os par sommet du maillage (JOINTS_0 et WEIGHTS_0)
+const jointsArray = new Uint8Array(vertexCount * 4);
+const weightsArray = new Float32Array(vertexCount * 4);
+
+for (let i = 0; i < vertexCount; i++) {
+  const u = vertToUnique[i];
+  const base = u * numBones;
+  const pairs = [];
+  for (let b = 0; b < numBones; b++) {
+    const w = weights[base + b];
+    if (w > 1e-4) pairs.push([b, w]);
+  }
+  pairs.sort((a, b) => b[1] - a[1]);
+  while (pairs.length < 4) pairs.push([0, 0]);
+  const top4 = pairs.slice(0, 4);
+  const total = top4[0][1] + top4[1][1] + top4[2][1] + top4[3][1] || 1;
+  for (let k = 0; k < 4; k++) {
+    jointsArray[i * 4 + k] = top4[k][0];
+    weightsArray[i * 4 + k] = top4[k][1] / total;
+  }
+}
+
+// ==================== 3. MISE À L'ÉCHELLE 1/3 DU MAILLAGE ====================
+for (let i = 0; i < vertexCount * 3; i++) {
+  rawPos[i] *= S;
+}
+posAcc.min = posAcc.min.map((v) => v * S);
+posAcc.max = posAcc.max.map((v) => v * S);
+
+// ==================== 4. MATRICES INVERSE BIND & ANIMATIONS ====================
+const ibmArray = new Float32Array(numBones * 16);
+for (let b = 0; b < numBones; b++) {
+  const [wx, wy, wz] = BONES[b].world;
+  const m = new T.Matrix4().makeTranslation(-wx, -wy, -wz);
+  m.toArray(ibmArray, b * 16);
+}
+
+// Nœuds glTF : 0 = Mesh, 1..9 = Bones (boneIdx + 1)
+json.nodes = [
+  { name: 'Riskick', mesh: 0, skin: 0 },
+  ...BONES.map((b) => {
+    const node = {
+      name: b.name,
+      translation: b.local,
+      rotation: [0, 0, 0, 1],
+      scale: [1, 1, 1],
+    };
+    if (b.children.length) node.children = b.children.map((c) => c + 1);
+    return node;
+  }),
+];
+json.scenes[0].nodes = [0, 1];
+
+// Aide pour construire les données binaires supplémentaires alignées sur 4 octets
+const extraChunks = [];
+let currentByteOffset = origBin.byteLength;
+
+function appendBufferView(typedArray, target) {
+  const pad = (4 - (currentByteOffset % 4)) % 4;
+  if (pad > 0) {
+    extraChunks.push(Buffer.alloc(pad));
+    currentByteOffset += pad;
+  }
+  const buf = Buffer.from(typedArray.buffer, typedArray.byteOffset, typedArray.byteLength);
+  const bvIndex = json.bufferViews.length;
+  const bv = { buffer: 0, byteOffset: currentByteOffset, byteLength: buf.byteLength };
+  if (target) bv.target = target;
+  json.bufferViews.push(bv);
+  extraChunks.push(buf);
+  currentByteOffset += buf.byteLength;
+  return bvIndex;
+}
+
+function appendAccessor(typedArray, componentType, count, type, target, minMax = null) {
+  const bvIndex = appendBufferView(typedArray, target);
+  const accIndex = json.accessors.length;
+  const acc = { bufferView: bvIndex, componentType, count, type };
+  if (minMax) {
+    acc.min = minMax.min;
+    acc.max = minMax.max;
+  }
+  json.accessors.push(acc);
+  return accIndex;
+}
+
+const jointsAccIdx = appendAccessor(jointsArray, 5121, vertexCount, 'VEC4', 34962);
+const weightsAccIdx = appendAccessor(weightsArray, 5126, vertexCount, 'VEC4', 34962);
+const ibmAccIdx = appendAccessor(ibmArray, 5126, numBones, 'MAT4', undefined);
+
+prim.attributes.JOINTS_0 = jointsAccIdx;
+prim.attributes.WEIGHTS_0 = weightsAccIdx;
+
+json.skins = [
+  {
+    name: 'RiskickArmature',
+    inverseBindMatrices: ibmAccIdx,
+    skeleton: 1,
+    joints: BONES.map((_, idx) => idx + 1),
+  },
+];
+
+// Échantillonnage d'un clip d'animation vers la structure glTF 2.0
+function buildGltfAnimation(name, duration, steps, poseFn) {
+  const times = new Float32Array(steps + 1);
+  for (let i = 0; i <= steps; i++) times[i] = (i / steps) * duration;
+  const timeAccIdx = appendAccessor(times, 5126, steps + 1, 'SCALAR', undefined, {
+    min: [0],
+    max: [duration],
+  });
+
+  const boneTracks = new Map();
   for (let i = 0; i <= steps; i++) {
-    const t = times[i];
-    const phase = (i / steps) * Math.PI * 2;
-    const pose = poseFn(phase, t);
-    for (const [nodeName, tr] of Object.entries(pose)) {
-      if (!channels.has(nodeName)) {
-        channels.set(nodeName, { pos: [], quat: [], scale: [], hasPos: false, hasQuat: false, hasScale: false });
+    const phi = (i / steps) * Math.PI * 2;
+    const pose = poseFn(phi, times[i]);
+    for (const [boneName, tr] of Object.entries(pose)) {
+      const boneIdx = BONES.findIndex((b) => b.name === boneName);
+      if (boneIdx < 0) continue;
+      if (!boneTracks.has(boneIdx)) {
+        boneTracks.set(boneIdx, {
+          pos: new Float32Array((steps + 1) * 3),
+          quat: new Float32Array((steps + 1) * 4),
+          scale: new Float32Array((steps + 1) * 3),
+          hasPos: false,
+          hasQuat: false,
+          hasScale: false,
+        });
       }
-      const ch = channels.get(nodeName);
-      const obj = root.getObjectByName(nodeName);
-      if (tr.pos) {
+      const ch = boneTracks.get(boneIdx);
+      const baseLocal = BONES[boneIdx].local;
+      if (tr.dPos) {
         ch.hasPos = true;
-        ch.pos.push(tr.pos[0], tr.pos[1], tr.pos[2]);
-      } else if (obj) {
-        ch.pos.push(obj.position.x, obj.position.y, obj.position.z);
+        ch.pos[i * 3] = baseLocal[0] + tr.dPos[0] * S;
+        ch.pos[i * 3 + 1] = baseLocal[1] + tr.dPos[1] * S;
+        ch.pos[i * 3 + 2] = baseLocal[2] + tr.dPos[2] * S;
+      } else {
+        ch.pos[i * 3] = baseLocal[0];
+        ch.pos[i * 3 + 1] = baseLocal[1];
+        ch.pos[i * 3 + 2] = baseLocal[2];
       }
       if (tr.rot) {
         ch.hasQuat = true;
         const q = new T.Quaternion().setFromEuler(new T.Euler(tr.rot[0], tr.rot[1], tr.rot[2], 'XYZ'));
-        ch.quat.push(q.x, q.y, q.z, q.w);
-      } else if (obj) {
-        ch.quat.push(obj.quaternion.x, obj.quaternion.y, obj.quaternion.z, obj.quaternion.w);
+        ch.quat[i * 4] = q.x;
+        ch.quat[i * 4 + 1] = q.y;
+        ch.quat[i * 4 + 2] = q.z;
+        ch.quat[i * 4 + 3] = q.w;
+      } else {
+        ch.quat[i * 4 + 3] = 1;
       }
       if (tr.scale) {
         ch.hasScale = true;
-        ch.scale.push(tr.scale[0], tr.scale[1], tr.scale[2]);
-      } else if (obj) {
-        ch.scale.push(obj.scale.x, obj.scale.y, obj.scale.z);
+        ch.scale[i * 3] = tr.scale[0];
+        ch.scale[i * 3 + 1] = tr.scale[1];
+        ch.scale[i * 3 + 2] = tr.scale[2];
+      } else {
+        ch.scale[i * 3] = 1;
+        ch.scale[i * 3 + 1] = 1;
+        ch.scale[i * 3 + 2] = 1;
       }
     }
   }
 
-  const tracks = [];
-  for (const [nodeName, ch] of channels.entries()) {
-    if (ch.hasPos) tracks.push(new T.VectorKeyframeTrack(`${nodeName}.position`, times, ch.pos));
-    if (ch.hasQuat) tracks.push(new T.QuaternionKeyframeTrack(`${nodeName}.quaternion`, times, ch.quat));
-    if (ch.hasScale) tracks.push(new T.VectorKeyframeTrack(`${nodeName}.scale`, times, ch.scale));
+  const samplers = [];
+  const channels = [];
+  for (const [boneIdx, ch] of boneTracks.entries()) {
+    const targetNode = boneIdx + 1;
+    if (ch.hasPos) {
+      const outAcc = appendAccessor(ch.pos, 5126, steps + 1, 'VEC3', undefined);
+      const sIdx = samplers.length;
+      samplers.push({ input: timeAccIdx, interpolation: 'LINEAR', output: outAcc });
+      channels.push({ sampler: sIdx, target: { node: targetNode, path: 'translation' } });
+    }
+    if (ch.hasQuat) {
+      const outAcc = appendAccessor(ch.quat, 5126, steps + 1, 'VEC4', undefined);
+      const sIdx = samplers.length;
+      samplers.push({ input: timeAccIdx, interpolation: 'LINEAR', output: outAcc });
+      channels.push({ sampler: sIdx, target: { node: targetNode, path: 'rotation' } });
+    }
+    if (ch.hasScale) {
+      const outAcc = appendAccessor(ch.scale, 5126, steps + 1, 'VEC3', undefined);
+      const sIdx = samplers.length;
+      samplers.push({ input: timeAccIdx, interpolation: 'LINEAR', output: outAcc });
+      channels.push({ sampler: sIdx, target: { node: targetNode, path: 'scale' } });
+    }
   }
-  return new T.AnimationClip(name, duration, tracks);
+  return { name, samplers, channels };
 }
 
-// 1. Animation Au repos (Idle) : respiration vivante, regard narquois gauche/droite
-const idle = sampleClip('Idle', 2.4, 32, (phi) => {
-  const breath = Math.sin(phi);
-  const look = Math.sin(phi);
+// 1. Animation Walk (Marche complète articulée)
+function legCycle(phase, side) {
+  const swing = Math.sin(phase); // > 0 : jambe vers l'avant (+Z)
+  const pass = Math.cos(phase); // > 0 : pied levé qui passe vers l'avant
+  const lift = Math.max(0, pass);
+  const stance = Math.max(0, -pass);
+
+  return {
+    leg: {
+      dPos: [side * 0.0005 * lift, 0.0038 * lift - 0.0008 * stance, 0.0028 * swing],
+      rot: [-0.55 * swing + 0.05 * lift, -side * 0.08 * swing, side * 0.035 * lift],
+    },
+    ankle: {
+      dPos: [0, 0.001 * lift, 0],
+      rot: [-0.24 * lift + 0.28 * Math.max(0, -swing) * stance - 0.1 * Math.max(0, swing), 0, -side * 0.03 * lift],
+    },
+  };
+}
+
+const walkAnim = buildGltfAnimation('Walk', 0.88, 36, (phi) => {
+  const right = legCycle(phi, -1); // Leg_R est du côté -X
+  const left = legCycle(phi + Math.PI, 1); // Leg_L est du côté +X
+  const bounce = Math.cos(2 * phi);
+  const sway = Math.sin(phi);
+
   return {
     Torso: {
-      pos: [0, 0.79 + 0.014 * breath, 0],
-      rot: [0.02 * breath, 0.04 * look, 0.015 * Math.cos(phi)],
-    },
-    Body: {
-      scale: [0.39 * (1 - 0.012 * breath), 0.39 * (1 + 0.022 * breath), 0.29 * (1 - 0.01 * breath)],
+      dPos: [0.0012 * sway, 0.0022 * bounce, 0.0008 * Math.sin(2 * phi)],
+      rot: [0.08 + 0.025 * Math.sin(2 * phi), -0.14 * sway, -0.065 * sway],
+      scale: [1 - 0.012 * bounce, 1 + 0.02 * bounce, 1 - 0.012 * bounce],
     },
     Head: {
-      pos: [0, 1.43 + 0.018 * Math.sin(phi - 0.25), 0],
-      rot: [0.025 * Math.cos(phi), 0.09 * look, 0.03 * Math.sin(phi)],
-    },
-    Arm_L: {
-      pos: [-0.32, 0.99 + 0.014 * breath, 0],
-      rot: [0.04 * breath, 0, -0.03 * (1 + breath * 0.5)],
+      dPos: [0, 0.001 * Math.cos(2 * phi - 0.35), 0],
+      rot: [-0.03 + 0.035 * Math.sin(2 * phi - 0.4), 0.1 * Math.sin(phi - 0.25), 0.055 * Math.sin(phi - 0.2)],
     },
     Arm_R: {
-      pos: [0.32, 0.99 + 0.014 * breath, 0],
-      rot: [-0.04 * breath, 0, 0.03 * (1 + breath * 0.5)],
+      rot: [0.38 * sway, -0.12 * sway, 0.08 * Math.cos(phi)],
+    },
+    Arm_L: {
+      rot: [-0.36 * sway, -0.1 * sway, -0.06 * Math.cos(phi)],
+    },
+    Leg_R: right.leg,
+    Ankle_R: right.ankle,
+    Leg_L: left.leg,
+    Ankle_L: left.ankle,
+  };
+});
+
+// 2. Animation Idle (Au repos : respiration, regard espiègle, main levée qui invite au danger)
+const idleAnim = buildGltfAnimation('Idle', 2.4, 32, (phi) => {
+  const b = Math.sin(phi);
+  return {
+    Torso: {
+      dPos: [0, 0.0008 * b, 0],
+      rot: [0.02 * b, 0.05 * Math.sin(phi), 0.02 * Math.cos(phi)],
+      scale: [1 - 0.01 * b, 1 + 0.018 * b, 1 - 0.01 * b],
+    },
+    Head: {
+      rot: [0.025 * Math.cos(phi), 0.09 * Math.sin(phi), 0.035 * Math.sin(phi)],
+    },
+    Arm_R: {
+      rot: [0.06 * b, 0.05 * Math.cos(phi), 0.07 * b],
+    },
+    Arm_L: {
+      rot: [-0.03 * b, 0, -0.03 * b],
     },
   };
 });
 
-// 2. Animation Provocation (Taunt) : rebond espiègle, bras levés, rire narquois
-const taunt = sampleClip('Taunt', 2.0, 32, (phi) => {
+// 3. Animation Taunt (Provocation : « Tu remets à demain ? Moi, je reste ! »)
+const tauntAnim = buildGltfAnimation('Taunt', 2.0, 32, (phi) => {
   const hop = Math.abs(Math.sin(phi * 2));
   const wave = Math.sin(phi * 2);
   return {
     Torso: {
-      pos: [0, 0.79 + 0.045 * hop, 0],
-      rot: [-0.06 * hop, 0.14 * Math.sin(phi), 0.05 * wave],
-    },
-    Body: {
-      scale: [0.39 * (1 + 0.025 * hop), 0.39 * (1 - 0.02 * Math.cos(phi * 2)), 0.29],
+      dPos: [0, 0.0028 * hop, 0],
+      rot: [-0.05 * hop, 0.14 * Math.sin(phi), 0.055 * wave],
+      scale: [1 + 0.02 * hop, 1 - 0.018 * Math.cos(phi * 2), 1],
     },
     Head: {
-      pos: [0, 1.43 + 0.05 * hop, 0.02 * hop],
-      rot: [-0.08 * hop, -0.22 * Math.sin(phi), 0.08 * wave],
+      rot: [-0.06 * hop, -0.18 * Math.sin(phi), 0.08 * wave],
     },
     Arm_R: {
-      pos: [0.32, 1.01 + 0.04 * hop, 0.02],
-      rot: [-0.45 + 0.18 * wave, -0.15, 0.68 + 0.22 * Math.sin(phi * 2)],
+      rot: [-0.18 + 0.22 * wave, 0.14 * Math.sin(phi), 0.18 * Math.sin(phi * 2)],
     },
     Arm_L: {
-      pos: [-0.32, 1.0 + 0.04 * hop, 0.02],
-      rot: [-0.28 - 0.15 * wave, 0.12, -0.35 - 0.15 * Math.cos(phi * 2)],
-    },
-    Leg_L: {
-      pos: [-0.21, 0.48 + 0.02 * hop, 0],
-      rot: [-0.08 * hop, 0, -0.04 * hop],
+      rot: [0.1 * wave, 0, -0.08 * hop],
     },
     Leg_R: {
-      pos: [0.21, 0.48 + 0.02 * hop, 0],
-      rot: [-0.08 * hop, 0, 0.04 * hop],
+      dPos: [0, 0.0018 * hop, 0],
+      rot: [-0.1 * hop, 0, -0.04 * hop],
+    },
+    Leg_L: {
+      dPos: [0, 0.0018 * hop, 0],
+      rot: [-0.1 * hop, 0, 0.04 * hop],
     },
   };
 });
 
-// 3. Animation Marche (Walk) : cycle de marche complet articulé (foulée, levé de pied, déroulé de cheville,
-// rebond double-fréquence, dandinement du bassin/torse, balancement croisé des bras et suivi de la tête)
-function legWalkTracks(phase, side) {
-  const swing = Math.sin(phase); // > 0 : jambe vers l'avant (+Z), < 0 : jambe vers l'arrière (-Z)
-  const pass = Math.cos(phase); // > 0 : phase d'oscillation (pied levé qui passe devant)
-  const lift = Math.max(0, pass);
-  const stance = Math.max(0, -pass);
+json.animations = [idleAnim, tauntAnim, walkAnim];
+json.buffers[0].byteLength = currentByteOffset;
 
-  // Rotation de la hanche : négatif = jambe projetée vers l'avant (+Z)
-  const hipRx = -0.62 * swing + 0.06 * lift;
-  const hipRy = -side * 0.07 * swing;
-  const hipRz = side * (0.03 + 0.04 * lift);
+// Assemblage du nouveau fichier GLB binaire (JSON + BIN alignés sur 4 octets)
+let jsonStr = JSON.stringify(json);
+const jsonPad = (4 - (Buffer.byteLength(jsonStr, 'utf8') % 4)) % 4;
+jsonStr += ' '.repeat(jsonPad);
+const jsonBuf = Buffer.from(jsonStr, 'utf8');
 
-  // Déroulé de la cheville : attaque du talon en fin d'oscillation, poussée des orteils en fin d'appui
-  const ankleRx = -0.22 * lift + 0.28 * Math.max(0, -swing) * stance - 0.12 * Math.max(0, swing);
-  const ankleRz = -side * 0.03 * lift;
-
-  return {
-    leg: {
-      pos: [side * (0.21 + 0.01 * lift), 0.48 + 0.075 * lift - 0.015 * stance, 0.04 * swing],
-      rot: [hipRx, hipRy, hipRz],
-    },
-    ankle: {
-      pos: [side * 0.035, -0.26 + 0.015 * lift, 0.02],
-      rot: [ankleRx, 0, ankleRz],
-    },
-  };
+const binPad = (4 - (currentByteOffset % 4)) % 4;
+if (binPad > 0) {
+  extraChunks.push(Buffer.alloc(binPad));
+  currentByteOffset += binPad;
 }
+const finalBinBuf = Buffer.concat([origBin, ...extraChunks]);
 
-const walk = sampleClip('Walk', 0.92, 36, (phi) => {
-  const left = legWalkTracks(phi, -1);
-  const right = legWalkTracks(phi + Math.PI, 1);
+const totalLength = 12 + 8 + jsonBuf.byteLength + 8 + finalBinBuf.byteLength;
+const header = Buffer.alloc(12);
+header.writeUInt32LE(0x46546c67, 0); // 'glTF'
+header.writeUInt32LE(2, 4);
+header.writeUInt32LE(totalLength, 8);
 
-  // Rebond vertical à chaque pas (2 pas par cycle)
-  const bounce = Math.cos(2 * phi);
-  const bounceLag = Math.cos(2 * phi - 0.35);
-  const sway = Math.sin(phi); // Transfert de poids gauche/droite
+const jsonHeader = Buffer.alloc(8);
+jsonHeader.writeUInt32LE(jsonBuf.byteLength, 0);
+jsonHeader.writeUInt32LE(0x4e4f534a, 4); // 'JSON'
 
-  return {
-    Torso: {
-      pos: [0.022 * sway, 0.79 + 0.038 * bounce, 0.015 * Math.sin(2 * phi)],
-      rot: [0.085 + 0.025 * Math.sin(2 * phi), -0.13 * sway, -0.075 * sway],
-    },
-    Body: {
-      scale: [0.39 * (1 - 0.016 * bounce), 0.39 * (1 + 0.026 * bounce), 0.29 * (1 - 0.014 * bounce)],
-    },
-    Head: {
-      pos: [0.018 * sway, 1.43 + 0.044 * bounceLag, 0.03 + 0.012 * Math.sin(2 * phi)],
-      rot: [0.03 + 0.035 * Math.sin(2 * phi - 0.4), 0.085 * Math.sin(phi - 0.25), 0.055 * Math.sin(phi - 0.2)],
-    },
-    // Balancement croisé des bras : bras droit avance quand jambe gauche avance (sin(phi) > 0 => rx < 0)
-    Arm_L: {
-      pos: [-0.32 + 0.015 * sway, 0.99 + 0.034 * bounce - 0.018 * sway, -0.025 * sway],
-      rot: [0.54 * sway - 0.08, -0.14 * sway, -0.07 - 0.04 * Math.cos(phi)],
-    },
-    Arm_R: {
-      pos: [0.32 + 0.015 * sway, 0.99 + 0.034 * bounce + 0.018 * sway, 0.025 * sway],
-      rot: [-0.54 * sway - 0.08, -0.14 * sway, 0.07 + 0.04 * Math.cos(phi)],
-    },
-    Leg_L: left.leg,
-    Ankle_L: left.ankle,
-    Leg_R: right.leg,
-    Ankle_R: right.ankle,
-  };
-});
+const binHeader = Buffer.alloc(8);
+binHeader.writeUInt32LE(finalBinBuf.byteLength, 0);
+binHeader.writeUInt32LE(0x004e4942, 4); // 'BIN\0'
 
-const binary = await new GLTFExporter().parseAsync(root, { binary: true, animations: [idle, taunt, walk] });
+const glbOut = Buffer.concat([header, jsonHeader, jsonBuf, binHeader, finalBinBuf]);
 
 for (const dir of ['personnages/riskick', 'public/models/personnages/riskick', 'public/models/riskick']) {
   await mkdir(dir, { recursive: true });
-  await writeFile(`${dir}/riskick-v1.glb`, Buffer.from(binary));
+  await writeFile(`${dir}/riskick-v1.glb`, glbOut);
 }
 
-// Keep the standalone viewer usable in both development and exported builds.
 for (const baseDir of ['public/models/personnages/riskick/viewer', 'public/models/riskick/viewer']) {
   for (const part of ['controls', 'loaders', 'utils']) await mkdir(`${baseDir}/${part}`, { recursive: true });
   for (const [source, target] of [
@@ -405,29 +501,17 @@ for (const baseDir of ['public/models/personnages/riskick/viewer', 'public/model
   }
 }
 
-const loaded = await new GLTFLoader().parseAsync(binary, '');
-if (loaded.animations.some((clip) => !clip.tracks.length)) throw new Error('Animation vide');
-const mixer = new T.AnimationMixer(loaded.scene);
-for (const clip of loaded.animations) {
-  mixer.stopAllAction();
-  mixer.clipAction(clip).play();
-  mixer.update(0.25);
-}
-let meshes = 0;
-let triangles = 0;
-loaded.scene.traverse((o) => {
-  if (o.isMesh) {
-    meshes++;
-    triangles += (o.geometry.index?.count ?? o.geometry.attributes.position.count) / 3;
-  }
-});
 console.log(
   JSON.stringify({
-    character: 'Riskick',
-    bytes: binary.byteLength,
-    meshes,
-    triangles,
-    animations: loaded.animations.map((a) => ({ name: a.name, duration: Number(a.duration.toFixed(2)), tracks: a.tracks.length })),
-    bounds: new T.Box3().setFromObject(loaded.scene).getSize(new T.Vector3()).toArray().map((v) => Number(v.toFixed(3))),
+    character: 'Riskick (modèle 3D officiel Riskick-grand-10cm.glb)',
+    humanHeight: HUMAN_HEIGHT,
+    riskickHeight: Number(TARGET_HEIGHT.toFixed(4)),
+    ratio: '1/3',
+    scaleFactor: Number(S.toFixed(4)),
+    vertices: vertexCount,
+    triangles: indexCount / 3,
+    bones: BONES.map((b) => b.name),
+    animations: json.animations.map((a) => ({ name: a.name, channels: a.channels.length })),
+    bytes: glbOut.byteLength,
   })
 );

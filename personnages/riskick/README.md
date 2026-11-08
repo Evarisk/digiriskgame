@@ -1,26 +1,31 @@
 # 1. Riskick — L'incarnation du danger
 
-**Riskick** est le premier personnage du jeu DigiRiskGame : une créature orange espiègle qui incarne le danger et les risques professionnels non maîtrisés.
+**Riskick** est le premier personnage du jeu DigiRiskGame : une créature espiègle qui incarne le danger et les risques professionnels non maîtrisés (« *Tu remets à demain ? Moi, je reste !* »).
 
-## Identité visuelle
+## Échelle dans le jeu (1/3 d'un humain / Guy)
 
-- **Silhouette** : Corps trapu orange vif (`#ed501b`), badge triangulaire d'alerte jaune (`#ffbb08`) riveté sur la poitrine avec point d'exclamation (`!`).
-- **Tête** : Sourire narquois à sept dents sculptées, yeux jaunes en amande sous d'épais sourcils froncés, cornes recourbées rayées noir et jaune de signalisation, pointes latérales et crête sur le sommet du crâne.
-- **Membres** : Bras dotés de gants sombres à trois doigts et pouce ; jambes articulées aux hanches (`Leg_L`, `Leg_R`) et aux chevilles (`Ankle_L`, `Ankle_R`).
+- **Taille d'un humain / Le Préventeur Guy** : **1,75 m**
+- **Taille de Riskick (1/3)** : **0,583 m** (`58,3 cm`, soit un facteur `×5,8333` appliqué au modèle original de 10 cm `Riskick-grand-10cm.glb`).
+
+## Modèle 3D et planches de référence
+
+Le modèle 3D provient directement de [`Riskick-grand-10cm.glb`](./Riskick-grand-10cm.glb) (306 686 sommets, 577 290 triangles, 3 textures PBR intégrées : couleur, rugosité/métal, normales), équipé d'une armature squelettique glTF 2.0 (`RiskickArmature` : `Root`, `Torso`, `Head`, `Arm_R`, `Arm_L`, `Leg_R`, `Ankle_R`, `Leg_L`, `Ankle_L`) avec lissage Laplacien des poids sur le maillage.
+
+### Planches visuelles incluses dans le dossier
+- [`Riskick-face-profil.png`](./Riskick-face-profil.png) : Vue de face et de profil.
+- [`Riskick-grand-10cm.png`](./Riskick-grand-10cm.png) : Visuel principal « *Tu remets à demain ? Moi, je reste !* ».
+- [`riskick.jpg`](./riskick.jpg) : Postures clés (*Au repos*, *Danger ignoré*, *Repéré !*, *Danger supprimé*, *Contrarié*).
+- [`riskick-2.png`](./riskick-2.png) : Nouvelles postures (*En marche*, *En course*, *À l'affût*, *Caché*, *Victoire*, *Provocation*, *En fuite*, *Déséquilibre*).
 
 ## Animations embarquées (`riskick-v1.glb`)
 
-1. **`Idle` (Au repos — 2,4 s)** : Respiration du torse (compression/extension), léger balancement des bras et regard narquois de gauche à droite.
-2. **`Taunt` (Provocation — 2,0 s)** : Petits sauts sur place, bras levés menaçants et hochements de tête.
-3. **`Walk` (Marche — 0,92 s)** : Cycle de marche complet à 36 clés :
-   - **Foulée et levé de pied** : flexion/extension des hanches (`Leg_L`, `Leg_R`), levé vertical pendant la phase d'oscillation et déroulé complet de la cheville (`Ankle_L`, `Ankle_R` : attaque du talon, appui, poussée des orteils).
-   - **Bassin et torse (`Torso`, `Body`)** : rebond vertical à double fréquence (2 pas par cycle), transfert de poids gauche/droite (dandinement), contre-rotation des épaules et légère inclinaison vers l'avant.
-   - **Bras (`Arm_L`, `Arm_R`)** : balancement croisé en opposition avec les jambes.
-   - **Tête (`Head`)** : suivi du rebond avec léger déphasage et stabilisation du regard.
+1. **`Walk` (Marche — 0,88 s)** : Cycle de marche complet articulé sur le modèle 3D texturé (flexion/extension des hanches `Leg_L`/`Leg_R`, levé de pied, déroulé des chevilles `Ankle_L`/`Ankle_R`, rebond et dandinement du torse `Torso`, balancement des bras `Arm_L`/`Arm_R` et suivi de la tête `Head`).
+2. **`Idle` (Au repos — 2,4 s)** : Respiration, regard espiègle et mouvement de la main levée.
+3. **`Taunt` (Provocation — 2,0 s)** : Petits sauts et provocation.
 
 ## Fichiers du dossier
 
-- [`create-riskick.mjs`](./create-riskick.mjs) : Générateur procédural Three.js du modèle et des animations.
-- [`riskick-v1.glb`](./riskick-v1.glb) : Modèle 3D binaire glTF 2.0 avec ses 3 clips d'animation.
-- [`viewer.html`](./viewer.html) : Gabarit de la visionneuse 3D (avec mode marche **En ronde**, **Sur place**, ou déplacement au clic sur le plateau).
-- [`riskick.html`](./riskick.html) : Visionneuse 3D autonome (ouvrable directement en double-cliquant sur le fichier ou via `/riskick.html`).
+- [`Riskick-grand-10cm.glb`](./Riskick-grand-10cm.glb) : Modèle 3D haute résolution source (10 cm).
+- [`create-riskick.mjs`](./create-riskick.mjs) : Script de mise à l'échelle `1/3` (0,583 m), rigging squelettique (`JOINTS_0` / `WEIGHTS_0`) et génération des animations.
+- [`riskick-v1.glb`](./riskick-v1.glb) : Modèle 3D final à l'échelle `1/3` avec squelette et animations.
+- [`viewer.html`](./viewer.html) & [`riskick.html`](./riskick.html) : Visionneuse 3D interactive (avec modes **En ronde**, **Sur place**, clic au sol pour marcher, et bouton **Repère taille Guy ×3**).

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Riskick — personnage 3D</title>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Riskick — personnage 3D (échelle 1/3)</title>
 <style>
 body{margin:0;background:#f7eddf;color:#233149;font:16px system-ui;overflow:hidden}
 canvas{display:block;width:100%;height:100vh}
@@ -16,21 +16,35 @@ button.secondary[aria-pressed=true]{background:#0f766e}
 #status{position:absolute;top:110px;left:28px}
 </style>
 <script type="importmap">{"imports":{"three":"./models/personnages/riskick/viewer/three.module.js","three/addons/":"./models/personnages/riskick/viewer/"}}</script></head>
-<body><header><h1>RISKICK</h1><p>Le danger prend vie · Personnage 1 (Méchant)</p><p>Glissez pour tourner · Molette pour zoomer · Cliquez au sol en mode Marche</p><a href="./preventeur-guy.html">Voir Personnage 2 : Le Préventeur Guy →</a></header><div id="status">Chargement…</div><footer><button data-clip="Idle" aria-pressed="false">Au repos</button><button data-clip="Taunt" aria-pressed="false">Provocation</button><button data-clip="Walk" aria-pressed="true">Marche</button><button id="roamBtn" class="secondary" aria-pressed="true">Déplacement : En ronde</button><a href="./models/personnages/riskick/riskick-v1.glb" download>Télécharger le modèle 3D</a></footer>
+<body><header><h1>RISKICK</h1><p>Modèle 3D officiel · Taille : 0,58 m (1/3 de Guy / Humain 1,75 m)</p><p>Glissez pour tourner · Molette pour zoomer · Cliquez au sol en mode Marche</p><a href="./preventeur-guy.html">Voir Personnage 2 : Le Préventeur Guy (1,75 m) →</a></header><div id="status">Chargement du modèle 3D…</div><footer><button data-clip="Idle" aria-pressed="false">Au repos</button><button data-clip="Taunt" aria-pressed="false">Provocation</button><button data-clip="Walk" aria-pressed="true">Marche</button><button id="roamBtn" class="secondary" aria-pressed="true">Déplacement : En ronde</button><button id="scaleBtn" class="secondary" aria-pressed="false">Repère taille Guy (×3)</button><a href="./models/personnages/riskick/riskick-v1.glb" download>Télécharger le modèle 3D</a></footer>
 <script type="module">
 import * as T from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 const scene=new T.Scene();scene.background=new T.Color('#f7eddf');
-const camera=new T.PerspectiveCamera(35,innerWidth/innerHeight,.1,100);camera.position.set(3,2.2,5.2);
+const camera=new T.PerspectiveCamera(35,innerWidth/innerHeight,.05,100);camera.position.set(1.15,.85,1.95);
 const renderer=new T.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.toneMapping=T.ACESFilmicToneMapping;document.body.append(renderer.domElement);
-const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(0,1.05,0);controls.minDistance=2.5;controls.maxDistance=9;controls.maxPolarAngle=Math.PI/2;controls.enableDamping=true;
+const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(0,.32,0);controls.minDistance=.7;controls.maxDistance=7;controls.maxPolarAngle=Math.PI/2;controls.enableDamping=true;
 scene.add(new T.HemisphereLight(0xffffff,0x957f68,2.5));
-const key=new T.DirectionalLight(0xffefd8,4);key.position.set(-3,5,5);key.castShadow=true;key.shadow.mapSize.set(2048,2048);scene.add(key);
-const rim=new T.DirectionalLight(0xc6deff,2);rim.position.set(3,3,-3);scene.add(rim);
-const floor=new T.Mesh(new T.CircleGeometry(3.2,64),new T.MeshStandardMaterial({color:'#eadbc6',roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=.02;floor.receiveShadow=true;scene.add(floor);
-const ring=new T.Mesh(new T.RingGeometry(1.32,1.38,64),new T.MeshBasicMaterial({color:'#d9c7ad',side:T.DoubleSide}));ring.rotation.x=-Math.PI/2;ring.position.y=.025;scene.add(ring);
-const targetMarker=new T.Mesh(new T.RingGeometry(.12,.18,32),new T.MeshBasicMaterial({color:'#c74a17',side:T.DoubleSide}));targetMarker.rotation.x=-Math.PI/2;targetMarker.position.y=.03;targetMarker.visible=false;scene.add(targetMarker);
+const key=new T.DirectionalLight(0xffefd8,4);key.position.set(-2.5,4,4);key.castShadow=true;key.shadow.mapSize.set(2048,2048);scene.add(key);
+const rim=new T.DirectionalLight(0xc6deff,2);rim.position.set(2.5,2.5,-2.5);scene.add(rim);
+const floor=new T.Mesh(new T.CircleGeometry(1.8,64),new T.MeshStandardMaterial({color:'#eadbc6',roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=0;floor.receiveShadow=true;scene.add(floor);
+const ring=new T.Mesh(new T.RingGeometry(.58,.61,64),new T.MeshBasicMaterial({color:'#d9c7ad',side:T.DoubleSide}));ring.rotation.x=-Math.PI/2;ring.position.y=.003;scene.add(ring);
+const targetMarker=new T.Mesh(new T.RingGeometry(.06,.09,32),new T.MeshBasicMaterial({color:'#c74a17',side:T.DoubleSide}));targetMarker.rotation.x=-Math.PI/2;targetMarker.position.y=.005;targetMarker.visible=false;scene.add(targetMarker);
+
+// Silhouette témoin à l'échelle de Guy / Humain (1,75 m = 3 × Riskick 0,583 m)
+const scaleRef=new T.Group();scaleRef.position.set(-.55,0,0);scaleRef.visible=false;scene.add(scaleRef);
+const refMat=new T.MeshStandardMaterial({color:'#233149',transparent:true,opacity:.24,roughness:.8});
+const addRef=(geo,y)=>{const m=new T.Mesh(geo,refMat);m.position.y=y;scaleRef.add(m);};
+addRef(new T.CylinderGeometry(.09,.07,.78,20),.39);
+addRef(new T.CylinderGeometry(.16,.14,.58,20),1.07);
+addRef(new T.SphereGeometry(.13,20,16),1.58);
+// Toise graduée 1/3 (0,583 m) et 3/3 (1,75 m)
+const pole=new T.Mesh(new T.CylinderGeometry(.006,.006,1.75,12),new T.MeshBasicMaterial({color:'#233149'}));pole.position.set(.26,.875,0);scaleRef.add(pole);
+for(const h of [1.75/3,1.75*2/3,1.75]){
+  const tick=new T.Mesh(new T.BoxGeometry(.09,.008,.008),new T.MeshBasicMaterial({color:h<0.6?'#c74a17':'#233149'}));
+  tick.position.set(.26,h,0);scaleRef.add(tick);
+}
 
 let mixer,currentAction,clips=[],actor,currentClip='Walk',roaming=true,roamAngle=0,walkTarget=null;
 function playClip(name){
@@ -40,7 +54,7 @@ function playClip(name){
   const next=mixer.clipAction(clip);
   if(currentAction&&currentAction!==next){
     next.reset().play();
-    currentAction.crossFadeTo(next,.22,true);
+    currentAction.crossFadeTo(next,.2,true);
   }else{
     next.reset().play();
   }
@@ -56,7 +70,7 @@ function playClip(name){
 new GLTFLoader().load('./models/personnages/riskick/riskick-v1.glb',g=>{
   actor=g.scene;
   scene.add(actor);
-  actor.traverse(o=>{if(o.isMesh)o.castShadow=true;});
+  actor.traverse(o=>{if(o.isMesh){o.castShadow=true;o.frustumCulled=false;}});
   mixer=new T.AnimationMixer(actor);
   clips=g.animations;
   playClip('Walk');
@@ -74,6 +88,23 @@ roamBtn.onclick=()=>{
   if(!roaming&&actor){actor.position.set(0,0,0);actor.rotation.set(0,0,0);}
 };
 
+const scaleBtn=document.querySelector('#scaleBtn');
+scaleBtn.onclick=()=>{
+  scaleRef.visible=!scaleRef.visible;
+  scaleBtn.setAttribute('aria-pressed',String(scaleRef.visible));
+  if(scaleRef.visible){
+    roaming=false;
+    roamBtn.setAttribute('aria-pressed','false');
+    roamBtn.textContent='Déplacement : Sur place';
+    if(actor){actor.position.set(0,0,0);actor.rotation.set(0,0,0);}
+    controls.target.set(-.22,.78,0);
+    camera.position.set(-.1,1.1,3.3);
+  }else{
+    controls.target.set(0,.32,0);
+    camera.position.set(1.15,.85,1.95);
+  }
+};
+
 const raycaster=new T.Raycaster(),pointer=new T.Vector2();
 let downPos=null;
 renderer.domElement.addEventListener('pointerdown',e=>{downPos=[e.clientX,e.clientY];});
@@ -82,9 +113,9 @@ renderer.domElement.addEventListener('pointerup',e=>{
   pointer.set((e.clientX/innerWidth)*2-1,-(e.clientY/innerHeight)*2+1);
   raycaster.setFromCamera(pointer,camera);
   const hit=raycaster.intersectObject(floor)[0];
-  if(hit&&hit.point.length()<2.7){
+  if(hit&&hit.point.length()<1.55){
     walkTarget=new T.Vector3(hit.point.x,0,hit.point.z);
-    targetMarker.position.set(hit.point.x,.03,hit.point.z);
+    targetMarker.position.set(hit.point.x,.005,hit.point.z);
     targetMarker.visible=true;
     if(currentClip!=='Walk')playClip('Walk');
   }
@@ -98,12 +129,12 @@ renderer.setAnimationLoop(()=>{
     if(walkTarget){
       const dx=walkTarget.x-actor.position.x,dz=walkTarget.z-actor.position.z;
       const dist=Math.hypot(dx,dz);
-      if(dist<.08){
+      if(dist<.04){
         walkTarget=null;
         targetMarker.visible=false;
         if(!roaming)playClip('Idle');
       }else{
-        const speed=1.15;
+        const speed=.65;
         actor.position.x+=(dx/dist)*Math.min(dist,speed*dt);
         actor.position.z+=(dz/dist)*Math.min(dist,speed*dt);
         const targetYaw=Math.atan2(dx,dz);
@@ -112,8 +143,8 @@ renderer.setAnimationLoop(()=>{
         actor.rotation.y+=diff*Math.min(1,dt*10);
       }
     }else if(roaming){
-      roamAngle+=dt*.85;
-      const r=1.35;
+      roamAngle+=dt*.95;
+      const r=.6;
       const nx=Math.cos(roamAngle)*r,nz=Math.sin(roamAngle)*r;
       const vx=-Math.sin(roamAngle),vz=Math.cos(roamAngle);
       actor.position.set(nx,0,nz);
